@@ -7,6 +7,8 @@ var Class = require('../util/Class'),
 		this.lexer = lexer;
 		this.look = null;
 		this.tokens = null;
+		this.lastLine = 1;
+		this.lastCol = 1;
 		this.line = 1;
 		this.col = 1;
 		this.index = 0;
@@ -49,11 +51,19 @@ var Class = require('../util/Class'),
 					return this.media();
 				case '@charset':
 					return this.charset();
+				case '@font-face':
+					return this.fontface();
+				case '@keyframes':
+					return this.kframes();
+				case '@page':
+					return this.page();
+				default:
+					this.error('unknow head rules');
 			}
 		},
 		impt: function() {
 			var node = new Node(Node.IMPORT);
-			node.add(this.match('@import'));
+			node.add(this.match());
 			node.add(this.match('url'));
 			node.add(this.match('('));
 			node.add(this.match(Token.STRING));
@@ -123,22 +133,61 @@ var Class = require('../util/Class'),
 		},
 		charset: function() {
 			var node = new Node(Node.CHARSET);
-			node.add(this.match('@charset'));
+			node.add(this.match());
 			node.add(this.match(Token.STRING));
 			node.add(this.match(';'));
 			return node;
 		},
-		styleset: function() {
+		fontface: function() {
+			var node = new Node(Node.FONTFACE);
+			node.add(this.match());
+			var node2 = new Node(Node.BLOCK);
+			node2.add(this.match('{'));
+			node2.add(this.match('font-family'));
+			node2.add(this.match(':'));
+			node2.add(this.match(Token.ID));
+			node2.add(this.match(';'));
+			node2.add(this.match('src'));
+			node2.add(this.match(':'));
+			node2.add(this.match('url'));
+			node2.add(this.match('('));
+			node2.add(this.match(Token.STRING));
+			node2.add(this.match(')'));
+			node2.add(this.match(';'));
+			node2.add(this.match('}'));
+			node.add(node2);
+			return node;
+		},
+		kframes: function() {
+			var node = new Node(Node.KEYFRAMES);
+			node.add(this.match());
+			node.add(this.match(Token.ID));
+			var node2 = new Node(Node.BLOCK);
+			node2.add(this.match('{'));
+			while(this.look && [Token.ID, Token.NUMBER].indexOf(this.look.type()) != -1) {
+				node2.add(this.styleset(true));
+			}
+			node2.add(this.match('}'));
+			node.add(node2);
+			return node;
+		},
+		page: function() {
+			var node = new Node(Node.PAGE);
+			node.add(this.match());
+			node.add(this.styleset());
+			return node;
+		},
+		styleset: function(numCanBeKey) {
 			var node = new Node(Node.STYLESET);
-			node.add(this.selector());
+			node.add(this.selector(numCanBeKey));
 			while(this.look && this.look.content() == ',') {
 				node.add(this.match());
-				node.add(this.selector());
+				node.add(this.selector(numCanBeKey));
 			}
 			node.add(this.block());
 			return node;
 		},
-		selector: function() {
+		selector: function(numCanBeKey) {
 			var node = new Node(Node.SELECTOR);
 			if(!this.look) {
 				this.error();
@@ -146,7 +195,10 @@ var Class = require('../util/Class'),
 			if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
 				node.add(this.match());
 			}
-			else if(['*', '>', '~'].indexOf(this.look.content()) != -1) {
+			else if(['*', '>', '~', ':'].indexOf(this.look.content()) != -1) {
+				node.add(this.match());
+			}
+			else if(numCanBeKey && this.look.type() == Token.NUMBER) {
 				node.add(this.match());
 			}
 			else {
@@ -156,7 +208,7 @@ var Class = require('../util/Class'),
 				if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
 					node.add(this.match());
 				}
-				else if(['*', '>', '~'].indexOf(this.look.content()) != -1) {
+				else if(['*', '>', '~', ':'].indexOf(this.look.content()) != -1) {
 					node.add(this.match());
 				}
 				else {
@@ -277,16 +329,18 @@ var Class = require('../util/Class'),
 		},
 		error: function(msg) {
 			msg = 'SyntaxError: ' + (msg || ' syntax error');
-			throw new Error(msg + ' line ' + this.line + ' col ' + this.col);
+			throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
 		},
 		move: function() {
+			this.lastLine = this.line;
+			this.lastCol = this.col;
 			do {
 				this.look = this.tokens[this.index++];
 				if(!this.look) {
 					return;
 				}
 				//´æÏÂºöÂÔµÄtoken
-				if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1) {
+				if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT, Token.IGNORE].indexOf(this.look.type()) != -1) {
 					this.ignores[this.index - 1] = this.look;
 				}
 				if(this.look.type() == Token.LINE) {
@@ -295,7 +349,16 @@ var Class = require('../util/Class'),
 				}
 				else if(this.look.type() == Token.COMMENT) {
 					var s = this.look.content(),
-						n = character.count(this.look.content(), character.LINE);
+						n = character.count(s, character.LINE);
+					if(n > 0) {
+						this.line += n;
+						var i = s.lastIndexOf(character.LINE);
+						this.col += s.length - i - 1;
+					}
+				}
+				else if(this.look.type() == Token.IGNORE) {
+					var s = this.look.content(),
+						n = character.count(s, character.LINE);
 					if(n > 0) {
 						this.line += n;
 						var i = s.lastIndexOf(character.LINE);

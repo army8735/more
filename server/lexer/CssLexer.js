@@ -80,12 +80,12 @@ var Lexer = require('./Lexer'),
 								this.parenthese = true;
 							}
 						}
-						//非值状态的属性忽略
+						//非值状态的属性被当作id
 						if(token.type() == Token.PROPERTY && !this.isValue) {
-							break;
+							token.type(Token.ID);
 						}
 						//非值状态的数字被当作id
-						if(token.type() == Token.NUMBER && !this.isValue) {
+						if(token.type() == Token.NUMBER && !this.isValue && token.content().charAt(0) == '#') {
 							token.type(Token.ID);
 						}
 						if(token.content() == 'url') {
@@ -123,7 +123,7 @@ var Lexer = require('./Lexer'),
 				if(j == -1) {
 					j = this.code.length;
 				}
-				var s = this.code.slice(this.index - 1, j);
+				var s = this.code.slice(this.index - 1, ++j);
 				var token = new Token(Token.IGNORE, s);
 				temp.push(token);
 				this.tokenList.push(token);
@@ -139,6 +139,17 @@ var Lexer = require('./Lexer'),
 				temp.push(token);
 				this.tokenList.push(token);
 				this.index = this.code.length;
+				var n = character.count(token.val(), character.LINE);
+				if(n > 0) {
+					var i = token.content().indexOf(character.LINE),
+						j = token.content().lastIndexOf(character.LINE);
+					this.colMax = Math.max(this.colMax, this.colNum + i);
+					this.colNum = match.content().length - j;
+				}
+				else {
+					this.colNum += token.content().length;
+				}
+				this.colMax = Math.max(this.colMax, this.colNum);
 				return;
 			}
 			var s = this.code.slice(this.index - 1, k),
@@ -152,6 +163,17 @@ var Lexer = require('./Lexer'),
 			this.tokenList.push(token);
 			this.index += s.length - 1;
 			this.parenthese = false;
+			var n = character.count(token.val(), character.LINE);
+			if(n > 0) {
+				var i = token.content().indexOf(character.LINE),
+					j = token.content().lastIndexOf(character.LINE);
+				this.colMax = Math.max(this.colMax, this.colNum + i);
+				this.colNum = match.content().length - j;
+			}
+			else {
+				this.colNum += token.content().length;
+			}
+			this.colMax = Math.max(this.colMax, this.colNum);
 		}
 	});
 module.exports = CssLexer;

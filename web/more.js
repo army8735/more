@@ -27,7 +27,7 @@ define(function(require, exports) {
 			if(window.console) {
 				console.warn(e);
 			}
-			node = parser.result();
+			return e.toString();
 		}
 		init();
 		join(node, ignore);console.log(node)

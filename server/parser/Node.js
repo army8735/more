@@ -48,6 +48,9 @@ var Class = require('../util/Class'),
 		STYLE: 'style',
 		SELECTOR: 'selector',
 		KEY: 'key',
-		VALUE: 'value'
+		VALUE: 'value',
+		FONTFACE: 'fontface',
+		KEYFRAMES: 'kframes',
+		PAGE: 'page'
 	});
 module.exports = Node;

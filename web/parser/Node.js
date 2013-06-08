@@ -49,7 +49,10 @@ define(function(require, exports, module) {
 			STYLE: 'style',
 			SELECTOR: 'selector',
 			KEY: 'key',
-			VALUE: 'value'
+			VALUE: 'value',
+			FONTFACE: 'fontface',
+			KEYFRAMES: 'kframes',
+			PAGE: 'page'
 		});
 	module.exports = Node;
 });
