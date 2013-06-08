@@ -74,7 +74,7 @@ define(function(require, exports, module) {
 								if(token.content() == ':') {
 									this.isValue = true;
 								}
-								else if(token.content() == ';' || token.content == '}' || token.content == '{') {
+								else if(token.content() == ';' || token.content() == '}' || token.content() == '{') {
 									this.isValue = false;
 								}
 								else if(token.content() == '(' && this.isUrl) {
