@@ -180,12 +180,17 @@ define(function(require, exports, module) {
 			},
 			styleset: function(numCanBeKey) {
 				var node = new Node(Node.STYLESET);
+				node.add(this.selectors(numCanBeKey));
+				node.add(this.block());
+				return node;
+			},
+			selectors: function(numCanBeKey) {
+				var node = new Node(Node.SELECTORS);
 				node.add(this.selector(numCanBeKey));
 				while(this.look && this.look.content() == ',') {
 					node.add(this.match());
 					node.add(this.selector(numCanBeKey));
 				}
-				node.add(this.block());
 				return node;
 			},
 			selector: function(numCanBeKey) {

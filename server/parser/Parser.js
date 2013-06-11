@@ -179,12 +179,17 @@ var Class = require('../util/Class'),
 		},
 		styleset: function(numCanBeKey) {
 			var node = new Node(Node.STYLESET);
+			node.add(this.selectors(numCanBeKey));
+			node.add(this.block());
+			return node;
+		},
+		selectors: function(numCanBeKey) {
+			var node = new Node(Node.SELECTORS);
 			node.add(this.selector(numCanBeKey));
 			while(this.look && this.look.content() == ',') {
 				node.add(this.match());
 				node.add(this.selector(numCanBeKey));
 			}
-			node.add(this.block());
 			return node;
 		},
 		selector: function(numCanBeKey) {
@@ -221,7 +226,7 @@ var Class = require('../util/Class'),
 			var node = new Node(Node.BLOCK);
 			node.add(this.match('{'));
 			while(this.look) {
-				if(this.look.type() == Token.ID) {
+				if(this.look.type() == Token.ID || ['*', '>', '~', ':'].indexOf(this.look.content()) != -1) {
 					node.add(this.styleset());
 				}
 				else if(this.look.type() == Token.KEYWORD) {

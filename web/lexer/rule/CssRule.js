@@ -31,7 +31,7 @@ define(function(require, exports, module) {
 
 			self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+[a-z%]*/i));
 
-			['{', '}', ',', ';', '::', ':', '-', '(', ')', '>', '+', '/', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '~'].forEach(function(o) {
+			['{', '}', ',', ';', '::', ':', '-', '(', ')', '>', '+', '/', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '~', '*'].forEach(function(o) {
 				self.addMatch(new CompleteEqual(Token.SIGN, o));
 			});
 			self.addMatch(new RegMatch(Token.HEAD, /^@[\w-]+/));

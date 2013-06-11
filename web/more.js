@@ -25,20 +25,14 @@ define(function(require, exports) {
 		}
 		stack = [];
 	}
-	function join(node, ignore, inHead) {
+	function join(node, ignore, inHead, isSelector) {
 		var isToken = node.name() == Node.TOKEN,
 			isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 		if(isToken) {
 			if(!isVirtual) {
 				var token = node.token();
-				//忽略的token
-				if(['var', '...', 'static'].indexOf(token.content()) == -1) {
-					if(token.content() == 'let' || token.content() == 'const') {
-						res += 'var';
-					}
-					else {
-						res += token.content();
-					}
+				if(!isSelector && ['{', '}'].indexOf(token.content()) == -1 || inHead) {
+					res += token.content();
 				}
 				while(ignore[++index]) {
 					var ig = ignore[index];
@@ -59,26 +53,62 @@ define(function(require, exports) {
 			if(node.name() == Node.STYLESET && !inHead) {
 				layer(true, node);
 			}
+			isSelector = (node.name() == Node.SELECTOR || node.name() == Node.SELECTORS);
 			//递归子节点
 			node.leaves().forEach(function(leaf, i) {
-				join(leaf, ignore, inHead);
+				join(leaf, ignore, inHead, isSelector);
 			});
 			if(node.name() == Node.STYLESET & !inHead) {
 				layer(false, node);
 			}
 		}
 	}
-	function layer(startOrEnd, node) {
-		if(startOrEnd) {
-			var selector = node.leaves()[0];
-			var s = '';
-			var i = index;
-			selector.leaves().forEach(function(o) {
-				var token = o.leaves();
-				s += token.content();
-			});console.log(s)
+	function concatSt(i, s, arr) {
+		if(i == stack.length) {
+			arr.push(s);
 		}
 		else {
+			for(var j = 0, se = stack[i], len = se.length; j < len; j++) {
+				var ns = s + (s.length ? ' ' : '') + se[j];
+				concatSt(i + 1, ns, arr);
+			}
+		}
+		return arr;
+	}
+	function layer(startOrEnd, node) {
+		if(startOrEnd) {
+			//先结束上级block
+			if(stack.length) {
+				res += '}';
+			}
+			var selectors = node.leaves()[0];
+			var i = index;
+			var temp = [];
+			stack.push(temp);
+			selectors.leaves().forEach(function(selector, i) {
+				if(i % 2 == 0) {
+					var s;
+					selector.leaves().forEach(function(o, j) {
+						var token = o.leaves();
+						if(j == 0) {
+							s = token.content();
+						}
+						else {
+							s += ' ' + token.content();
+						}
+					});
+					temp.push(s);
+				}
+			});
+			//将上级选择器拼接起来
+			var concat = concatSt(0, '', []);console.log(concat)
+			res += concat.join(', ') + '{';
+		}
+		else {
+			stack.pop();
+			if(!stack.length) {
+				res += '}';
+			}
 		}
 	}
 

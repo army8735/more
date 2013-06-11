@@ -47,6 +47,7 @@ define(function(require, exports, module) {
 			BLOCK: 'block',
 			STYLESET: 'styleset',
 			STYLE: 'style',
+			SELECTORS: 'selectors',
 			SELECTOR: 'selector',
 			KEY: 'key',
 			VALUE: 'value',
