@@ -25,22 +25,39 @@ define(function(require, exports) {
 		}
 		stack = [];
 	}
-	function join(node, ignore, inHead, isSelector) {
+	function join(node, ignore, inHead, isSelectors, isSelector) {
 		var isToken = node.name() == Node.TOKEN,
 			isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 		if(isToken) {
 			if(!isVirtual) {
 				var token = node.token();
-				if(!isSelector && ['{', '}'].indexOf(token.content()) == -1 || inHead) {
+				if(inHead) {
 					res += token.content();
+				}
+				else if(isSelectors || isSelector) {
+					var temp = stack[stack.length - 1];
+					if(isSelectors) {
+						temp.push('');
+					}
+					else {
+						temp[temp.length - 1] += token.content();
+					}
+				}
+				else {
+					res += token.content();
+				}
+				if(!isSelector && ['{', '}'].indexOf(token.content()) == -1 || inHead) {
+					//res += token.content();
 				}
 				while(ignore[++index]) {
 					var ig = ignore[index];
-					if(ig.type() == Token.IGNORE) {
-						res += ig.content().replace(/\S/g, ' ');
+					var s = ig.type() == Token.IGNORE ? ig.content().replace(/\S/g, ' ') : ig.content();
+					if(!inHead && (isSelectors || isSelector)) {
+						var temp = stack[stack.length - 1];
+						temp[temp.length - 1] += s;
 					}
 					else {
-						res += ig.content();
+						res += s;
 					}
 				}
 			}
@@ -51,15 +68,22 @@ define(function(require, exports) {
 			}
 			//将层级拆开
 			if(node.name() == Node.STYLESET && !inHead) {
-				layer(true, node);
+				styleset(true, node);
 			}
-			isSelector = (node.name() == Node.SELECTOR || node.name() == Node.SELECTORS);
+			else if(node.name() == Node.BLOCK && !inHead) {
+				block(true, node);
+			}
+			isSelectors = node.name() == Node.SELECTORS;
+			isSelector = node.name() == Node.SELECTOR;
 			//递归子节点
 			node.leaves().forEach(function(leaf, i) {
-				join(leaf, ignore, inHead, isSelector);
+				join(leaf, ignore, inHead, isSelectors, isSelector);
 			});
 			if(node.name() == Node.STYLESET & !inHead) {
-				layer(false, node);
+				styleset(false, node);
+			}
+			else if(node.name() == Node.BLOCK && !inHead) {
+				block(false, node);
 			}
 		}
 	}
@@ -69,46 +93,32 @@ define(function(require, exports) {
 		}
 		else {
 			for(var j = 0, se = stack[i], len = se.length; j < len; j++) {
-				var ns = s + (s.length ? ' ' : '') + se[j];
+				var ns = s + (s.length && !/.*\s$/.test(s) ? ' ' : '') + se[j];
 				concatSt(i + 1, ns, arr);
 			}
 		}
 		return arr;
 	}
-	function layer(startOrEnd, node) {
+	function styleset(startOrEnd, node) {
 		if(startOrEnd) {
-			//先结束上级block
+			//二级等以上选择器先结束上级block
 			if(stack.length) {
 				res += '}';
 			}
-			var selectors = node.leaves()[0];
-			var i = index;
-			var temp = [];
-			stack.push(temp);
-			selectors.leaves().forEach(function(selector, i) {
-				if(i % 2 == 0) {
-					var s;
-					selector.leaves().forEach(function(o, j) {
-						var token = o.leaves();
-						if(j == 0) {
-							s = token.content();
-						}
-						else {
-							s += ' ' + token.content();
-						}
-					});
-					temp.push(s);
-				}
-			});
-			//将上级选择器拼接起来
-			var concat = concatSt(0, '', []);console.log(concat)
-			res += concat.join(', ') + '{';
+			stack.push(['']);
 		}
 		else {
 			stack.pop();
-			if(!stack.length) {
-				res += '}';
+			if(stack.length) {
+				res += concatSt(0, '', []).join(',') + '{';
 			}
+		}
+	}
+	function block(startOrEnd, node) {
+		if(startOrEnd) {
+			res += concatSt(0, '', []).join(',');
+		}
+		else {
 		}
 	}
 
