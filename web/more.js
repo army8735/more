@@ -46,9 +46,6 @@ define(function(require, exports) {
 				else {
 					res += token.content();
 				}
-				if(!isSelector && ['{', '}'].indexOf(token.content()) == -1 || inHead) {
-					//res += token.content();
-				}
 				while(ignore[++index]) {
 					var ig = ignore[index];
 					var s = ig.type() == Token.IGNORE ? ig.content().replace(/\S/g, ' ') : ig.content();
@@ -87,14 +84,14 @@ define(function(require, exports) {
 			}
 		}
 	}
-	function concatSt(i, s, arr) {
+	function concatSt(i, s, arr, needTrim) {
 		if(i == stack.length) {
 			arr.push(s);
 		}
 		else {
 			for(var j = 0, se = stack[i], len = se.length; j < len; j++) {
-				var ns = s + (s.length && !/.*\s$/.test(s) ? ' ' : '') + se[j];
-				concatSt(i + 1, ns, arr);
+				var ns = s + (s.length && !/.*\s$/.test(s) ? ' ' : '') + (needTrim ? se[j].trim() : se[j]);
+				concatSt(i + 1, ns, arr, needTrim);
 			}
 		}
 		return arr;
@@ -110,13 +107,13 @@ define(function(require, exports) {
 		else {
 			stack.pop();
 			if(stack.length) {
-				res += concatSt(0, '', []).join(',') + '{';
+				res += concatSt(0, '', [], true).join(',') + '{';
 			}
 		}
 	}
 	function block(startOrEnd, node) {
 		if(startOrEnd) {
-			res += concatSt(0, '', []).join(',');
+			res += concatSt(0, '', [], stack.length > 1).join(',');
 		}
 		else {
 		}
@@ -137,7 +134,7 @@ define(function(require, exports) {
 			return e.toString();
 		}
 		init(ignore);
-		join(node, ignore);console.log(node);
+		join(node, ignore);
 		return character.escapeHTML(res);
 	};
 	exports.tree = function() {
