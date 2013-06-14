@@ -286,6 +286,28 @@ define(function(require, exports, module) {
 					}
 				}
 				switch(kw) {
+					case 'background-attachment':
+						node.add(this.match(['fixed', 'local', 'scroll']));
+						while(this.look && this.look.content() == ',') {
+							node.add(this.match());
+							node.add(this.match(['fixed', 'local', 'scroll']));
+						}
+					break;
+					case 'background-clip':
+						node.add(this.match(['border-box', 'padding-box', 'content-box', 'text']));
+						while(this.look && this.look.content() == ',') {
+							node.add(this.match());
+							node.add(this.match(['border-box', 'padding-box', 'content-box', 'text']));
+						}
+					break;
+					case 'background-color':
+						if(this.look.content() == 'transparent' || this.look.type() == Token.NUMBER) {
+							node.add(this.match());
+						}
+						else {
+							node.add(this.color());
+						}
+					break;
 					default:
 						if(this.look.type() == Token.ID) {
 							node.add(this.match());
@@ -325,6 +347,41 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
+			color: function() {
+				var arr = [];
+				if(!this.look) {
+					this.error();
+				}
+				switch(this.look.content().toLowerCase()) {
+					case 'rgb':
+					case 'hsl':
+						arr.push(this.match());
+						arr.push(this.match('('));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(','));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(','));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(')'));
+					break;
+					case 'rgba':
+					case 'hsla':
+						arr.push(this.match());
+						arr.push(this.match('('));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(','));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(','));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(','));
+						arr.push(this.match(Token.NUMBER));
+						arr.push(this.match(')'));
+					break;
+					default:
+						this.error();
+				}
+				return arr;
+			},
 			match: function(type, msg) {
 				//未定义为所有
 				if(character.isUndefined(type)) {
@@ -336,6 +393,25 @@ define(function(require, exports, module) {
 					else {
 						this.error('syntax error' + (msg || ''));
 					}
+				}
+				//数组为其中一个即可
+				else if(Array.isArray(type)) {
+					if(this.look) {
+						for(var i = 0, len = type.length; i < len; i++) {
+							var t = type[i];
+							if(typeof t == 'string' && this.look.content() == t) {
+								var l = this.look;
+								this.move();
+								return new Node(Node.TOKEN, l);
+							}
+							else if(typeof t == 'number' && this.look.type() == t) {
+								var l = this.look;
+								this.move();
+								return new Node(Node.TOKEN, l);
+							}
+						}
+					}
+					this.error('missing ' + type.join('|') + (msg || ''));
 				}
 				//或者根据token的type或者content匹配
 				else if(typeof type == 'string') {

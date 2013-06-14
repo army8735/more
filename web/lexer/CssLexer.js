@@ -60,7 +60,10 @@ define(function(require, exports, module) {
 										else if(/!important$/.test(s)) {
 											s = s.slice(0, s.length - 10);
 										}
-										if(this.rule.values().hasOwnProperty(s)) {
+										if(this.rule.colors().hasOwnProperty(s)) {
+											token.type(Token.NUMBER);
+										}
+										else if(this.rule.values().hasOwnProperty(s)) {
 											token.type(Token.PROPERTY);
 										}
 									}
