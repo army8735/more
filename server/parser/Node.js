@@ -52,6 +52,10 @@ var Class = require('../util/Class'),
 		VALUE: 'value',
 		FONTFACE: 'fontface',
 		KEYFRAMES: 'kframes',
-		PAGE: 'page'
+		PAGE: 'page',
+		URL: 'url',
+		LINEARGRADIENT: 'lineargradient',
+		LENGTH: 'length',
+		COLOR: 'color'
 	});
 module.exports = Node;

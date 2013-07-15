@@ -64,10 +64,7 @@ var Class = require('../util/Class'),
 		impt: function() {
 			var node = new Node(Node.IMPORT);
 			node.add(this.match());
-			node.add(this.match('url'));
-			node.add(this.match('('));
-			node.add(this.match(Token.STRING));
-			node.add(this.match(')'));
+			node.add(this.url(true));
 			if(['only', 'not', 'all', 'aural', 'braille', 'handheld', 'print', 'projection', 'screen', 'tty', 'embossed', 'tv'].indexOf(this.look.content()) != -1) {
 				node.add(this.mediaQList());
 			}
@@ -164,10 +161,7 @@ var Class = require('../util/Class'),
 			key.add(this.match('src'));
 			style.add(key);
 			style.add(this.match(':'));
-			value.add(this.match('url'));
-			value.add(this.match('('));
-			value.add(this.match(Token.STRING));
-			value.add(this.match(')'));
+			value.add(this.url());
 			style.add(value);
 			style.add(this.match(';'));
 			node2.add(style);
@@ -277,8 +271,8 @@ var Class = require('../util/Class'),
 			}
 			var kw = key.leaves()[0].leaves().content().toLowerCase();
 			if(/^[\-_*].*/.test(kw)) {
-				if(/^-(webkit|moz).*/.test(kw)) {
-					kw = kw.replace(/^-(webkit|moz)/, '');
+				if(/^-(webkit|moz|o|ms)-.*/.test(kw)) {
+					kw = kw.replace(/^-(webkit|moz|o|ms)-/, '');
 				}
 				else {
 					kw = kw.slice(1);
@@ -305,6 +299,17 @@ var Class = require('../util/Class'),
 					}
 					else {
 						node.add(this.color());
+					}
+				break;
+				case 'background-image':
+					if(this.look.content() == 'none') {
+						node.add(this.match());
+					}
+					else if(this.look.content() == 'url') {
+						node.add(this.url());
+					}
+					else if(this.look.content() == 'linear-gradient') {
+						node.add(this.lineargradient());
 					}
 				break;
 				default:
@@ -344,42 +349,102 @@ var Class = require('../util/Class'),
 						}
 					}
 			}
+			if(this.look && this.look.content() == '!important') {
+				node.add(this.look);
+			}
 			return node;
 		},
 		color: function() {
-			var arr = [];
+			var node = new Node(Node.COLOR);
 			if(!this.look) {
 				this.error();
 			}
 			switch(this.look.content().toLowerCase()) {
 				case 'rgb':
 				case 'hsl':
-					arr.push(this.match());
-					arr.push(this.match('('));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(','));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(','));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(')'));
+					node.add(this.match());
+					node.add(this.match('('));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(','));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(','));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(')'));
 				break;
 				case 'rgba':
 				case 'hsla':
-					arr.push(this.match());
-					arr.push(this.match('('));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(','));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(','));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(','));
-					arr.push(this.match(Token.NUMBER));
-					arr.push(this.match(')'));
+					node.add(this.match());
+					node.add(this.match('('));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(','));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(','));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(','));
+					node.add(this.match(Token.NUMBER));
+					node.add(this.match(')'));
 				break;
 				default:
-					this.error();
+					if(this.look.type() == Token.NUMBER && /^#/.test(this.look.content())) {
+						node.add(this.match());
+					}
+					else {
+						this.error('not a color');
+					}
 			}
-			return arr;
+			return node;
+		},
+		url: function(ellipsis) {
+			if(!this.look) {
+				this.error();
+			}
+			var node = new Node(Node.URL);
+			if(ellipsis && this.look.type() == Token.STRING) {
+				if(['"', '"'].indexOf(this.look.content().charAt(0)) > -1) {
+					node.add(this.match());
+				}
+				else {
+					this.error('missing quotation');
+				}
+			}
+			else {
+				node.add(
+					this.match('url'),
+					this.match('('),
+					this.match(Token.STRING),
+					this.match(')')
+				);
+			}
+			return node;
+		},
+		lineargradient: function() {
+			var node = new Node(Node.LINEARGRADIENT);
+			node.add(this.match('linear-gradient'));
+			node.add(this.match('('));
+			if(!this.look) {
+				this.error();
+			}
+			var point = false;
+			while(['left', 'right', 'top', 'bottom'].indexOf(this.look.content()) != -1 || (this.look.type() == Token.NUMBER && /deg$/.test(this.look.content()))) {
+				node.add(this.match());
+				point = true;
+			}
+			if(point) {
+				node.add(this.match(','));
+			}
+			node.add(this.color());
+			if(this.look.type() == Token.NUMBER) {
+				node.add(this.match());
+			}
+			while(this.look && this.look.content() == ',') {
+				node.add(this.match(','));
+				node.add(this.color());
+				if(this.look.type() == Token.NUMBER) {
+					node.add(this.match());
+				}
+			}
+			node.add(this.match(')'));
+			return node;
 		},
 		match: function(type, msg) {
 			//未定义为所有
