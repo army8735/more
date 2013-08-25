@@ -25,7 +25,7 @@ define(function(require, exports) {
 		}
 		stack = [];
 	}
-	function join(node, ignore, inHead, isSelectors, isSelector) {
+	function join(node, ignore, inHead, isSelectors, isSelector, prev, next) {
 		var isToken = node.name() == Node.TOKEN,
 			isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 		if(isToken) {
@@ -65,19 +65,20 @@ define(function(require, exports) {
 			}
 			//将层级拆开
 			if(node.name() == Node.STYLESET && !inHead) {
-				styleset(true, node);
+				styleset(true, node, prev, next);
 			}
 			else if(node.name() == Node.BLOCK && !inHead) {
 				block(true, node);
 			}
 			isSelectors = node.name() == Node.SELECTORS;
 			isSelector = node.name() == Node.SELECTOR;
+			var leaves = node.leaves();
 			//递归子节点
-			node.leaves().forEach(function(leaf, i) {
-				join(leaf, ignore, inHead, isSelectors, isSelector);
+			leaves.forEach(function(leaf, i) {
+				join(leaf, ignore, inHead, isSelectors, isSelector, leaves[i - 1], leaves[i + 1]);
 			});
 			if(node.name() == Node.STYLESET & !inHead) {
-				styleset(false, node);
+				styleset(false, node, prev, next);
 			}
 			else if(node.name() == Node.BLOCK && !inHead) {
 				block(false, node);
@@ -96,17 +97,25 @@ define(function(require, exports) {
 		}
 		return arr;
 	}
-	function styleset(startOrEnd, node) {
+	function styleset(startOrEnd, node, prev, next) {
 		if(startOrEnd) {
 			//二级等以上选择器先结束上级block
 			if(stack.length) {
-				res += '}';
+				if(prev && prev.name() == Node.STYLESET) {
+				}
+				else {
+					res += '}';
+				}
 			}
 			stack.push(['']);
 		}
 		else {
 			stack.pop();
 			if(stack.length) {
+				//当多级styleset结束时下个还是styleset或}，会造成空白样式表，取消输出
+				if(next && next.name() == Node.STYLESET) {
+					return;
+				}
 				res += concatSt(0, '', [], true).join(',') + '{';
 			}
 		}
@@ -114,8 +123,6 @@ define(function(require, exports) {
 	function block(startOrEnd, node) {
 		if(startOrEnd) {
 			res += concatSt(0, '', [], stack.length > 1).join(',');
-		}
-		else {
 		}
 	}
 
