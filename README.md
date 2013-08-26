@@ -2,7 +2,7 @@
 
 The css lexer bases on jssc: https://github.com/army8735/jssc
 
-相对于less，more的命名意思是比原本的css多做了一点点，定位于普通产品简化开发位置，而非广义CSS下游框架并以此滥加功能。
+相对于less，more的命名意思是比原本的css多做了一点点，定位于普通产品简化开发位置，而非广义CSS下游框架重量级功能。
 
 初版仅提供层级功能和子文件拆分（实际上就是原标准的@import语法，并不擅自发明规范之外的新语法，合并工具请自行实现），AST部分预研css增量压缩器。
 
