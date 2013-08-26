@@ -57,7 +57,8 @@ define(function(require, exports, module) {
 			URL: 'url',
 			LINEARGRADIENT: 'lineargradient',
 			LENGTH: 'length',
-			COLOR: 'color'
+			COLOR: 'color',
+			VARS: 'vars'
 		});
 	module.exports = Node;
 });

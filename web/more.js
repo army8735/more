@@ -9,7 +9,8 @@ define(function(require, exports) {
 		node,
 		token,
 		index,
-		stack;
+		stack,
+		varHash;
 
 	function init(ignore) {
 		res = '';
@@ -24,15 +25,65 @@ define(function(require, exports) {
 			index++;
 		}
 		stack = [];
+		varHash = {};
 	}
-	function join(node, ignore, inHead, isSelectors, isSelector, prev, next) {
+	function preVar(node) {
+		var isToken = node.name() == Node.TOKEN;
+		if(!isToken) {
+			if(node.name() == Node.VARS) {
+				var leaves = node.leaves(),
+					k = leaves[0].leaves().content().slice(1),
+					v = leaves[2].leaves().content();
+				varHash[k] = v;
+			}
+			else {
+				node.leaves().forEach(function(leaf) {
+					preVar(leaf);
+				});
+			}
+		}
+	}
+	function replaceVar(s) {
+		if(s.indexOf('$') > -1) {
+			for(var i = 0; i < s.length; i++) {
+				if(s.charAt(i) == '\\') {
+					i++;
+					continue;
+				}
+				if(s.charAt(i) == '$') {
+					var c = s.charAt(i + 1),
+						lit;
+					if(c == '{') {
+						var j = s.indexOf('}', i + 3);
+						if(j > -1) {
+							c = s.slice(i + 2, j);
+							if(varHash[c]) {
+								s = s.slice(0, i) + varHash[c] + s.slice(j + 1);
+							}
+						}
+					}
+					else if(/[\w-]/.test(c)) {
+						c = /^[\w-]+/.exec(s.slice(i + 1))[0];
+						if(varHash[c]) {
+							s = s.slice(0, i) + varHash[c] + s.slice(i + c.length + 1);
+						}
+					}
+				}
+			}
+		}
+		return s;
+	}
+	function join(node, ignore, inHead, isSelectors, isSelector, isVar, prev, next) {
 		var isToken = node.name() == Node.TOKEN,
 			isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 		if(isToken) {
 			if(!isVirtual) {
 				var token = node.token();
 				if(inHead) {
-					res += token.content();
+					res += replaceVar(token.content());
+				}
+				else if(isVar) {
+					//忽略变量声明
 				}
 				else if(isSelectors || isSelector) {
 					var temp = stack[stack.length - 1];
@@ -44,7 +95,7 @@ define(function(require, exports) {
 					}
 				}
 				else {
-					res += token.content();
+					res += replaceVar(token.content());
 				}
 				while(ignore[++index]) {
 					var ig = ignore[index];
@@ -63,6 +114,9 @@ define(function(require, exports) {
 			if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
 				inHead = true;
 			}
+			if(node.name() == Node.VARS) {
+				isVar = true;
+			}
 			//将层级拆开
 			if(node.name() == Node.STYLESET && !inHead) {
 				styleset(true, node, prev, next);
@@ -75,7 +129,7 @@ define(function(require, exports) {
 			var leaves = node.leaves();
 			//递归子节点
 			leaves.forEach(function(leaf, i) {
-				join(leaf, ignore, inHead, isSelectors, isSelector, leaves[i - 1], leaves[i + 1]);
+				join(leaf, ignore, inHead, isSelectors, isSelector, isVar, leaves[i - 1], leaves[i + 1]);
 			});
 			if(node.name() == Node.STYLESET & !inHead) {
 				styleset(false, node, prev, next);
@@ -141,6 +195,7 @@ define(function(require, exports) {
 			return e.toString();
 		}
 		init(ignore);
+		preVar(node);
 		join(node, ignore);
 		return character.escapeHTML(res);
 	};

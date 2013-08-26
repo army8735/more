@@ -56,6 +56,7 @@ var Class = require('../util/Class'),
 		URL: 'url',
 		LINEARGRADIENT: 'lineargradient',
 		LENGTH: 'length',
-		COLOR: 'color'
+		COLOR: 'color',
+		VARS: 'vars'
 	});
 module.exports = Node;

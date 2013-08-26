@@ -44,6 +44,7 @@ define(function(require, exports, module) {
 			TEMPLATE: 13,
 			ENTER: 14,
 			PROPERTY: 15,
+			VARS: 16,
 			type: function(tag) {
 				if(character.isUndefined(types)) {
 					types = [];

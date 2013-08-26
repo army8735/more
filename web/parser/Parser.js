@@ -40,6 +40,9 @@ define(function(require, exports, module) {
 				if(this.look.type() == Token.HEAD) {
 					return this.head();
 				}
+				else if(this.look.type() == Token.VARS) {
+					return this.vars();
+				}
 				else {
 					return this.styleset();
 				}
@@ -189,6 +192,13 @@ define(function(require, exports, module) {
 				node.add(this.styleset());
 				return node;
 			},
+			vars: function() {
+				var node = new Node(Node.VARS);
+				node.add(this.match());
+				node.add(this.match(':'));
+				node.add(this.match([Token.STRING, Token.NUMBER]));
+				return node;
+			},
 			styleset: function(numCanBeKey) {
 				var node = new Node(Node.STYLESET);
 				node.add(this.selectors(numCanBeKey));
@@ -314,32 +324,14 @@ define(function(require, exports, module) {
 						}
 					break;
 					default:
-						if(this.look.type() == Token.ID) {
-							node.add(this.match());
-						}
-						else if(this.look.type() == Token.PROPERTY) {
-							node.add(this.match());
-						}
-						else if(this.look.type() == Token.NUMBER) {
-							node.add(this.match());
-						}
-						else if(this.look.type() == Token.STRING) {
+						if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING].indexOf(this.look.type()) > -1) {
 							node.add(this.match());
 						}
 						else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
 							node.add(this.match());
 						}
 						while(this.look) {
-							if(this.look.type() == Token.ID) {
-								node.add(this.match());
-							}
-							else if(this.look.type() == Token.PROPERTY) {
-								node.add(this.match());
-							}
-							else if(this.look.type() == Token.NUMBER) {
-								node.add(this.match());
-							}
-							else if(this.look.type() == Token.STRING) {
+							if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING].indexOf(this.look.type()) > -1) {
 								node.add(this.match());
 							}
 							else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
@@ -365,28 +357,31 @@ define(function(require, exports, module) {
 					case 'hsl':
 						node.add(this.match());
 						node.add(this.match('('));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(','));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(','));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(')'));
 					break;
 					case 'rgba':
 					case 'hsla':
 						node.add(this.match());
 						node.add(this.match('('));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(','));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(','));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(','));
-						node.add(this.match(Token.NUMBER));
+						node.add(this.match([Token.VARS, Token.NUMBER]));
 						node.add(this.match(')'));
 					break;
 					default:
 						if(this.look.type() == Token.NUMBER && /^#/.test(this.look.content())) {
+							node.add(this.match());
+						}
+						else if(this.look.type() == Token.VARS) {
 							node.add(this.match());
 						}
 						else {
@@ -412,7 +407,7 @@ define(function(require, exports, module) {
 					node.add(
 						this.match('url'),
 						this.match('('),
-						this.match(Token.STRING),
+						this.match([Token.VARS, Token.STRING]),
 						this.match(')')
 					);
 				}
@@ -434,13 +429,13 @@ define(function(require, exports, module) {
 					node.add(this.match(','));
 				}
 				node.add(this.color());
-				if(this.look.type() == Token.NUMBER) {
+				if(this.look.type() == Token.VARS || this.look.type() == Token.NUMBER) {
 					node.add(this.match());
 				}
 				while(this.look && this.look.content() == ',') {
 					node.add(this.match(','));
 					node.add(this.color());
-					if(this.look.type() == Token.NUMBER) {
+					if(this.look.type() == Token.VARS || this.look.type() == Token.NUMBER) {
 						node.add(this.match());
 					}
 				}
