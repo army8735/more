@@ -1,6 +1,6 @@
 ##A css pre-compiler by javascript
 
-The css lexer base on jssc: https://github.com/army8735/jssc
+The css lexer bases on jssc: https://github.com/army8735/jssc
 
 相对于less，more的命名意思是比原本的css多做了一点点，定位于普通产品简化开发位置，而非广义CSS下游框架并以此滥加功能。
 
