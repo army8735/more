@@ -33,7 +33,7 @@ define(function(require, exports) {
 			if(node.name() == Node.VARS) {
 				var leaves = node.leaves(),
 					k = leaves[0].leaves().content().slice(1),
-					v = leaves[2].leaves().content();
+					v = leaves[2].leaves().val();
 				varHash[k] = v;
 			}
 			else {
@@ -44,13 +44,13 @@ define(function(require, exports) {
 		}
 	}
 	function replaceVar(s) {
-		if(s.indexOf('$') > -1) {
+		if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
 			for(var i = 0; i < s.length; i++) {
 				if(s.charAt(i) == '\\') {
 					i++;
 					continue;
 				}
-				if(s.charAt(i) == '$') {
+				if(s.charAt(i) == '$' || s.charAt(i) == '@') {
 					var c = s.charAt(i + 1),
 						lit;
 					if(c == '{') {

@@ -62,7 +62,14 @@ define(function(require, exports, module) {
 					case '@page':
 						return this.page();
 					default:
-						this.error('unknow head rules');
+						//ºÊ»›less
+						if(this.tokens[this.index] && this.tokens[this.index].content() == ':') {
+							this.look.type(Token.VARS);
+							return this.vars();
+						}
+						else {
+							this.error('unknow head rules');
+						}
 				}
 			},
 			impt: function() {
