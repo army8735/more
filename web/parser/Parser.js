@@ -331,14 +331,14 @@ define(function(require, exports, module) {
 						}
 					break;
 					default:
-						if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING].indexOf(this.look.type()) > -1) {
+						if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
 							node.add(this.match());
 						}
 						else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
 							node.add(this.match());
 						}
 						while(this.look) {
-							if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING].indexOf(this.look.type()) > -1) {
+							if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
 								node.add(this.match());
 							}
 							else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
@@ -364,31 +364,31 @@ define(function(require, exports, module) {
 					case 'hsl':
 						node.add(this.match());
 						node.add(this.match('('));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(','));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(','));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(')'));
 					break;
 					case 'rgba':
 					case 'hsla':
 						node.add(this.match());
 						node.add(this.match('('));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(','));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(','));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(','));
-						node.add(this.match([Token.VARS, Token.NUMBER]));
+						node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
 						node.add(this.match(')'));
 					break;
 					default:
 						if(this.look.type() == Token.NUMBER && /^#/.test(this.look.content())) {
 							node.add(this.match());
 						}
-						else if(this.look.type() == Token.VARS) {
+						else if([Token.VARS, Token.HEAD].indexOf(this.look.type()) > -1) {
 							node.add(this.match());
 						}
 						else {
@@ -414,7 +414,7 @@ define(function(require, exports, module) {
 					node.add(
 						this.match('url'),
 						this.match('('),
-						this.match([Token.VARS, Token.STRING]),
+						this.match([Token.VARS, Token.STRING, Token.HEAD]),
 						this.match(')')
 					);
 				}
@@ -436,13 +436,13 @@ define(function(require, exports, module) {
 					node.add(this.match(','));
 				}
 				node.add(this.color());
-				if(this.look.type() == Token.VARS || this.look.type() == Token.NUMBER) {
+				if([Token.VARS, Token.NUMBER, Token.HEAD].indexOf(this.look.type()) > -1) {
 					node.add(this.match());
 				}
 				while(this.look && this.look.content() == ',') {
 					node.add(this.match(','));
 					node.add(this.color());
-					if(this.look.type() == Token.VARS || this.look.type() == Token.NUMBER) {
+					if([Token.VARS, Token.NUMBER, Token.HEAD].indexOf(this.look.type()) > -1) {
 						node.add(this.match());
 					}
 				}
