@@ -4,7 +4,7 @@ The css lexer bases on jssc: https://github.com/army8735/jssc
 
 相对于less，more的命名意思是比原本的css多做了一点点，定位于普通产品简化开发位置，而非广义CSS下游框架重量级功能。
 
-初版仅提供层级功能和子文件拆分（实际上就是原标准的@import语法，并不擅自发明规范之外的新语法，合并工具请自行实现），AST部分预研css增量压缩器。
+目前仅提供层级功能、子文件拆分和层级变量（实际上就是原标准的@import语法，并不擅自发明规范之外的新语法，合并工具请自行实现），AST部分预研css增量压缩器。
 
 web目录下为书写符合AMD/CMD规范的js文件；
 server目录下为nodejs环境的module模块。
@@ -16,6 +16,14 @@ more的核心理念是：原有的浏览器标准不修改，编译后的代码�
 more.parse(code:String):String
 
 方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
+此为开发调试使用，将@import拆开为子文件，并通过url后缀传递变量。
+构建合并请使用build()。
+
+more.build(code:String):String
+
+方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
+此为发布使用，将@import子文件合并进父文件。
+开发调试请使用parse()。
 
 more.tree():Node
 

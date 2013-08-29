@@ -9,7 +9,8 @@ var CssLexer = require('./lexer/CssLexer'),
 	token,
 	index,
 	stack,
-	varHash;
+	varHash,
+	isBuild;
 
 function init(ignore) {
 	res = '';
@@ -25,6 +26,7 @@ function init(ignore) {
 	}
 	stack = [];
 	varHash = {};
+	isBuild = false;
 }
 function preVar(node) {
 	var isToken = node.name() == Node.TOKEN;
@@ -43,13 +45,13 @@ function preVar(node) {
 	}
 }
 function replaceVar(s) {
-	if(s.indexOf('$') > -1) {
+	if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
 		for(var i = 0; i < s.length; i++) {
 			if(s.charAt(i) == '\\') {
 				i++;
 				continue;
 			}
-			if(s.charAt(i) == '$') {
+			if(s.charAt(i) == '$' || s.charAt(i) == '@') {
 				var c = s.charAt(i + 1),
 					lit;
 				if(c == '{') {
@@ -72,14 +74,40 @@ function replaceVar(s) {
 	}
 	return s;
 }
-function join(node, ignore, inHead, isSelectors, isSelector, isVar, prev, next) {
+function var2str() {
+	var arr = [];
+	Object.keys(varHash).forEach(function(k) {
+		arr.push(k + '=' + encodeURIComponent(varHash[k]).replace(/(['"])/g, '\\$1'));
+	});
+	return arr.join('&');
+}
+function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, prev, next) {
 	var isToken = node.name() == Node.TOKEN,
 		isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 	if(isToken) {
 		if(!isVirtual) {
 			var token = node.token();
 			if(inHead) {
-				res += replaceVar(token.content());
+				var s = replaceVar(token.content());
+				if(isImport && token.type() == Token.STRING) {
+					if(s.indexOf('?') > -1) {
+						if(/['"]$/.test(s)) {
+							s = s.slice(0, s.length - 1) + '&' + var2str() + s.slice(-1);
+						}
+						else {
+							s += '&' + var2str() + s.slice(-1);
+						}
+					}
+					else {
+						if(/['"]$/.test(s)) {
+							s = s.slice(0, s.length - 1) + '?' + var2str() + s.slice(-1);
+						}
+						else {
+							s += '?' + var2str() + s.slice(-1);
+						}
+					}
+				}
+				res += s;
 			}
 			else if(isVar) {
 				//忽略变量声明
@@ -123,12 +151,15 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, prev, next) 
 		else if(node.name() == Node.BLOCK && !inHead) {
 			block(true, node);
 		}
+		if(node.name() == Node.IMPORT) {
+			isImport = true;
+		}
 		isSelectors = node.name() == Node.SELECTORS;
 		isSelector = node.name() == Node.SELECTOR;
 		var leaves = node.leaves();
 		//递归子节点
 		leaves.forEach(function(leaf, i) {
-			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, leaves[i - 1], leaves[i + 1]);
+			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, leaves[i - 1], leaves[i + 1]);
 		});
 		if(node.name() == Node.STYLESET & !inHead) {
 			styleset(false, node, prev, next);
@@ -179,7 +210,12 @@ function block(startOrEnd, node) {
 	}
 }
 
-exports.parse = function(code) {
+exports.parse = function(code, vars) {
+	vars = vars || {};
+	//传入初始化变量
+	Object.keys(vars).forEach(function(k) {
+		varHash[k] = varHash[vars[k]];
+	});
 	var lexer = new CssLexer(new CssRule()),
 		parser = new Parser(lexer),
 		ignore = {};
@@ -197,6 +233,8 @@ exports.parse = function(code) {
 	preVar(node);
 	join(node, ignore);
 	return character.escapeHTML(res);
+};
+exports.build = function(charset) {
 };
 exports.tree = function() {
 	return node;
