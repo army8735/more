@@ -10,7 +10,8 @@ var CssLexer = require('./lexer/CssLexer'),
 	index,
 	stack,
 	varHash,
-	isBuild;
+	isBuild,
+	imports;
 
 function init(ignore) {
 	res = '';
@@ -27,6 +28,7 @@ function init(ignore) {
 	stack = [];
 	varHash = {};
 	isBuild = false;
+	imports = [];
 }
 function preVar(node) {
 	var isToken = node.name() == Node.TOKEN;
@@ -74,13 +76,6 @@ function replaceVar(s) {
 	}
 	return s;
 }
-function var2str() {
-	var arr = [];
-	Object.keys(varHash).forEach(function(k) {
-		arr.push(k + '=' + encodeURIComponent(varHash[k]).replace(/(['"])/g, '\\$1'));
-	});
-	return arr.join('&');
-}
 function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, prev, next) {
 	var isToken = node.name() == Node.TOKEN,
 		isVirtual = isToken && node.token().type() == Token.VIRTUAL;
@@ -88,26 +83,10 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, pr
 		if(!isVirtual) {
 			var token = node.token();
 			if(inHead) {
-				var s = replaceVar(token.content());
+				res += replaceVar(token.content());
 				if(isImport && token.type() == Token.STRING) {
-					if(s.indexOf('?') > -1) {
-						if(/['"]$/.test(s)) {
-							s = s.slice(0, s.length - 1) + '&' + var2str() + s.slice(-1);
-						}
-						else {
-							s += '&' + var2str() + s.slice(-1);
-						}
-					}
-					else {
-						if(/['"]$/.test(s)) {
-							s = s.slice(0, s.length - 1) + '?' + var2str() + s.slice(-1);
-						}
-						else {
-							s += '?' + var2str() + s.slice(-1);
-						}
-					}
+					imports.push(token.val().replace(/\?.*$/, ''));
 				}
-				res += s;
 			}
 			else if(isVar) {
 				//忽略变量声明
@@ -212,10 +191,6 @@ function block(startOrEnd, node) {
 
 exports.parse = function(code, vars) {
 	vars = vars || {};
-	//传入初始化变量
-	Object.keys(vars).forEach(function(k) {
-		varHash[k] = varHash[vars[k]];
-	});
 	var lexer = new CssLexer(new CssRule()),
 		parser = new Parser(lexer),
 		ignore = {};
@@ -230,15 +205,23 @@ exports.parse = function(code, vars) {
 		return e.toString();
 	}
 	init(ignore);
+	//传入初始化变量
+	Object.keys(vars).forEach(function(k) {
+		varHash[k] = vars[k];
+	});
 	preVar(node);
 	join(node, ignore);
 	return character.escapeHTML(res);
-};
-exports.build = function(charset) {
 };
 exports.tree = function() {
 	return node;
 };
 exports.token = function() {
 	return token;
+};
+exports.vars = function() {
+	return varHash;
+};
+exports.imports = function() {
+	return imports;
 };

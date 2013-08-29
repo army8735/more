@@ -203,6 +203,7 @@ var Class = require('../util/Class'),
 			node.add(this.match());
 			node.add(this.match(':'));
 			node.add(this.match([Token.STRING, Token.NUMBER]));
+			node.add(this.match(';'));
 			return node;
 		},
 		styleset: function(numCanBeKey) {

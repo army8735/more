@@ -13,17 +13,11 @@ more的核心理念是：原有的浏览器标准不修改，编译后的代码�
 
 ##API
 
-more.parse(code:String):String
+more.parse(code:String, preVars:Object):String
 
 方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
-此为开发调试使用，将@import拆开为子文件，并通过url后缀传递变量。
-构建合并请使用build()。
-
-more.build(code:String):String
-
-方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
-此为发布使用，将@import子文件合并进父文件。
-开发调试请使用parse()。
+preVars为解析前预变量，功用在于实现层级变量作用域——即被import的文件可以访问父级变量。此接口可以自定义实现仅文件内作用域或全局作用域。
+推荐使用层级作用域，demo文件夹中的import.html和node.js演示了这一特性。
 
 more.tree():Node
 
