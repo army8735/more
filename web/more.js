@@ -11,7 +11,6 @@ define(function(require, exports) {
 		index,
 		stack,
 		varHash,
-		isBuild,
 		imports;
 
 	function init(ignore) {
@@ -28,7 +27,6 @@ define(function(require, exports) {
 		}
 		stack = [];
 		varHash = {};
-		isBuild = false;
 		imports = [];
 	}
 	function preVar(node) {
@@ -225,5 +223,52 @@ define(function(require, exports) {
 	};
 	exports.imports = function() {
 		return imports;
+	};
+
+	function compress(s, node, inHead) {
+		if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
+			inHead = true;
+		}
+		var isToken = node.name() == Node.TOKEN;
+		if(isToken) {
+			if(inHead) {
+				s += node.content();
+			}
+			else {
+				s += node.content();
+			}
+		}
+		else {
+			var leaves = node.leaves();
+			//µÝ¹é×Ó½Úµã
+			leaves.forEach(function(leaf, i) {
+				compressNode(s, leaf, inHead);
+			});
+		}
+		return s;
+	}
+
+	exports.compress = function(src, merge) {
+		var cleanCSS = require('clean-css');
+		var minimized = cleanCSS.process(src, {
+			removeEmpty: true
+		});
+		if(merge) {
+			var node,
+				ignore = {};
+			try {
+				lexer.parse(minimized);
+				node = parser.program();
+				ignore = parser.ignore();
+			} catch(e) {
+				if(window.console) {
+					console.error(e);
+				}
+				return e.toString();
+			}
+			init(ignore);
+			minimized = compress('', node, ignore);
+		}
+		return minimized;
 	};
 });

@@ -8,14 +8,14 @@ http.createServer(function(request, response) {
 	var params = url.parse(request.url, true);
 	console.log("Request for " + params.path + " received.");
 
-	if(/\.css$/.test(params.pathname)) {console.log(1, hash)
+	if(/\.css$/.test(params.pathname)) {
 		response.writeHead(200, { 'Content-Type': 'text/css' });
 		var parent = params.path.replace(/\w+\.css$/, '');
 		var f = module.filename.replace(/\w+\.js$/, '') + /\w+\.css$/.exec(params.pathname)[0];
 		var s = fs.readFileSync(f, {
 			encoding: 'utf-8'
 		});
-		var pre = hash[params.path];console.log(2, pre)
+		var pre = hash[params.path];
 		var str = more.parse(s, pre);
 		var vars = more.vars();
 		var imports = more.imports();

@@ -225,3 +225,17 @@ exports.vars = function() {
 exports.imports = function() {
 	return imports;
 };
+
+function compress(node) {
+}
+
+exports.compress = function(src, merge) {
+	var cleanCSS = require('clean-css');
+	var minimized = cleanCSS.process(src, {
+		removeEmpty: true
+	});
+	if(merge) {
+		minimized = compress(parse(minimized));
+	}
+	return minimized;
+};
