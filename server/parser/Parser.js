@@ -287,113 +287,25 @@ var Class = require('../util/Class'),
 			if(!this.look) {
 				this.error();
 			}
-			var kw = key.leaves()[0].leaves().content().toLowerCase();
-			if(/^[\-_*].*/.test(kw)) {
-				if(/^-(webkit|moz|o|ms)-.*/.test(kw)) {
-					kw = kw.replace(/^-(webkit|moz|o|ms)-/, '');
+			if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
+				node.add(this.match());
+			}
+			else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
+				node.add(this.match());
+			}
+			while(this.look) {
+				if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
+					node.add(this.match());
+				}
+				else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
+					node.add(this.match());
 				}
 				else {
-					kw = kw.slice(1);
+					break;
 				}
-			}
-			switch(kw) {
-				case 'background-attachment':
-					node.add(this.match(['fixed', 'local', 'scroll']));
-					while(this.look && this.look.content() == ',') {
-						node.add(this.match());
-						node.add(this.match(['fixed', 'local', 'scroll']));
-					}
-				break;
-				case 'background-clip':
-					node.add(this.match(['border-box', 'padding-box', 'content-box', 'text']));
-					while(this.look && this.look.content() == ',') {
-						node.add(this.match());
-						node.add(this.match(['border-box', 'padding-box', 'content-box', 'text']));
-					}
-				break;
-				case 'background-color':
-					if(this.look.content() == 'transparent' || this.look.type() == Token.NUMBER) {
-						node.add(this.match());
-					}
-					else {
-						node.add(this.color());
-					}
-				break;
-				case 'background-image':
-					if(this.look.content() == 'none') {
-						node.add(this.match());
-					}
-					else if(this.look.content() == 'url') {
-						node.add(this.url());
-					}
-					else if(this.look.content() == 'linear-gradient') {
-						node.add(this.lineargradient());
-					}
-				break;
-				default:
-					if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
-						node.add(this.match());
-					}
-					else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
-						node.add(this.match());
-					}
-					while(this.look) {
-						if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
-							node.add(this.match());
-						}
-						else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
-							node.add(this.match());
-						}
-						else {
-							break;
-						}
-					}
 			}
 			if(this.look && this.look.content() == '!important') {
 				node.add(this.look);
-			}
-			return node;
-		},
-		color: function() {
-			var node = new Node(Node.COLOR);
-			if(!this.look) {
-				this.error();
-			}
-			switch(this.look.content().toLowerCase()) {
-				case 'rgb':
-				case 'hsl':
-					node.add(this.match());
-					node.add(this.match('('));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(','));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(','));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(')'));
-				break;
-				case 'rgba':
-				case 'hsla':
-					node.add(this.match());
-					node.add(this.match('('));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(','));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(','));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(','));
-					node.add(this.match([Token.VARS, Token.NUMBER, Token.HEAD]));
-					node.add(this.match(')'));
-				break;
-				default:
-					if(this.look.type() == Token.NUMBER && /^#/.test(this.look.content())) {
-						node.add(this.match());
-					}
-					else if([Token.VARS, Token.HEAD].indexOf(this.look.type()) > -1) {
-						node.add(this.match());
-					}
-					else {
-						this.error('not a color');
-					}
 			}
 			return node;
 		},
@@ -418,35 +330,6 @@ var Class = require('../util/Class'),
 					this.match(')')
 				);
 			}
-			return node;
-		},
-		lineargradient: function() {
-			var node = new Node(Node.LINEARGRADIENT);
-			node.add(this.match('linear-gradient'));
-			node.add(this.match('('));
-			if(!this.look) {
-				this.error();
-			}
-			var point = false;
-			while(['left', 'right', 'top', 'bottom'].indexOf(this.look.content()) != -1 || (this.look.type() == Token.NUMBER && /deg$/.test(this.look.content()))) {
-				node.add(this.match());
-				point = true;
-			}
-			if(point) {
-				node.add(this.match(','));
-			}
-			node.add(this.color());
-			if([Token.VARS, Token.NUMBER, Token.HEAD].indexOf(this.look.type()) > -1) {
-				node.add(this.match());
-			}
-			while(this.look && this.look.content() == ',') {
-				node.add(this.match(','));
-				node.add(this.color());
-				if([Token.VARS, Token.NUMBER, Token.HEAD].indexOf(this.look.type()) > -1) {
-					node.add(this.match());
-				}
-			}
-			node.add(this.match(')'));
 			return node;
 		},
 		match: function(type, msg) {

@@ -10,7 +10,6 @@ var CssLexer = require('./lexer/CssLexer'),
 	index,
 	stack,
 	varHash,
-	isBuild,
 	imports;
 
 function init(ignore) {
@@ -27,7 +26,6 @@ function init(ignore) {
 	}
 	stack = [];
 	varHash = {};
-	isBuild = false;
 	imports = [];
 }
 function preVar(node) {
@@ -226,7 +224,33 @@ exports.imports = function() {
 	return imports;
 };
 
-function compress(node) {
+var minstr;
+function compress(node, ignore, inHead) {
+	if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
+		inHead = true;
+	}
+	var isToken = node.name() == Node.TOKEN;
+	if(isToken) {
+		var token = node.token();
+		if(inHead) {
+			minstr += token.content();
+		}
+		else {
+			minstr += token.content();
+		}
+		while(ignore[++index]) {
+			var ig = ignore[index];
+			minstr += ig.content();
+		}
+	}
+	else {
+		var leaves = node.leaves();
+		//µÝ¹é×Ó½Úµã
+		leaves.forEach(function(leaf, i) {
+			compress(leaf, ignore, inHead);
+		});
+	}
+	return minstr;
 }
 
 exports.compress = function(src, merge) {
@@ -235,7 +259,42 @@ exports.compress = function(src, merge) {
 		removeEmpty: true
 	});
 	if(merge) {
-		minimized = compress(parse(minimized));
+		minstr = '';
+		index = 0;
+		var node,
+			ignore = {},
+			lexer = new CssLexer(new CssRule()),
+			parser = new Parser(lexer);
+		try {
+			lexer.parse(minimized);
+			var node = parser.program();
+				ignore = parser.ignore();
+		} catch(e) {
+			if(console) {
+				console.error(e);
+			}
+			return e.toString();
+		}
+		minimized = compress(node, ignore);
 	}
 	return minimized;
+};
+exports.test = function(src) {
+	minstr = '';
+	index = 0;
+	var node,
+		ignore = {},
+		lexer = new CssLexer(new CssRule()),
+		parser = new Parser(lexer);
+	try {
+		lexer.parse(src);
+		var node = parser.program();
+			ignore = parser.ignore();
+	} catch(e) {
+		if(console) {
+			console.error(e);
+		}
+		return e.toString();
+	}
+	return compress(node, ignore);
 };

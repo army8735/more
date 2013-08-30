@@ -28,7 +28,7 @@ var Rule = require('./Rule'),
 		self.addMatch(new LineParse(Token.STRING, '"', '"', false));
 		self.addMatch(new LineParse(Token.STRING, "'", "'", false));
 		
-		self.addMatch(new RegMatch(Token.NUMBER, /^-\d+\.?\d*[a-z%]*/i));
+		self.addMatch(new RegMatch(Token.NUMBER, /^-\d+\.?\d*[a-z%]*(\\[90])?/i));
 
 		self.addMatch(new RegMatch(Token.ID, /^[a-z_\-*][\w\-_]+(?:\\\d)?/i));
 		self.addMatch(new CompleteEqual(Token.PROPERTY, '!important'));
@@ -41,9 +41,9 @@ var Rule = require('./Rule'),
 		self.addMatch(new RegMatch(Token.HEAD, /^@[\w-]+/));
 		self.addMatch(new RegMatch(Token.VARS, /^\$[\w-]+/));
 
-		self.addMatch(new RegMatch(Token.NUMBER, /^#[\da-f]{6}/i));
-		self.addMatch(new RegMatch(Token.NUMBER, /^#[\da-f]{3}/i));
-		self.addMatch(new RegMatch(Token.NUMBER, /^\d+\.?\d*[a-z%]*/i));
+		self.addMatch(new RegMatch(Token.NUMBER, /^#[\da-f]{6}(\\[90])?/i));
+		self.addMatch(new RegMatch(Token.NUMBER, /^#[\da-f]{3}(\\[90])?/i));
+		self.addMatch(new RegMatch(Token.NUMBER, /^\d+\.?\d*[a-z%]*(\\[90])?/i));
 		
 		self.addMatch(new RegMatch(Token.ID, /^[.#]?[a-z_][\w\-_.#]*/i));
 	}).methods({

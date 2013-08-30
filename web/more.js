@@ -225,27 +225,35 @@ define(function(require, exports) {
 		return imports;
 	};
 
-	function compress(s, node, inHead) {
+	var minstr;
+	function compress(node, ignore, inHead) {
 		if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
 			inHead = true;
 		}
 		var isToken = node.name() == Node.TOKEN;
 		if(isToken) {
-			if(inHead) {
-				s += node.content();
-			}
-			else {
-				s += node.content();
+			var token = node.token();
+			if(token.type() != Token.VIRTUAL) {
+				if(inHead) {
+					minstr += token.content();
+				}
+				else {
+					minstr += token.content();
+				}
+				while(ignore[++index]) {
+					var ig = ignore[index];
+					minstr += ig.content();
+				}
 			}
 		}
 		else {
 			var leaves = node.leaves();
 			//µÝ¹é×Ó½Úµã
 			leaves.forEach(function(leaf, i) {
-				compressNode(s, leaf, inHead);
+				compress(leaf, ignore, inHead);
 			});
 		}
-		return s;
+		return minstr;
 	}
 
 	exports.compress = function(src, merge) {
@@ -254,21 +262,43 @@ define(function(require, exports) {
 			removeEmpty: true
 		});
 		if(merge) {
+			minstr = '';
+			index = 0;
 			var node,
-				ignore = {};
+				ignore = {},
+				lexer = new CssLexer(new CssRule()),
+				parser = new Parser(lexer);
 			try {
 				lexer.parse(minimized);
-				node = parser.program();
-				ignore = parser.ignore();
+				var node = parser.program();
+					ignore = parser.ignore();
 			} catch(e) {
-				if(window.console) {
+				if(console) {
 					console.error(e);
 				}
 				return e.toString();
 			}
-			init(ignore);
-			minimized = compress('', node, ignore);
+			minimized = compress(node, ignore);
 		}
 		return minimized;
+	};
+	exports.test = function(src) {
+		minstr = '';
+		index = 0;
+		var node,
+			ignore = {},
+			lexer = new CssLexer(new CssRule()),
+			parser = new Parser(lexer);
+		try {
+			lexer.parse(src);
+			var node = parser.program();
+				ignore = parser.ignore();
+		} catch(e) {
+			if(console) {
+				console.error(e);
+			}
+			return e.toString();
+		}
+		return compress(node, ignore);
 	};
 });
