@@ -305,8 +305,11 @@ define(function(require, exports, module) {
 						break;
 					}
 				}
-				if(this.look && this.look.content() == '!important') {
-					node.add(this.look);
+				if(this.look && this.look.type() == Token.HACK) {
+					node.add(this.match());
+				}
+				if(this.look && this.look.type() == Token.IMPORTANT) {
+					node.add(this.match());
 				}
 				return node;
 			},
