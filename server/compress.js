@@ -6,7 +6,9 @@ var CssLexer = require('./lexer/CssLexer'),
 	cleanCSS = require('clean-css'),
 	index,
 	head,
-	body;
+	body,
+	plus,
+	plus2;
 
 function getHead(node, ignore) {
 	var leaves = node.leaves();
@@ -170,11 +172,98 @@ function duplicate(node) {
 		}
 	});
 }
+function union(node) {
+	var hash = {};
+	for(var i = 0; i < node.length; i++) {
+		var key = '';
+		node[i].block.sort(function(a, b) {
+			return a.key > b.key;
+		});
+		node[i].block.forEach(function(style, i) {
+			key += style.key + ':' + style.value;
+			if(style.hack) {
+				key += style.hack;
+			}
+			if(style.impt) {
+				key += '!important';
+			}
+			if(i < node[i].block.length - 1) {
+				key += ';';
+			}
+		});
+		hash[key] = hash[key] || [];
+		hash[key].push(node[i]);
+	}
+	Object.keys(hash).forEach(function(o) {
+		if(hash[o].length > 1) {
+			//后面的选择器合并到第一个上，并做标识标识忽略
+			hash[o].forEach(function(item, i) {
+				if(i) {
+					hash[o][0].selectors = hash[o][0].selectors.concat(item.selectors);
+					item.union = true;
+				}
+			});
+		}
+	});
+}
+function extract(node) {
+	var hash = {};
+	node.forEach(function(o) {
+		if(o.union) {
+			return;
+		}
+		o.block.forEach(function(style) {
+			var key = style.key + ':' + style.value;
+			if(style.hack) {
+				key += style.hack;
+			}
+			if(style.impt) {
+				key += '!important';
+			}
+			hash[key] = hash[key] || [];
+			hash[key].push({
+				selectors: o.selectors,
+				style: style
+			});
+		});
+	});
+	Object.keys(hash).forEach(function(o) {
+		if(hash[o].length > 1) {
+			hash[o].forEach(function(item, i) {
+				//供join时忽略
+				item.style.extract = true;
+				plus += item.selectors.join(',');
+				if(i < hash[o].length - 1) {
+					plus += ',';
+				}
+			});
+			plus += '{';
+			plus += o;
+			plus += '}';
+		}
+	});
+}
 function join(node) {
 	node.forEach(function(o) {
+		if(o.union) {
+			return;
+		}
+		//提取合并可能会出现空的情况
+		var num = 0;
+		o.block.forEach(function(style) {
+			if(style.extract) {
+				num++;
+			}
+		});
+		if(num == o.block.length) {
+			return;
+		}
 		body += o.selectors.join(',');
 		body += '{';
 		o.block.forEach(function(style, i) {
+			if(style.extract) {
+				return;
+			}
 			body += style.key;
 			body += ':';
 			body += style.value;
@@ -209,16 +298,22 @@ function compress(src) {
 	index = 0;
 	head = '';
 	body = '';
+	plus = '';
+	plus2 = '';
 	getHead(node, ignore);
 	//将ast重构成更直接的形式并添加附加信息
 	node = rebuild(node, ignore, []);
 	//合并相同选择器
-	merge(node);console.log(node);
+	merge(node);
 	//去除同一选择器中重复样式声明
 	duplicate(node);
-	//合并同类项
+	//合并相同样式的选择器
+	union(node);
+	//提取合并同类项
+	extract(node);
+	//结果
 	join(node);
-	return head + body;
+	return head + body + plus + plus2;
 }
 
 exports.compress = compress;
