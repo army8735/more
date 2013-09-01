@@ -27,6 +27,18 @@ more.token():Array<Token>
 
 获取解析后的词法单元列表。此为内部接口，一般用不到。
 
+more.vars():HashTable<String, String>
+
+获取解析后的变量声明哈希表。键为变量名，值为变量值。
+
+more.imports():Array
+
+获取解析后的导入文件列表。
+
+more.compress(src:String, mergy:Boolean):String
+
+压缩css文件。此方法基于clean-css，在不传入mergy参数或为false时即为clean-css的原有压缩功能；mergy为true时进行增量压缩，删除重复声明以及合并同类项等。
+
 # License
 
 [MIT License]
