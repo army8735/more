@@ -47,6 +47,7 @@ var Rule = require('./Rule'),
 		
 		self.addMatch(new RegMatch(Token.ID, /^[.#]?[a-z_][\w\-_.#]*/i));
 
+		self.addMatch(new CompleteEqual(Token.HACK, '\\9\\0'));
 		self.addMatch(new CompleteEqual(Token.HACK, '\\0'));
 		self.addMatch(new CompleteEqual(Token.HACK, '\\9'));
 	}).methods({

@@ -27,7 +27,7 @@ more.token():Array<Token>
 
 获取解析后的词法单元列表。此为内部接口，一般用不到。
 
-more.vars():HashTable<String, String>
+more.vars():Object<String, String>
 
 获取解析后的变量声明哈希表。键为变量名，值为变量值。
 
