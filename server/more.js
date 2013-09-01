@@ -225,30 +225,90 @@ exports.imports = function() {
 };
 
 var minstr;
-function compress(node, ignore, inHead) {
+var keys;
+var currentKey;
+var currentValue;
+var temp;
+var start;
+function compress(node, ignore, inHead, isStyle, isKey, isValue) {
 	if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
 		inHead = true;
 	}
 	var isToken = node.name() == Node.TOKEN;
 	if(isToken) {
 		var token = node.token();
-		if(inHead) {
-			minstr += token.content();
-		}
-		else {
-			minstr += token.content();
-		}
-		while(ignore[++index]) {
-			var ig = ignore[index];
-			minstr += ig.content();
+		if(token.type() != Token.VIRTUAL) {
+			if(inHead) {
+				minstr += token.content();
+			}
+			else {
+				if(isKey) {
+					currentKey = token.content();
+					keys[currentKey] = keys[currentKey] || [];
+					keys[currentKey].push({
+						start: minstr.length
+					});
+				}
+				else if(isValue) {
+					currentValue += token.content();
+				}
+				minstr += token.content();
+			}
+			while(ignore[++index]) {
+				var ig = ignore[index];
+				minstr += ig.content();
+				if(isValue) {
+					currentValue += ig.content();
+				}
+			}
 		}
 	}
 	else {
+		if(!inHead) {
+			isStyle = node.name() == Node.STYLE;
+			//进入一个样式表开始记录key并去重
+			if(node.name() == Node.BLOCK) {
+				keys = {};
+			}
+			else if(node.name() == Node.KEY) {
+				isKey = true;
+				start = minstr.length;
+			}
+			else if(node.name() == Node.VALUE) {
+				isValue = true;
+				currentValue = '';
+			}
+		}
 		var leaves = node.leaves();
 		//递归子节点
 		leaves.forEach(function(leaf, i) {
-			compress(leaf, ignore, inHead);
+			compress(leaf, ignore, inHead, isStyle, isKey, isValue);
 		});
+		if(!inHead) {
+			if(node.name() == Node.BLOCK) {
+				var offset = 0;
+				Object.keys(keys).forEach(function(k) {
+					var o = keys[k];
+					if(o.length > 1) {
+						for(var i = 0; i < o.length - 1; i++) {
+							minstr = minstr.slice(0, o[i].start - offset) + minstr.slice(o[i].end - offset);
+							offset += o[i].end - o[i].start;
+						}
+					}
+				});
+			}
+			else if(node.name() == Node.STYLE) {
+				var o = keys[currentKey];
+				o = o[o.length - 1];
+				o.end = minstr.length;
+				o.key = currentKey;
+				o.value = currentValue;
+			}
+			else if(node.name() == Node.KEY) {
+			}
+			else if(node.name() == Node.VALUE) {
+			}
+		}
 	}
 	return minstr;
 }
