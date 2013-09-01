@@ -8,8 +8,7 @@ define(function(require, exports) {
 		index,
 		head,
 		body,
-		plus,
-		plus2;
+		plus;
 
 	function getHead(node, ignore) {
 		var leaves = node.leaves();
@@ -300,7 +299,6 @@ define(function(require, exports) {
 		head = '';
 		body = '';
 		plus = '';
-		plus2 = '';
 		getHead(node, ignore);
 		//将ast重构成更直接的形式并添加附加信息
 		node = rebuild(node, ignore, []);
@@ -308,13 +306,13 @@ define(function(require, exports) {
 		merge(node);
 		//去除同一选择器中重复样式声明
 		duplicate(node);
-		//合并相同样式的选择器
+		//聚集相同样式的选择器
 		union(node);
-		//提取合并同类项
+		//提取同类项
 		extract(node);
 		//结果
 		join(node);
-		return head + body + plus + plus2;
+		return head + body + plus;
 	}
 
 	exports.compress = compress;
