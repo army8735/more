@@ -1,7 +1,7 @@
 var more = require('../server/more.js');
 var s = '@import "a.css";\
 	@charset "gbk";\
-	div{color:#F00;color:#000;width:0;color:#00F\\9;width:100%;}\
+	div{color:red;color:#000\\0;width:0 !important;color:#0F9;width:100%;color:#FFF;width:3px}\
 	div{}\
 	div{color:#F00 !important;}\
 	p{color:#000;width:50%;}\

@@ -227,7 +227,7 @@ exports.imports = function() {
 var minstr;
 var keys;
 var currentKey;
-var currentValue;
+var currentImpt;
 var temp;
 var start;
 function compress(node, ignore, inHead, isStyle, isKey, isValue) {
@@ -244,22 +244,20 @@ function compress(node, ignore, inHead, isStyle, isKey, isValue) {
 			else {
 				if(isKey) {
 					currentKey = token.content();
-					keys[currentKey] = keys[currentKey] || [];
-					keys[currentKey].push({
-						start: minstr.length
-					});
 				}
 				else if(isValue) {
-					currentValue += token.content();
+					if(token.type() == Token.HACK) {
+						currentKey += token.content();
+					}
+					else if(token.type() == Token.IMPORTANT) {
+						currentImpt = true;
+					}
 				}
 				minstr += token.content();
 			}
 			while(ignore[++index]) {
 				var ig = ignore[index];
 				minstr += ig.content();
-				if(isValue) {
-					currentValue += ig.content();
-				}
 			}
 		}
 	}
@@ -276,7 +274,7 @@ function compress(node, ignore, inHead, isStyle, isKey, isValue) {
 			}
 			else if(node.name() == Node.VALUE) {
 				isValue = true;
-				currentValue = '';
+				currentImpt = null;
 			}
 		}
 		var leaves = node.leaves();
@@ -286,23 +284,50 @@ function compress(node, ignore, inHead, isStyle, isKey, isValue) {
 		});
 		if(!inHead) {
 			if(node.name() == Node.BLOCK) {
-				var offset = 0;
+				var dels = [];
+				//一个样式集结束后，以样式名+hack为键，其它信息为值的hash表被保存下，进行重复过滤
 				Object.keys(keys).forEach(function(k) {
 					var o = keys[k];
 					if(o.length > 1) {
-						for(var i = 0; i < o.length - 1; i++) {
-							minstr = minstr.slice(0, o[i].start - offset) + minstr.slice(o[i].end - offset);
-							offset += o[i].end - o[i].start;
+						var hasImpt = false;
+						o.forEach(function(item) {
+							if(item.impt) {
+								hasImpt = true;
+							}
+						});
+						//同一样式声明中有!important出现，取最后一个!important，其它删除
+						if(hasImpt) {
+							for(var i = o.length - 1; i >= 0; i--) {
+								if(o[i].impt) {
+									o.splice(i, 1);
+									break;
+								}
+							}
 						}
+						//没有的话直接取最后一次有效，其余删除
+						else {
+							o.pop();
+						}
+						dels = dels.concat(o);
 					}
 				});
+				//将dels中记录的逆序排序后删除
+				if(dels.length) {
+					dels.sort(function(a, b) {
+						return a.start < b.start;
+					});
+					dels.forEach(function(o) {
+						minstr = minstr.slice(0, o.start) + minstr.slice(o.end);
+					});
+				}
 			}
 			else if(node.name() == Node.STYLE) {
-				var o = keys[currentKey];
-				o = o[o.length - 1];
-				o.end = minstr.length;
-				o.key = currentKey;
-				o.value = currentValue;
+				keys[currentKey] = keys[currentKey] || [];
+				keys[currentKey].push({
+					start: start,
+					end: minstr.length,
+					impt: currentImpt
+				});
 			}
 			else if(node.name() == Node.KEY) {
 			}
