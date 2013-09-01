@@ -4,6 +4,7 @@ var CssLexer = require('./lexer/CssLexer'),
 	Parser = require('./parser/Parser'),
 	Node = require('./parser/Node'),
 	character = require('./util/character'),
+	compress = require('./compress'),
 	res,
 	node,
 	token,
@@ -223,163 +224,16 @@ exports.vars = function() {
 exports.imports = function() {
 	return imports;
 };
-
-var minstr;
-var keys;
-var currentKey;
-var currentImpt;
-var temp;
-var start;
-function compress(node, ignore, inHead, isStyle, isKey, isValue) {
-	if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
-		inHead = true;
-	}
-	var isToken = node.name() == Node.TOKEN;
-	if(isToken) {
-		var token = node.token();
-		if(token.type() != Token.VIRTUAL) {
-			if(inHead) {
-				minstr += token.content();
-			}
-			else {
-				if(isKey) {
-					currentKey = token.content();
-				}
-				else if(isValue) {
-					if(token.type() == Token.HACK) {
-						currentKey += token.content();
-					}
-					else if(token.type() == Token.IMPORTANT) {
-						currentImpt = true;
-					}
-				}
-				minstr += token.content();
-			}
-			while(ignore[++index]) {
-				var ig = ignore[index];
-				minstr += ig.content();
-			}
-		}
-	}
-	else {
-		if(!inHead) {
-			isStyle = node.name() == Node.STYLE;
-			//进入一个样式表开始记录key并去重
-			if(node.name() == Node.BLOCK) {
-				keys = {};
-			}
-			else if(node.name() == Node.KEY) {
-				isKey = true;
-				start = minstr.length;
-			}
-			else if(node.name() == Node.VALUE) {
-				isValue = true;
-				currentImpt = null;
-			}
-		}
-		var leaves = node.leaves();
-		//递归子节点
-		leaves.forEach(function(leaf, i) {
-			compress(leaf, ignore, inHead, isStyle, isKey, isValue);
-		});
-		if(!inHead) {
-			if(node.name() == Node.BLOCK) {
-				var dels = [];
-				//一个样式集结束后，以样式名+hack为键，其它信息为值的hash表被保存下，进行重复过滤
-				Object.keys(keys).forEach(function(k) {
-					var o = keys[k];
-					if(o.length > 1) {
-						var hasImpt = false;
-						o.forEach(function(item) {
-							if(item.impt) {
-								hasImpt = true;
-							}
-						});
-						//同一样式声明中有!important出现，取最后一个!important，其它删除
-						if(hasImpt) {
-							for(var i = o.length - 1; i >= 0; i--) {
-								if(o[i].impt) {
-									o.splice(i, 1);
-									break;
-								}
-							}
-						}
-						//没有的话直接取最后一次有效，其余删除
-						else {
-							o.pop();
-						}
-						dels = dels.concat(o);
-					}
-				});
-				//将dels中记录的逆序排序后删除
-				if(dels.length) {
-					dels.sort(function(a, b) {
-						return a.start < b.start;
-					});
-					dels.forEach(function(o) {
-						minstr = minstr.slice(0, o.start) + minstr.slice(o.end);
-					});
-				}
-			}
-			else if(node.name() == Node.STYLE) {
-				keys[currentKey] = keys[currentKey] || [];
-				keys[currentKey].push({
-					start: start,
-					end: minstr.length,
-					impt: currentImpt
-				});
-			}
-			else if(node.name() == Node.KEY) {
-			}
-			else if(node.name() == Node.VALUE) {
-			}
-		}
-	}
-	return minstr;
-}
-
-exports.compress = function(src, merge) {
+exports.compress = function(src, agressive) {
 	var cleanCSS = require('clean-css');
 	var minimized = cleanCSS.process(src, {
 		removeEmpty: true
 	});
-	if(merge) {
-		minstr = '';
-		index = 0;
-		var node,
-			ignore = {},
-			lexer = new CssLexer(new CssRule()),
-			parser = new Parser(lexer);
-		try {
-			lexer.parse(minimized);
-			var node = parser.program();
-				ignore = parser.ignore();
-		} catch(e) {
-			if(console) {
-				console.error(e);
-			}
-			return e.toString();
-		}
-		minimized = compress(node, ignore);
+	if(agressive) {
+		minimized = compress.compress(minimized);
 	}
 	return minimized;
 };
 exports.test = function(src) {
-	minstr = '';
-	index = 0;
-	var node,
-		ignore = {},
-		lexer = new CssLexer(new CssRule()),
-		parser = new Parser(lexer);
-	try {
-		lexer.parse(src);
-		var node = parser.program();
-			ignore = parser.ignore();
-	} catch(e) {
-		if(console) {
-			console.error(e);
-		}
-		return e.toString();
-	}
-	return compress(node, ignore);
+	return compress.compress(src);
 };

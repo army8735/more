@@ -35,9 +35,9 @@ more.imports():Array
 
 获取解析后的导入文件列表。
 
-more.compress(src:String, mergy:Boolean):String
+more.compress(src:String, agressive:Boolean):String
 
-压缩css文件。此方法基于clean-css，在不传入mergy参数或为false时即为clean-css的原有压缩功能；mergy为true时进行增量压缩，删除重复声明以及合并同类项等。
+压缩css文件。此方法基于clean-css，在不传入agressive参数或为false时即为clean-css的原有压缩功能；agressive为true时进行增量压缩，删除重复声明以及合并同类项。
 
 # License
 

@@ -23,7 +23,7 @@ public class Transform {
 			if(f.isDirectory()) {
 				copy(f, target, false);
 			}
-			else if(f.getName().equals("more.js")) {
+			else if(f.getName().equals("more.js") || f.getName().equals("compress.js")) {
 				copy(f, target, true);
 			}
 		}
