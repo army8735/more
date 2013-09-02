@@ -10,8 +10,8 @@ var s = '@import "a.css";\
 	div{color:#FFF;}\
 	div p{width:100%;}\
 	div p{*width:1px;}\
-	b{font-size:12px;color:#000;*width:1px}\
-	i{color:#000;*width:1px;background-color:#FFF;background:none}\
+	b{font-size:12px;color:#000;*width:1px;-height:1;height:0}\
+	i{_background-color:#111;color:#000;*width:1px;background-color:#FFF;background:none}\
 	a{margin:0;padding:0}h3{padding:0;margin:0}';
 
 var res = more.compress(s);

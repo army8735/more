@@ -175,6 +175,45 @@ define(function(require, exports) {
 				}
 			}
 		});
+		node.forEach(function(o) {
+			if(o.block.length > 1) {
+				var hash1 = {};
+				var hash2 = {};
+				//从后往前遍历，后面出现的条件会覆盖掉前面的包括hack
+				for(var i = o.block.length - 1; i >= 0; i--) {
+					var style = o.block[i];
+					var k = style.key;
+					if(k.indexOf('-webkit-') == 0) {
+						k = k.slice(8);
+					}
+					else if(k.indexOf('-moz-') == 0) {
+						k = k.slice(5);
+					}
+					else if(k.indexOf('-ms-') == 0) {
+						k = k.slice(4);
+					}
+					else if(/^[*\-_]/.test(k)) {
+						k = k.slice(1);
+					}
+					if(style.impt) {
+						if(hash2[k]) {
+							o.block.splice(i, 1);
+						}
+						else {
+							hash2[k] = true;
+						}
+					}
+					else {
+						if(hash1[k]) {
+							o.block.splice(i, 1);
+						}
+						else {
+							hash1[k] = true;
+						}
+					}
+				}
+			}
+		});
 	}
 	function override(node) {
 		node.forEach(function(o) {
