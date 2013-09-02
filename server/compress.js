@@ -47,6 +47,14 @@ function rebuild(node, ignore, arr) {
 			rb(leaf, ignore, arr);
 		}
 	});
+	//将每一组选择器顺序排列
+	arr.forEach(function(o) {
+		if(o.selectors.length) {
+			o.selectors.sort(function(a, b) {
+				return a > b;
+			});
+		}
+	});
 	return arr;
 }
 function rb(node, ignore, arr, isSelector, isValue) {
@@ -119,10 +127,6 @@ function merge(node) {
 	var hash = {};
 	for(var i = 0; i < node.length; i++) {
 		var o = node[i];
-		//先排序选择器，可能会出现反过顺序来写多个选择器的情况，其实同为一个集
-		o.selectors.sort(function(a, b) {
-			return a > b;
-		});
 		var s = o.selectors.join(',');
 		if(hash[s]) {
 			hash[s].block = hash[s].block.concat(o.block);
@@ -171,13 +175,123 @@ function duplicate(node) {
 		}
 	});
 }
+function override(node) {
+	node.forEach(function(o) {
+		if(o.block.length > 1) {
+			//true做hash标识，2代表已出现
+			var hash = {
+				background: true,
+				font: true,
+				margin: true,
+				padding: true,
+				'list-style': true,
+				overflow: true,
+				border: true,
+				'border-left': true,
+				'border-top': true,
+				'border-right': true,
+				'border-bottom': true
+			};
+			//从后往前遍历，后面出现的总条件会覆盖掉前面的子条件
+			for(var i = o.block.length - 1; i >= 0; i--) {
+				var style = o.block[i];
+				if(hash[style.key]) {
+					hash[style.key] = 2;
+					continue;
+				}
+				switch(style.key) {
+					case 'background-position':
+					case 'background-color':
+					case 'background-repeat':
+					case 'background-attachment':
+					case 'background-image':
+						if(hash['background'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'font-style':
+					case 'color':
+					case 'line-height':
+					case 'font-family':
+					case 'font-variant':
+					case 'font-size':
+						if(hash['font'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'margin-top':
+					case 'margin-right':
+					case 'margin-bottom':
+					case 'margin-left':
+						if(hash['margin'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'padding-top':
+					case 'padding-right':
+					case 'padding-bottom':
+					case 'padding-left':
+						if(hash['padding'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'list-style-image':
+					case 'list-style-position':
+					case 'list-style-type':
+						if(hash['list-style'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'overflow-x':
+					case 'overflow-y':
+						if(hash['overflow'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-width':
+					case 'border-color':
+					case 'border-style':
+						if(hash['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-left-width':
+					case 'border-left-color':
+					case 'border-left-style':
+						if(hash['border-left'] == 2 || hash['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-top-width':
+					case 'border-top-color':
+					case 'border-top-style':
+						if(hash['border-top'] == 2 || hash['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-right-width':
+					case 'border-right-color':
+					case 'border-right-style':
+						if(hash['border-right'] == 2 || hash['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-bottom-width':
+					case 'border-bottom-color':
+					case 'border-bottom-style':
+						if(hash['border-bottom'] == 2 || hash['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+					break;
+				}
+			}
+		}
+	});
+}
 function union(node) {
 	var hash = {};
 	for(var i = 0; i < node.length; i++) {
 		var key = '';
-		node[i].block.sort(function(a, b) {
-			return a.key > b.key;
-		});
 		node[i].block.forEach(function(style, j) {
 			key += style.key + ':' + style.value;
 			if(style.hack) {
@@ -305,6 +419,8 @@ function compress(src) {
 	merge(node);
 	//去除同一选择器中重复样式声明
 	duplicate(node);
+	//去除同一选择器中被覆盖的样式声明
+	override(node);
 	//聚集相同样式的选择器
 	union(node);
 	//提取同类项
