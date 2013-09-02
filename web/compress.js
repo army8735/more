@@ -180,9 +180,6 @@ define(function(require, exports) {
 		var hash = {};
 		for(var i = 0; i < node.length; i++) {
 			var key = '';
-			node[i].block.sort(function(a, b) {
-				return a.key > b.key;
-			});
 			node[i].block.forEach(function(style, j) {
 				key += style.key + ':' + style.value;
 				if(style.hack) {
