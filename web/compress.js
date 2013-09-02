@@ -179,9 +179,13 @@ define(function(require, exports) {
 			if(o.block.length > 1) {
 				var hash1 = {};
 				var hash2 = {};
-				//从后往前遍历，后面出现的条件会覆盖掉前面的包括hack
+				//从后往前遍历，后面出现的条件会覆盖掉前面的包括键hack
 				for(var i = o.block.length - 1; i >= 0; i--) {
 					var style = o.block[i];
+					//忽略值hack
+					if(style.hack) {
+						continue;
+					}
 					var k = style.key;
 					if(k.indexOf('-webkit-') == 0) {
 						k = k.slice(8);
