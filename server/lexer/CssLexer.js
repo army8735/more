@@ -60,7 +60,7 @@ var Lexer = require('./Lexer'),
 								}
 							}
 							//ie hackÒ²Ëã¹Ø¼ü×Ö
-							else if(/[*\-_]/.test(token.content().charAt(0))) {
+							else if(/^[*\-_]/.test(token.content().charAt(0))) {
 								if(this.rule.keyWords().hasOwnProperty(token.content().slice(1))) {
 									token.type(Token.KEYWORD);
 								}

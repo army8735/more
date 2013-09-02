@@ -199,7 +199,21 @@ function override(node) {
 					hash[style.key] = 2;
 					continue;
 				}
-				switch(style.key) {
+				//hack的也会被覆盖
+				var k = style.key;
+				if(k.indexOf('-webkit-') == 0) {
+					k = k.slice(8);
+				}
+				else if(k.indexOf('-moz-') == 0) {
+					k = k.slice(5);
+				}
+				else if(k.indexOf('-ms-') == 0) {
+					k = k.slice(4);
+				}
+				else if(/^[*\-_]/.test(k)) {
+					k = k.slice(1);
+				}
+				switch(k) {
 					case 'background-position':
 					case 'background-color':
 					case 'background-repeat':
