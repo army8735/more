@@ -179,7 +179,7 @@ define(function(require, exports) {
 			node[i].block.sort(function(a, b) {
 				return a.key > b.key;
 			});
-			node[i].block.forEach(function(style, i) {
+			node[i].block.forEach(function(style, j) {
 				key += style.key + ':' + style.value;
 				if(style.hack) {
 					key += style.hack;
@@ -187,7 +187,7 @@ define(function(require, exports) {
 				if(style.impt) {
 					key += '!important';
 				}
-				if(i < node[i].block.length - 1) {
+				if(j < node[i].block.length - 1) {
 					key += ';';
 				}
 			});

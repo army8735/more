@@ -53,6 +53,12 @@ define(function(require, exports, module) {
 										token.type(Token.KEYWORD);
 									}
 								}
+								//-ms-
+								else if(token.content().indexOf('-ms-') == 0) {
+									if(this.rule.keyWords().hasOwnProperty(token.content().slice(4))) {
+										token.type(Token.KEYWORD);
+									}
+								}
 								//ie hack也算关键字
 								else if(/[*\-_]/.test(token.content().charAt(0))) {
 									if(this.rule.keyWords().hasOwnProperty(token.content().slice(1))) {
@@ -88,11 +94,11 @@ define(function(require, exports, module) {
 								if(token.content() == ':') {
 									this.isValue = true;
 								}
-								else if([';', '{', '}', '*', '>'].indexOf(token.content()) > -1) {
-									this.isValue = false;
-								}
 								else if(token.content() == '(' && this.isUrl) {
 									this.parenthese = true;
+								}
+								else if([';', '{', '}', '*', '>', '('].indexOf(token.content()) > -1) {
+									this.isValue = false;
 								}
 							}
 							//非值状态的属性被当作id

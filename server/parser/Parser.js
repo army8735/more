@@ -229,7 +229,7 @@ var Class = require('../util/Class'),
 			if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
 				node.add(this.match());
 			}
-			else if(['*', '>', '~', ':'].indexOf(this.look.content()) != -1) {
+			else if(['*', '>', '~', '::', ':', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '(', ')'].indexOf(this.look.content()) != -1) {
 				node.add(this.match());
 			}
 			else if(numCanBeKey && this.look.type() == Token.NUMBER) {
@@ -242,7 +242,7 @@ var Class = require('../util/Class'),
 				if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
 					node.add(this.match());
 				}
-				else if(['*', '>', '~', ':'].indexOf(this.look.content()) != -1) {
+				else if(['*', '>', '~', '::', ':', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '(', ')'].indexOf(this.look.content()) != -1) {
 					node.add(this.match());
 				}
 				else {
@@ -294,10 +294,10 @@ var Class = require('../util/Class'),
 				node.add(this.match());
 			}
 			while(this.look) {
-				if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
+				if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD, Token.KEYWORD].indexOf(this.look.type()) > -1) {
 					node.add(this.match());
 				}
-				else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
+				else if([',', '(', ')', '/', '='].indexOf(this.look.content()) != -1) {
 					node.add(this.match());
 				}
 				else {
