@@ -33,6 +33,7 @@ define(function(require, exports, module) {
 								}
 								else if(token.content() == ')') {
 									this.parenthese = false;
+									this.isUrl = false;
 								}
 								else {
 									this.dealPt(temp);
@@ -68,7 +69,7 @@ define(function(require, exports, module) {
 								else {
 									//分属性和值
 									if(this.rule.keyWords().hasOwnProperty(token.content())) {
-										if(this.isValue && this.rule.values().hasOwnProperty(token.content())) {
+										if(this.isValue) {
 											token.type(Token.PROPERTY);
 										}
 										else {
@@ -97,7 +98,7 @@ define(function(require, exports, module) {
 								else if(token.content() == '(' && this.isUrl) {
 									this.parenthese = true;
 								}
-								else if([';', '{', '}', '*', '>', '('].indexOf(token.content()) > -1) {
+								else if([';', '{', '}', '(', '='].indexOf(token.content()) > -1) {
 									this.isValue = false;
 								}
 							}
