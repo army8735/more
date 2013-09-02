@@ -309,7 +309,7 @@ define(function(require, exports) {
 		//聚集相同样式的选择器
 		union(node);
 		//提取同类项
-		extract(node);
+		//extract(node);
 		//结果
 		join(node);
 		return head + body + plus;
