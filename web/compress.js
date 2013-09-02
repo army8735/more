@@ -48,6 +48,14 @@ define(function(require, exports) {
 				rb(leaf, ignore, arr);
 			}
 		});
+		//将每一组选择器顺序排列
+		arr.forEach(function(o) {
+			if(o.selectors.length) {
+				o.selectors.sort(function(a, b) {
+					return a > b;
+				});
+			}
+		});
 		return arr;
 	}
 	function rb(node, ignore, arr, isSelector, isValue) {
@@ -120,10 +128,6 @@ define(function(require, exports) {
 		var hash = {};
 		for(var i = 0; i < node.length; i++) {
 			var o = node[i];
-			//先排序选择器，可能会出现反过顺序来写多个选择器的情况，其实同为一个集
-			o.selectors.sort(function(a, b) {
-				return a > b;
-			});
 			var s = o.selectors.join(',');
 			if(hash[s]) {
 				hash[s].block = hash[s].block.concat(o.block);
