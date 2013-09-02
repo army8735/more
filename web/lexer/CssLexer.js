@@ -41,8 +41,20 @@ define(function(require, exports, module) {
 							}
 							//将id区分出属性名和属性值
 							if(token.type() == Token.ID) {
+								//-webkit-
+								if(token.content().indexOf('-webkit-') == 0) {
+									if(this.rule.keyWords().hasOwnProperty(token.content().slice(8))) {
+										token.type(Token.KEYWORD);
+									}
+								}
+								//-moz-
+								else if(token.content().indexOf('-moz-') == 0) {
+									if(this.rule.keyWords().hasOwnProperty(token.content().slice(5))) {
+										token.type(Token.KEYWORD);
+									}
+								}
 								//ie hack也算关键字
-								if(/[*\-_]/.test(token.content().charAt(0))) {
+								else if(/[*\-_]/.test(token.content().charAt(0))) {
 									if(this.rule.keyWords().hasOwnProperty(token.content().slice(1))) {
 										token.type(Token.KEYWORD);
 									}
@@ -50,16 +62,15 @@ define(function(require, exports, module) {
 								else {
 									//分属性和值
 									if(this.rule.keyWords().hasOwnProperty(token.content())) {
-										token.type(Token.KEYWORD);
+										if(this.isValue && this.rule.values().hasOwnProperty(token.content())) {
+											token.type(Token.PROPERTY);
+										}
+										else {
+											token.type(Token.KEYWORD);
+										}
 									}
 									else {
 										var s = token.content();
-										if(/\\\d$/.test(s)) {
-											s = s.slice(0, s.length - 2);
-										}
-										else if(/!important$/.test(s)) {
-											s = s.slice(0, s.length - 10);
-										}
 										if(this.rule.colors().hasOwnProperty(s)) {
 											token.type(Token.NUMBER);
 										}
