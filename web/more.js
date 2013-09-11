@@ -46,7 +46,7 @@ define(function(require, exports) {
 			}
 		}
 	}
-	function replaceVar(s) {
+	function replaceVar(s, type) {
 		if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
 			for(var i = 0; i < s.length; i++) {
 				if(s.charAt(i) == '\\') {
@@ -61,14 +61,14 @@ define(function(require, exports) {
 						if(j > -1) {
 							c = s.slice(i + 2, j);
 							if(varHash[c]) {
-								s = s.slice(0, i) + varHash[c] + s.slice(j + 1);
+								s = s.slice(0, i) + (type == Token.STRING ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(j + 1);
 							}
 						}
 					}
 					else if(/[\w-]/.test(c)) {
 						c = /^[\w-]+/.exec(s.slice(i + 1))[0];
 						if(varHash[c]) {
-							s = s.slice(0, i) + varHash[c] + s.slice(i + c.length + 1);
+							s = s.slice(0, i) + (type == Token.STRING ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(i + c.length + 1);
 						}
 					}
 				}
@@ -83,7 +83,7 @@ define(function(require, exports) {
 			if(!isVirtual) {
 				var token = node.token();
 				if(inHead) {
-					res += replaceVar(token.content());
+					res += replaceVar(token.content(), token.type());
 					if(isImport && token.type() == Token.STRING) {
 						imports.push(token.val().replace(/\?.*$/, ''));
 					}
@@ -101,7 +101,7 @@ define(function(require, exports) {
 					}
 				}
 				else {
-					res += replaceVar(token.content());
+					res += replaceVar(token.content(), token.type());
 				}
 				while(ignore[++index]) {
 					var ig = ignore[index];
