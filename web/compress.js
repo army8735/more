@@ -53,6 +53,7 @@ define(function(require, exports) {
 		//将每一组选择器顺序排列，比较时即可直接==比较
 		arr.forEach(function(o) {
 			sort(o.selectors);
+			o.s2s = o.selectors.join(',');
 		});
 		return arr;
 	}
@@ -123,6 +124,21 @@ define(function(require, exports) {
 		}
 	}
 
+	function getK(s) {
+		if(s.indexOf('-webkit-') == 0) {
+			s = s.slice(8);
+		}
+		else if(s.indexOf('-moz-') == 0) {
+			s = s.slice(5);
+		}
+		else if(s.indexOf('-ms-') == 0) {
+			s = s.slice(4);
+		}
+		else if(/^[*_-]/.test(s)) {
+			s = s.slice(1);
+		}
+		return s;
+	}
 	function noImpact(node, first, other) {
 		//紧邻选择器无优先级影响
 		if(first == other - 1) {
@@ -133,7 +149,7 @@ define(function(require, exports) {
 			var hash = {};
 			for(var i = first + 1; i < other; i++) {
 				node[i].block.forEach(function(o) {
-					var k = o.key.replace(/^[_*-]/, '');
+					var k = getK(o.key);
 					if(hash[k]) {
 						hash[k].p = Math.max(hash[k].p, o.impt ? 2 : 1);
 						//多次出现不同值无需记录，因为后声明的不可能同时等于两个值，将其置true说明冲突
@@ -150,7 +166,7 @@ define(function(require, exports) {
 			var res = true;
 			node[other].block.forEach(function(o) {
 				if(res) {
-					var n = hash[o.key.replace(/^[_*-]/, '')];
+					var n = hash[getK(o.key)];
 					if(n && n.p >= (o.impt ? 2 : 1)) {
 						if(n.v === true || n.v != o.value) {
 							res = false;
@@ -164,22 +180,25 @@ define(function(require, exports) {
 	}
 
 	function merge(node) {
-		var hash = {};
-		var index = {};
-		for(var i = 0; i < node.length; i++) {
-			var o = node[i];
-			var s = o.selectors.join(',');
-			if(hash[s]) {
-				//当无优先级冲突时可合并分开的相同选择器
-				if(noImpact(node, index[s], i)) {
-					hash[s].block = hash[s].block.concat(o.block);
-					node.splice(i, 1);
-					i--;
+		//冒泡处理，因为可能处理后留有多个相同选择器，但后面的选择器可继续递归过程
+		for(var i = 0; i < node.length - 1; i++) {
+			var hash = {};
+			var index = {};
+			for(var j = i; j < node.length; j++) {
+				var o = node[j];
+				var s = o.s2s;
+				if(hash[s]) {
+					//当无优先级冲突时可合并分开的相同选择器
+					if(noImpact(node, index[s], j)) {
+						hash[s].block = hash[s].block.concat(o.block);
+						node.splice(j, 1);
+						j--;
+					}
 				}
-			}
-			else {
-				hash[s] = o;
-				index[s] = i;
+				else {
+					hash[s] = o;
+					index[s] = j;
+				}
 			}
 		}
 	}
@@ -231,18 +250,6 @@ define(function(require, exports) {
 						continue;
 					}
 					var k = style.key;
-					if(k.indexOf('-webkit-') == 0) {
-						k = k.slice(8);
-					}
-					else if(k.indexOf('-moz-') == 0) {
-						k = k.slice(5);
-					}
-					else if(k.indexOf('-ms-') == 0) {
-						k = k.slice(4);
-					}
-					else if(/^[*\-_]/.test(k)) {
-						k = k.slice(1);
-					}
 					if(style.impt) {
 						if(hash2[k]) {
 							o.block.splice(i, 1);
