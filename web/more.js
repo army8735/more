@@ -235,7 +235,7 @@ define(function(require, exports) {
 		}
 		return minimized;
 	};
-	exports.test = function(src) {
+	exports.compress2 = function(src) {
 		return compress.compress(src);
 	};
 });

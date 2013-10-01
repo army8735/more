@@ -5,6 +5,7 @@ define(function(require, exports) {
 		Parser = require('./parser/Parser'),
 		Node = require('./parser/Node'),
 		cleanCSS = require('clean-css'),
+		sort = require('./util/sort'),
 		index,
 		head,
 		body,
@@ -50,11 +51,7 @@ define(function(require, exports) {
 		});
 		//将每一组选择器顺序排列
 		arr.forEach(function(o) {
-			if(o.selectors.length) {
-				o.selectors.sort(function(a, b) {
-					return a > b;
-				});
-			}
+			sort(o.selectors);
 		});
 		return arr;
 	}
