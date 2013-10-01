@@ -38,6 +38,7 @@ define(function(require, exports) {
 			});
 		}
 	}
+
 	var currentStyle;
 	var currentValue;
 	var currentHack;
@@ -49,7 +50,7 @@ define(function(require, exports) {
 				rb(leaf, ignore, arr);
 			}
 		});
-		//将每一组选择器顺序排列
+		//将每一组选择器顺序排列，比较时即可直接==比较
 		arr.forEach(function(o) {
 			sort(o.selectors);
 		});
@@ -121,18 +122,64 @@ define(function(require, exports) {
 			}
 		}
 	}
+
+	function noImpact(node, first, other) {
+		//紧邻选择器无优先级影响
+		if(first == other - 1) {
+			return true;
+		}
+		//非紧邻则若无相同样式或后声明有important更高优先级或后声明与中间夹杂的值相同亦无影响
+		else {
+			var hash = {};
+			for(var i = first + 1; i < other; i++) {
+				node[i].block.forEach(function(o) {
+					var k = o.key.replace(/^[_*-]/, '');
+					if(hash[k]) {
+						hash[k].p = Math.max(hash[k].p, o.impt ? 2 : 1);
+						//多次出现不同值无需记录，因为后声明的不可能同时等于两个值，将其置true说明冲突
+						hash[k].v = hash[k].v == o.value ? o.value : true;
+					}
+					else {
+						hash[k] = {
+							p: o.impt ? 2 : 1,
+							v: o.value
+						};
+					}
+				});
+			}
+			var res = true;
+			node[other].block.forEach(function(o) {
+				if(res) {
+					var n = hash[o.key.replace(/^[_*-]/, '')];
+					if(n && n.p >= (o.impt ? 2 : 1)) {
+						if(n.v === true || n.v != o.value) {
+							res = false;
+						}
+					}
+				}
+			});
+			return res;
+		}
+		return false;
+	}
+
 	function merge(node) {
 		var hash = {};
+		var index = {};
 		for(var i = 0; i < node.length; i++) {
 			var o = node[i];
 			var s = o.selectors.join(',');
 			if(hash[s]) {
-				hash[s].block = hash[s].block.concat(o.block);
-				node.splice(i, 1);
-				i--;
+				//当无优先级冲突时可合并分开的相同选择器
+				if(noImpact(node, index[s], i)) {
+					hash[s].block = hash[s].block.concat(o.block);
+					node.splice(i, 1);
+					i--;
+				}
 			}
 			else {
 				hash[s] = o;
+				index[s] = i;
 			}
 		}
 	}
