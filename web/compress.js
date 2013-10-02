@@ -147,6 +147,19 @@ define(function(require, exports) {
 		//非紧邻则若无相同样式或后声明有important更高优先级或后声明与中间夹杂的值相同亦无影响
 		else {
 			var hash = {};
+			var keys = {
+				background: true,
+				font: true,
+				margin: true,
+				padding: true,
+				'list-style': true,
+				overflow: true,
+				border: true,
+				'border-left': true,
+				'border-top': true,
+				'border-right': true,
+				'border-bottom': true
+			};
 			for(var i = first + 1; i < other; i++) {
 				node[i].block.forEach(function(o) {
 					var k = getK(o.key);
@@ -166,7 +179,8 @@ define(function(require, exports) {
 			var res = true;
 			node[other].block.forEach(function(o) {
 				if(res) {
-					var n = hash[getK(o.key)];
+					var key = getK(o.key);
+					var n = hash[key];
 					if(n && n.p >= (o.impt ? 2 : 1)) {
 						if(n.v === true || n.v != o.value) {
 							res = false;
@@ -380,6 +394,16 @@ define(function(require, exports) {
 						}
 					break;
 					case 'border-left':
+					case 'border-top':
+					case 'border-right':
+					case 'border-bottom':
+						if(hash[o.s2s]['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
 					case 'border-left-width':
 					case 'border-left-color':
 					case 'border-left-style':
