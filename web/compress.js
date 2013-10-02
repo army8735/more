@@ -203,38 +203,47 @@ define(function(require, exports) {
 		}
 	}
 	function duplicate(node) {
+		var hash = {};
 		node.forEach(function(o) {
-			if(o.block.length > 1) {
-				var hash = {};
-				for(var i = 0; i < o.block.length; i++) {
-					var style = o.block[i];
-					//以样式名+hack为键，去除hack的影响
-					var key = style.key;
-					if(style.hack) {
-						key += style.hack;
-					}
-					//没有声明优先级为0，普通声明为1，!important为2，删除低优先级和先出现的
-					var priority = style.impt ? 2 : 1;
-					if(hash[key]) {
-						if(priority >= hash[key].priority) {
-							o.block.splice(hash[key].index, 1);
-							i--;
-							hash[key] = {
-								index: i,
-								priority: priority
-							};
-						}
-						else {
-							o.block.splice(i, 1);
-							i--;
-						}
+			hash[o.s2s] = hash[o.s2s] || {};
+			for(var i = 0; i < o.block.length; i++) {
+				var style = o.block[i];
+				//以样式名+hack为键，去除hack的影响
+				var key = style.key;
+				if(style.hack) {
+					key += style.hack;
+				}
+				//优先级普通声明为1，!important为2，删除低优先级和先出现的
+				var priority = style.impt ? 2 : 1;
+				if(hash[o.s2s][key]) {
+					if(priority >= hash[o.s2s][key].priority) {
+						//置空后统一删除，防止干扰index
+						hash[o.s2s][key].parent.block[hash[o.s2s][key].index] = null;
+						hash[o.s2s][key] = {
+							index: i,
+							priority: priority,
+							parent: o
+						};
 					}
 					else {
-						hash[key] = {
-							index: i,
-							priority: priority
-						}
+						o.block.splice(i, 1);
+						i--;
 					}
+				}
+				else {
+					hash[o.s2s][key] = {
+						index: i,
+						priority: priority,
+						parent: o
+					}
+				}
+			}
+		});
+		//清空null
+		node.forEach(function(o) {
+			for(var i = o.block.length - 1; i >= 0; i--) {
+				if(!o.block[i]) {
+					o.block.splice(i, 1);
 				}
 			}
 		});
@@ -557,7 +566,7 @@ define(function(require, exports) {
 		//将ast重构成更直接的形式并添加附加信息
 		node = rebuild(node, ignore, []);
 		//合并相同选择器
-		merge(node);
+		//merge(node);
 		//去除同一选择器中重复样式声明
 		duplicate(node);
 		//去除同一选择器中被覆盖的样式声明
