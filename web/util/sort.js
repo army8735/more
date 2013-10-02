@@ -62,7 +62,7 @@ define(function() {
 		if(arr.length < 2) {
 			return arr;
 		}
-		//优化尽可能选取中间值，5等分取每组最大最小值，然后10个数取中值，保证最坏情况首次分割值也不会出现在1/5外
+		//优化尽可能选取中间值，5等分取每组最大最小值，然后10个数取中值，保证最坏情况首次分割值也在2/5~3/5
 		if(arr.length > 9) {
 			var n = Math.floor(arr.length / 5);
 			var split = [];

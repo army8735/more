@@ -566,7 +566,7 @@ define(function(require, exports) {
 		//将ast重构成更直接的形式并添加附加信息
 		node = rebuild(node, ignore, []);
 		//合并相同选择器
-		//merge(node);
+		merge(node);
 		//去除同一选择器中重复样式声明
 		duplicate(node);
 		//去除同一选择器中被覆盖的样式声明
