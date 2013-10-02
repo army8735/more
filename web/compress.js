@@ -251,6 +251,22 @@ define(function(require, exports) {
 		});
 		//清空null
 		clean(node);
+		//后出现的普通样式会覆盖掉前面的hack
+		hash = {};
+		for(var i = node.length - 1; i >=0; i--) {
+			var o = node[i];
+			hash[o.s2s] = hash[o.s2s] || {};
+			for(var j = o.block.length - 1; j >= 0; j--) {
+				var style = o.block[j];
+				var key = getK(style.key);
+				if(key == style.key && !style.hack) {
+					hash[o.s2s][style.key] = style.impt ? 2 : 1;
+				}
+				else if(hash[o.s2s][key] && hash[o.s2s][key] >= (style.impt ? 2 : 1)) {
+					o.block.splice(j, 1);
+				}
+			}
+		}
 	}
 	function override(node) {
 		node.forEach(function(o) {
