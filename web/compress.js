@@ -427,40 +427,38 @@ define(function(require, exports) {
 	function union(node) {
 		var hash = {};
 		for(var i = 0; i < node.length; i++) {
-			var key = '';
-			node[i].block.forEach(function(style, j) {
-				key += style.key + ':' + style.value;
+			var key = [];
+			node[i].block.forEach(function(style) {
+				var k = style.key + ':' + style.value;
 				if(style.hack) {
-					key += style.hack;
+					k += style.hack;
 				}
 				if(style.impt) {
-					key += '!important';
+					k += '!important';
 				}
-				if(j < node[i].block.length - 1) {
-					key += ';';
-				}
+				key.push(k);
 			});
+			sort(key);
+			key = key.join(';');
 			hash[key] = hash[key] || [];
 			hash[key].push(node[i]);
 		}
 		Object.keys(hash).forEach(function(o) {
 			if(hash[o].length > 1) {
-				//后面的选择器合并到第一个上，并做标识标识忽略
+				//后面的选择器合并到第一个上，并置空
 				hash[o].forEach(function(item, i) {
 					if(i) {
 						hash[o][0].selectors = hash[o][0].selectors.concat(item.selectors);
-						item.union = true;
+						item.block = [];
 					}
 				});
 			}
 		});
+		clean(node);
 	}
 	function extract(node) {
 		var hash = {};
 		node.forEach(function(o) {
-			if(o.union) {
-				return;
-			}
 			o.block.forEach(function(style) {
 				var key = style.key + ':' + style.value;
 				if(style.hack) {
@@ -494,9 +492,6 @@ define(function(require, exports) {
 	}
 	function join(node) {
 		node.forEach(function(o) {
-			if(o.union) {
-				return;
-			}
 			//提取合并可能会出现空的情况
 			var num = 0;
 			o.block.forEach(function(style) {
