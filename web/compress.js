@@ -441,20 +441,25 @@ define(function(require, exports) {
 			sort(key);
 			key = key.join(';');
 			hash[key] = hash[key] || [];
-			hash[key].push(node[i]);
+			hash[key].push({
+				n: node[i],
+				i: i
+			});
 		}
 		Object.keys(hash).forEach(function(o) {
 			if(hash[o].length > 1) {
-				//后面的选择器合并到第一个上，并置空
-				hash[o].forEach(function(item, i) {
-					if(i) {
-						hash[o][0].selectors = hash[o][0].selectors.concat(item.selectors);
-						item.block = [];
+				var queue = hash[o];
+				//后面的选择器冒泡合并到第一个上，并置空
+				for(var i = 0; i < queue.length - 1; i++) {
+					for(var j = i + 1; j < queue.length; j++) {
+						if(queue[i].n.block.length && queue[j].n.block.length && noImpact(node, queue[i].i, queue[j].i)) {
+							queue[i].n.selectors = queue[i].n.selectors.concat(queue[j].n.selectors);
+							queue[j].n.block = [];
+						}
 					}
-				});
+				}
 			}
 		});
-		clean(node);
 	}
 	function extract(node) {
 		var hash = {};
