@@ -386,13 +386,6 @@ define(function(require, exports) {
 					case 'border-width':
 					case 'border-color':
 					case 'border-style':
-						if(hash[o.s2s]['border'] == 2) {
-							o.block.splice(i, 1);
-						}
-						else if(hash[o.s2s]['border'] && !style.impt) {
-							o.block.splice(i, 1);
-						}
-					break;
 					case 'border-left':
 					case 'border-top':
 					case 'border-right':
