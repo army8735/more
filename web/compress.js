@@ -178,6 +178,16 @@ define(function(require, exports) {
 		}
 		return false;
 	}
+	function clean(node) {
+		//清空null
+		node.forEach(function(o) {
+			for(var i = o.block.length - 1; i >= 0; i--) {
+				if(!o.block[i]) {
+					o.block.splice(i, 1);
+				}
+			}
+		});
+	}
 
 	function merge(node) {
 		//冒泡处理，因为可能处理后留有多个相同选择器，但后面的选择器可继续递归过程
@@ -240,13 +250,7 @@ define(function(require, exports) {
 			}
 		});
 		//清空null
-		node.forEach(function(o) {
-			for(var i = o.block.length - 1; i >= 0; i--) {
-				if(!o.block[i]) {
-					o.block.splice(i, 1);
-				}
-			}
-		});
+		clean(node);
 		node.forEach(function(o) {
 			if(o.block.length > 1) {
 				var hash1 = {};
