@@ -158,7 +158,8 @@ define(function(require, exports) {
 				'border-left': true,
 				'border-top': true,
 				'border-right': true,
-				'border-bottom': true
+				'border-bottom': true,
+				'border-radius': true
 			};
 			for(var i = first + 1; i < other; i++) {
 				node[i].block.forEach(function(o) {
@@ -287,6 +288,14 @@ define(function(require, exports) {
 									res = true;
 								}
 							break;
+							case 'border-radius':
+								if( (hash['border-top-left-radius'] && n.p <= hash['border-top-left-radius'].p) ||
+									(hash['border-top-right-radius'] && n.p <= hash['border-top-right-radius'].p) ||
+									(hash['border-bottom-left-radius'] && n.p <= hash['border-bottom-left-radius'].p) ||
+									(hash['border-bottom-right-radius'] && n.p <= hash['border-bottom-right-radius'].p) ) {
+									res = true;
+								}
+							break;
 						}
 					}
 				}
@@ -398,7 +407,8 @@ define(function(require, exports) {
 			'border-left': true,
 			'border-top': true,
 			'border-right': true,
-			'border-bottom': true
+			'border-bottom': true,
+			'border-radius': true
 		};
 		for(var j = node.length - 1; j >= 0; j--) {
 			var o = node[j];
@@ -537,6 +547,17 @@ define(function(require, exports) {
 							o.block.splice(i, 1);
 						}
 						else if(hash[o.s2s]['border-bottom'] || hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-top-left-radius':
+					case 'border-top-right-radius':
+					case 'border-bottom-left-radius':
+					case 'border-bottom-right-radius':
+						if(hash[o.s2s]['border-radius'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border-radius'] && !style.impt) {
 							o.block.splice(i, 1);
 						}
 					break;
