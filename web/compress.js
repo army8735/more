@@ -269,151 +269,160 @@ define(function(require, exports) {
 		}
 	}
 	function override(node) {
-		node.forEach(function(o) {
-			if(o.block.length > 1) {
-				//true做hash标识，2代表已出现，3代表important出现
-				var hash = {
-					background: true,
-					font: true,
-					margin: true,
-					padding: true,
-					'list-style': true,
-					overflow: true,
-					border: true,
-					'border-left': true,
-					'border-top': true,
-					'border-right': true,
-					'border-bottom': true
-				};
-				//从后往前遍历，后面出现的总条件会覆盖掉前面的子条件
-				for(var i = o.block.length - 1; i >= 0; i--) {
-					var style = o.block[i];
-					//hack的也会被覆盖
-					var k = getK(style.key);
-					if(hash[style.key] && !style.hack) {
-						hash[style.key] = style.impt ? 3 : 2;
+		var hash = {};
+		var keys = {
+			background: true,
+			font: true,
+			margin: true,
+			padding: true,
+			'list-style': true,
+			overflow: true,
+			border: true,
+			'border-left': true,
+			'border-top': true,
+			'border-right': true,
+			'border-bottom': true
+		};
+		for(var j = node.length - 1; j >= 0; j--) {
+			var o = node[j];
+			hash[o.s2s] = hash[o.s2s] || {};
+			//从后往前遍历，后面出现的总样式会覆盖掉前面的分样式
+			for(var i = o.block.length - 1; i >= 0; i--) {
+				var style = o.block[i];
+				//hack的分样式也会被覆盖，但hahc的总样式没有覆盖权利
+				var k = getK(style.key);
+				if(k == style.key && keys[k] && !style.hack) {
+					hash[o.s2s][k] = style.impt ? 2 : 1;
+					//以下4个即可作为总样式也可作为分样式
+					if(!{
+						'border-left': true,
+						'border-top': true,
+						'border-right': true,
+						'border-bottom': true
+					}[k]) {
 						continue;
 					}
-					switch(k) {
-						case 'background-position':
-						case 'background-color':
-						case 'background-repeat':
-						case 'background-attachment':
-						case 'background-image':
-							if(hash['background'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['background'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'font-style':
-						case 'line-height':
-						case 'font-family':
-						case 'font-variant':
-						case 'font-size':
-							if(hash['font'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['font'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'margin-top':
-						case 'margin-right':
-						case 'margin-bottom':
-						case 'margin-left':
-							if(hash['margin'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['margin'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'padding-top':
-						case 'padding-right':
-						case 'padding-bottom':
-						case 'padding-left':
-							if(hash['padding'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['padding'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'list-style-image':
-						case 'list-style-position':
-						case 'list-style-type':
-							if(hash['list-style'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['list-style'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'overflow-x':
-						case 'overflow-y':
-							if(hash['overflow'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['overflow'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'border-width':
-						case 'border-color':
-						case 'border-style':
-							if(hash['border'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['border'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'border-left-width':
-						case 'border-left-color':
-						case 'border-left-style':
-							if(hash['border-left'] == 3 || hash['border'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['border-left'] == 2 || hash['border'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'border-top-width':
-						case 'border-top-color':
-						case 'border-top-style':
-							if(hash['border-top'] == 3 || hash['border'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['border-top'] == 2 || hash['border'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'border-right-width':
-						case 'border-right-color':
-						case 'border-right-style':
-							if(hash['border-right'] == 3 || hash['border'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['border-right'] == 2 || hash['border'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-						case 'border-bottom-width':
-						case 'border-bottom-color':
-						case 'border-bottom-style':
-							if(hash['border-bottom'] == 3 || hash['border'] == 3) {
-								o.block.splice(i, 1);
-							}
-							else if(hash['border-bottom'] == 2 || hash['border'] == 2 && !style.impt) {
-								o.block.splice(i, 1);
-							}
-						break;
-					}
+				}
+				switch(k) {
+					case 'background-position':
+					case 'background-color':
+					case 'background-repeat':
+					case 'background-attachment':
+					case 'background-image':
+						if(hash[o.s2s]['background'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['background'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'font-style':
+					case 'line-height':
+					case 'font-family':
+					case 'font-variant':
+					case 'font-size':
+						if(hash[o.s2s]['font'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['font'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'margin-top':
+					case 'margin-right':
+					case 'margin-bottom':
+					case 'margin-left':
+						if(hash[o.s2s]['margin'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['margin'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'padding-top':
+					case 'padding-right':
+					case 'padding-bottom':
+					case 'padding-left':
+						if(hash[o.s2s]['padding'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['padding'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'list-style-image':
+					case 'list-style-position':
+					case 'list-style-type':
+						if(hash[o.s2s]['list-style'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['list-style'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'overflow-x':
+					case 'overflow-y':
+						if(hash[o.s2s]['overflow'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['overflow'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-width':
+					case 'border-color':
+					case 'border-style':
+						if(hash[o.s2s]['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-left':
+					case 'border-left-width':
+					case 'border-left-color':
+					case 'border-left-style':
+						if(hash[o.s2s]['border-left'] == 2 || hash[o.s2s]['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border-left'] || hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-top-width':
+					case 'border-top-color':
+					case 'border-top-style':
+						if(hash[o.s2s]['border-top'] == 2 || hash[o.s2s]['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border-top'] || hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-right-width':
+					case 'border-right-color':
+					case 'border-right-style':
+						if(hash[o.s2s]['border-right'] == 2 || hash[o.s2s]['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border-right'] || hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
+					case 'border-bottom-width':
+					case 'border-bottom-color':
+					case 'border-bottom-style':
+						if(hash[o.s2s]['border-bottom'] == 2 || hash[o.s2s]['border'] == 2) {
+							o.block.splice(i, 1);
+						}
+						else if(hash[o.s2s]['border-bottom'] || hash[o.s2s]['border'] && !style.impt) {
+							o.block.splice(i, 1);
+						}
+					break;
 				}
 			}
-		});
+		}
 	}
 	function union(node) {
 		var hash = {};
