@@ -226,16 +226,21 @@ define(function(require, exports) {
 		return imports;
 	};
 	exports.compress = function(src, agressive) {
-		var cleanCSS = require('clean-css');
-		var minimized = cleanCSS.process(src, {
-			removeEmpty: true
-		});
-		if(agressive) {
+		src = src || '';
+		var web = !!(window && window.define);
+		var minimized;
+		if(web) {
+			minimized = src;
+		}
+		else {
+			var cleanCSS = require('clean-css');
+			minimized = cleanCSS.process(src, {
+				removeEmpty: true
+			});
+		}
+		if(web || agressive) {
 			minimized = compress.compress(minimized);
 		}
 		return minimized;
-	};
-	exports.compress2 = function(src) {
-		return compress.compress(src);
 	};
 });
