@@ -8,8 +8,7 @@ define(function(require, exports) {
 		sort = require('./util/sort'),
 		index,
 		head,
-		body,
-		plus;
+		body;
 
 	function getHead(node, ignore) {
 		var leaves = node.leaves();
@@ -139,7 +138,7 @@ define(function(require, exports) {
 		}
 		return s;
 	}
-	function noImpact(node, first, other) {
+	function noImpact(node, first, other, child) {
 		//紧邻选择器无优先级影响
 		if(first == other - 1) {
 			return true;
@@ -178,7 +177,12 @@ define(function(require, exports) {
 				});
 			}
 			var res = true;
-			node[other].block.forEach(function(o) {
+			var block = node[other].block;
+			//有child索引时仅检查other样式的索引冲突，否则为other全部
+			if(typeof child == 'number') {
+				block = block.slice(child, child + 1);
+			}
+			block.forEach(function(o) {
 				if(res) {
 					var key = getK(o.key);
 					var n = hash[key];
@@ -302,7 +306,6 @@ define(function(require, exports) {
 			});
 			return res;
 		}
-		return false;
 	}
 	function clean(node) {
 		//清空null
@@ -342,6 +345,7 @@ define(function(require, exports) {
 			}
 		}
 	}
+
 	function duplicate(node) {
 		var hash = {};
 		node.forEach(function(o) {
@@ -398,6 +402,7 @@ define(function(require, exports) {
 			}
 		}
 	}
+
 	function override(node) {
 		var hash = {};
 		var keys = {
@@ -569,6 +574,7 @@ define(function(require, exports) {
 			}
 		}
 	}
+
 	function union(node) {
 		var hash = {};
 		for(var i = 0; i < node.length; i++) {
@@ -607,10 +613,11 @@ define(function(require, exports) {
 		});
 		clean(node);
 	}
+
 	function extract(node) {
 		var hash = {};
-		node.forEach(function(o) {
-			o.block.forEach(function(style) {
+		node.forEach(function(o, i) {
+			o.block.forEach(function(style, j) {
 				var key = style.key + ':' + style.value;
 				if(style.hack) {
 					key += style.hack;
@@ -620,27 +627,46 @@ define(function(require, exports) {
 				}
 				hash[key] = hash[key] || [];
 				hash[key].push({
-					selectors: o.selectors,
-					style: style
+					parent: o,
+					i: i,
+					j: j
 				});
 			});
 		});
+		//将只有1次出现的删除，多次出现的保留，将留下的组成一个二维数组
+		var index = [];
+		var max = 0;
+		var keys = [];
 		Object.keys(hash).forEach(function(o) {
-			if(hash[o].length > 1) {
-				hash[o].forEach(function(item, i) {
-					//供join时忽略
-					item.style.extract = true;
-					plus += item.selectors.join(',');
-					if(i < hash[o].length - 1) {
-						plus += ',';
-					}
-				});
-				plus += '{';
-				plus += o;
-				plus += '}';
+			var same = hash[o];
+			if(same.length == 1) {
+				delete hash[o];
 			}
+			else {
+				keys.push(o);
+				var temp = {};
+				same.forEach(function(o2) {
+					temp[o2.i] = true;
+				});
+				index.push(temp);
+				max = Math.max(max, same.length);
+			}
+		});//console.log(keys);console.log(hash)
+		//排列好map的位置，索引和位置对应，空的地方填null
+		var map = [];
+		index.forEach(function(temp, idx) {
+			var arr = new Array(max);
+			for(var i = 0; i <= max; i++) {
+				arr[i] = null;
+			}
+			Object.keys(temp).forEach(function(i) {
+				arr[parseInt(i)] = true;
+			});
+			map.push(arr);console.log(arr, keys[idx]);
 		});
+		//同列相同部分视为一块矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器。优先取最大面积者合并。当然至少要2列，因为1列为只出现在一个选择器中没必要提。
 	}
+
 	function join(node) {
 		node.forEach(function(o) {
 			//提取合并可能会出现空的情况
@@ -693,7 +719,6 @@ define(function(require, exports) {
 		index = 0;
 		head = '';
 		body = '';
-		plus = '';
 		getHead(node, ignore);
 		//将ast重构成更直接的形式并添加附加信息
 		node = rebuild(node, ignore, []);
@@ -705,11 +730,11 @@ define(function(require, exports) {
 		override(node);
 		//聚合相同样式的选择器
 		union(node);
-		//提取同类项
-		//extract(node);
+		//提取公因子
+		extract(node);
 		//结果
 		join(node);
-		return head + body + plus;
+		return head + body;
 	}
 
 	exports.compress = compress;
