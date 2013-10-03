@@ -306,13 +306,17 @@ define(function(require, exports) {
 	}
 	function clean(node) {
 		//Çå¿Õnull
-		node.forEach(function(o) {
-			for(var i = o.block.length - 1; i >= 0; i--) {
-				if(!o.block[i]) {
-					o.block.splice(i, 1);
+		for(var i = node.length - 1; i >= 0; i--) {
+			var o = node[i];
+			for(var j = o.block.length - 1; j >= 0; j--) {
+				if(!o.block[j]) {
+					o.block.splice(j, 1);
 				}
 			}
-		});
+			if(!o.block.length) {
+				node.splice(i, 1);
+			}
+		}
 	}
 
 	function merge(node) {
@@ -601,6 +605,7 @@ define(function(require, exports) {
 				}
 			}
 		});
+		clean(node);
 	}
 	function extract(node) {
 		var hash = {};
