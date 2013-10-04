@@ -514,6 +514,12 @@ define(function(require, exports) {
 			//缓存留以后用
 			if(!mode) {
 				imCache[first + ',' + other] = res;
+				//如果first到other之间无优先级冲突，将first和other之间也做标记
+				if(res) {
+					for(var i = first + 1; i < other; i++) {
+						imCache[i + ',' + other] = res;
+					}
+				}
 			}
 			return res;
 		}
