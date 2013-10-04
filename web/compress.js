@@ -828,6 +828,7 @@ define(function(require, exports) {
 					for(var j = i + 1; j < queue.length; j++) {
 						if(queue[i].n.block.length && queue[j].n.block.length && noImpact(node, queue[i].i, queue[j].i)) {
 							queue[i].n.selectors = queue[i].n.selectors.concat(queue[j].n.selectors);
+							sort(queue[i].n.selectors);
 							queue[i].n.s2s = queue[i].n.selectors.join(',');
 							queue[j].n.block = [];
 						}
@@ -910,9 +911,10 @@ define(function(require, exports) {
 				if(reduce > add + same.length) {
 					var ss = [];
 					same.forEach(function(o) {
-						ss.push(o.parent.s2s);
+						ss = ss.concat(o.parent.selectors);
 						record.push(o);
 					});
+					sort(ss);
 					//插入提取合并结果的位置在第一个之后
 					insert.push({
 						i: same[0].i + 1,
@@ -942,9 +944,10 @@ define(function(require, exports) {
 							if(reduce > add + n - m - 1) {
 								var ss = [];
 								for(j = count - 1; j < count + n - m - 1; j++) {
-									ss.push(same[j].parent.s2s);
+									ss = ss.concat(same[j].parent.selectors);
 									record.push(same[j]);
 								}
+								sort(ss);
 								insert.push({
 									i: same[count - 1].i + 1,
 									selectors: ss,
