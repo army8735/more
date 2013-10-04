@@ -138,6 +138,8 @@ define(function(require, exports) {
 		}
 		return s;
 	}
+	var imCache = {};
+	var imCache2 = {};
 	function noImpact(node, first, other, child) {
 		var mode = false;
 		if(typeof child == 'number') {
@@ -146,6 +148,12 @@ define(function(require, exports) {
 		//紧邻选择器无优先级影响
 		if(first == other - 1) {
 			return true;
+		}
+		else if(mode && typeof imCache2[first + ',' + other + ',' + child] == 'boolean') {
+			return imCache2[first + ',' + other + ',' + child];
+		}
+		else if(!mode && typeof imCache[first + ',' + other] == 'boolean') {
+			imCache2[first + ',' + other] = res;
 		}
 		//非紧邻则若无相同样式或后声明有important更高优先级或后声明与中间夹杂的值相同亦无影响
 		else {
@@ -507,6 +515,13 @@ define(function(require, exports) {
 					}
 				}
 			});
+			//缓存留以后用
+			if(mode) {
+				imCache2[first + ',' + other + ',' + child] = res;
+			}
+			else {
+				imCache2[first + ',' + other] = res;
+			}
 			return res;
 		}
 	}
@@ -523,6 +538,9 @@ define(function(require, exports) {
 				node.splice(i, 1);
 			}
 		}
+		//节点变化必须清空imcache
+		imCache = {};
+		imCache2 = {};
 	}
 
 	function merge(node) {
