@@ -826,6 +826,7 @@ define(function(require, exports) {
 					for(var j = i + 1; j < queue.length; j++) {
 						if(queue[i].n.block.length && queue[j].n.block.length && noImpact(node, queue[i].i, queue[j].i)) {
 							queue[i].n.selectors = queue[i].n.selectors.concat(queue[j].n.selectors);
+							queue[i].n.s2s = queue[i].n.selectors.join(',');
 							queue[j].n.block = [];
 						}
 					}
@@ -895,7 +896,7 @@ define(function(require, exports) {
 			var end = row.lastIndexOf(1);
 			var style = keys[i];
 			var same = hash[style];
-			//没有冲突还要看合并后是否缩小体积，即减少的样式字数要比选择器拼接大
+			//优先本行合并，若冲突，进行相邻列合并。因为相邻出现一定无冲突
 			if(noImpact(node, start, end, same[same.length - 1].j)) {
 				//没有冲突还要看合并后是否缩小体积，即减少的样式字数要比选择器拼接大
 				var reduce = style.length * (same.length - 1);
@@ -917,6 +918,42 @@ define(function(require, exports) {
 						block: [same[0].parent.block[same[0].j]],
 						s2s: ss.join(',')
 					});
+				}
+			}
+			else {
+				var count = 0;
+				for(var m = 0; m < row.length - 1; m++) {
+					if(row[m]) {
+						count++;
+						for(var n = m + 1; n < row.length; n++) {
+							if(!row[n]) {
+								break;
+							}
+						}
+						//相邻必须有2个以上才合并
+						if(n > m + 1) {
+							var reduce = style.length * (n - m - 1);
+							var add = 0;
+							for(var j = count - 1; j < count + n - m - 1; j++) {
+								add += same[j].parent.s2s.length;
+							}
+							if(reduce > add + n - m - 1) {
+								var ss = [];
+								for(j = count - 1; j < count + n - m - 1; j++) {
+									ss.push(same[j].parent.s2s);
+									record.push(same[j]);
+								}
+								insert.push({
+									i: same[count - 1].i + 1,
+									selectors: ss,
+									block: [same[count - 1].parent.block[same[count - 1].j]],
+									s2s: ss.join(',')
+								});
+							}
+						}
+						count += n - m - 1;
+						m = n;
+					}
 				}
 			}
 		});
