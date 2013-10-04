@@ -865,20 +865,56 @@ define(function(require, exports) {
 			Object.keys(temp).forEach(function(i) {
 				arr[parseInt(i)] = 1;
 			});
-			map.push(arr);console.log(arr, keys[idx]);
+			map.push(arr);
 		});
 		//同列相同部分视为一块矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器。优先取最大面积者合并。当然至少要2列，因为1列为只出现在一个选择器中没必要提
 		//to do 面积择优算法。目前想到的复杂度过高，无法用于实际场景
-		//舍弃之采用单行合并，即拥有某一个样式的所有选择器尝试合并，当然因为优先级冲突不一定能够整行合并，递归其所有组合尝试
+		//舍弃之采用单行合并，即拥有某一个样式的所有选择器尝试合并，当然因为优先级冲突不一定能够整行合并，应该递归其所有组合尝试，代价太大暂时忽略
+		var record = [];
+		var insert = [];
 		map.forEach(function(row, i) {
 			var start = row.indexOf(1);
-			var end = row.lastIndexOf(1);console.log(start, end);
-			var same = hash[keys[i]];console.log(same);
-			if(noImpact(node, start, end, same[same.length - 1].j)) {console.log('m', i);
-			}
-			else {console.log('confilct');
+			var end = row.lastIndexOf(1);
+			var style = keys[i];
+			var same = hash[style];
+			//没有冲突还要看合并后是否缩小体积，即减少的样式字数要比选择器拼接大
+			if(noImpact(node, start, end, same[same.length - 1].j)) {
+				//没有冲突还要看合并后是否缩小体积，即减少的样式字数要比选择器拼接大
+				var reduce = style.length * (same.length - 1);
+				var add = 0;
+				same.forEach(function(o, i) {
+					add += o.parent.s2s.length;
+				});
+				//提取合并每2个选择器之间会多1个,且样式表会多2个字符{}，抵消后为增加same.length
+				if(reduce > add + same.length) {
+					var ss = [];
+					same.forEach(function(o) {
+						ss.push(o.parent.s2s);
+						record.push(o);
+					});
+					//插入提取合并结果的位置在第一个之后
+					insert.push({
+						i: same[0].i + 1,
+						selectors: ss,
+						block: [same[0].parent.block[same[0].j]],
+						s2s: ss.join(',')
+					});
+				}
 			}
 		});
+		//清空记录的提取项，插入提取结果
+		record.forEach(function(o) {
+			o.parent.block[o.j] = null;
+		});
+		sort(insert, function(a, b) {
+			return a.i < b.i;
+		});
+		insert.forEach(function(o) {
+			node.splice(o.i, 0, o);
+		});
+		clean(node);
+		//再次合并相同的选择器
+		union(node);
 	}
 
 	function join(node) {

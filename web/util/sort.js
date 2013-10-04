@@ -1,5 +1,5 @@
 define(function() {
-	function quickSort(arr, begin, end) {
+	function quickSort(arr, begin, end, compare) {
 		if(begin >= end) {
 			return;
 		}
@@ -8,7 +8,7 @@ define(function() {
 		while(i < j) {
 			if(seq) {
 				for(; i < j; j--) {
-					if(n > arr[j]) {
+					if((compare && compare.call(arr, n, arr[j])) || (!compare && n > arr[j])) {
 						swap(arr, p, j);
 						p = j;
 						seq = !seq;
@@ -18,7 +18,7 @@ define(function() {
 			}
 			else {
 				for(; i < j; i++) {
-					if(n < arr[i]) {
+					if((compare && compare.call(arr, arr[i], n)) || (!compare && n < arr[i])) {
 						swap(arr, p, i);
 						p = i;
 						seq = !seq;
@@ -27,8 +27,8 @@ define(function() {
 				}
 			}
 		}
-		quickSort(arr, begin, p);
-		quickSort(arr, p + 1, end);
+		quickSort(arr, begin, p, compare);
+		quickSort(arr, p + 1, end, compare);
 	}
 	function swap(arr, a, b) {
 		var temp = arr[a];
@@ -55,7 +55,7 @@ define(function() {
 			j: j
 		};
 	}
-	return function(arr) {
+	return function(arr, compare) {
 		if(!Array.isArray(arr)) {
 			throw new Error('quick sort need an array');
 		}
@@ -63,7 +63,7 @@ define(function() {
 			return arr;
 		}
 		//优化尽可能选取中间值，5等分取每组最大最小值，然后10个数取中值，保证最坏情况首次分割值也在2/5~3/5
-		if(arr.length > 9) {
+		if(!compare && arr.length > 9) {
 			var n = Math.floor(arr.length / 5);
 			var split = [];
 			var index = [];
@@ -87,7 +87,7 @@ define(function() {
 				}
 			}
 		}
-		quickSort(arr, 0, arr.length - 1);
+		quickSort(arr, 0, arr.length - 1, compare);
 		return arr;
 	};
 });
