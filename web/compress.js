@@ -932,8 +932,10 @@ define(function(require, exports) {
 		});
 		clean(node);
 		//再次合并相同的选择器
-		merge(node);
-		union(node);
+		if(insert.length) {
+			merge(node);
+			union(node);
+		}
 	}
 
 	function join(node) {
