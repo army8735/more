@@ -234,15 +234,15 @@ define(function(require, exports) {
 							res = false;
 						}
 					}
-					//后出现的总样式和先出现的分样式有冲突，反之则无
+					//总样式和分样式有冲突
 					else if(keys[key]) {
 						switch(key) {
 							case 'background':
-								if( (hash['background-position'] && n.p == hash['background-position'].p) ||
-									(hash['background-color'] && n.p == hash['background-color'].p) ||
-									(hash['background-repeat'] && n.p == hash['background-repeat'].p) ||
-									(hash['background-attachment'] && n.p == hash['background-attachment'].p) ||
-									(hash['background-image'] && n.p == hash['background-image'].p) ) {
+								if( hash['background-position'] ||
+									hash['background-color'] ||
+									hash['background-repeat'] ||
+									hash['background-attachment'] ||
+									hash['background-image'] ) {
 									res = false;
 								}
 								else {
@@ -254,7 +254,7 @@ define(function(require, exports) {
 							case 'background-repeat':
 							case 'background-attachment':
 							case 'background-image':
-								if(hash['background'] && n.p == hash['background'].p) {
+								if(hash['background']) {
 									res = false;
 								}
 								else {
@@ -262,11 +262,11 @@ define(function(require, exports) {
 								}
 							break;
 							case 'font':
-								if( (hash['font-style'] && n.p == hash['font-style'].p) ||
-									(hash['line-height'] && n.p == hash['line-height'].p) ||
-									(hash['font-family'] && n.p == hash['font-family'].p) ||
-									(hash['font-variant'] && n.p == hash['font-variant'].p) ||
-									(hash['font-size'] && n.p == hash['font-size'].p) ) {
+								if( hash['font-style'] ||
+									hash['line-height'] ||
+									hash['font-family'] ||
+									hash['font-variant'] ||
+									hash['font-size'] ) {
 									res = false;
 								}
 								else {
@@ -278,7 +278,7 @@ define(function(require, exports) {
 							case 'font-family':
 							case 'font-variant':
 							case 'font-size':
-								if(hash['font'] && n.p == hash['font'].p) {
+								if(hash['font']) {
 									res = false;
 								}
 								else {
@@ -286,10 +286,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'margin':
-								if( (hash['margin-top'] && n.p == hash['margin-top'].p) ||
-									(hash['margin-right'] && n.p == hash['margin-right'].p) ||
-									(hash['margin-bottom'] && n.p == hash['margin-bottom'].p) ||
-									(hash['margin-left'] && n.p == hash['margin-left'].p) ) {
+								if( hash['margin-top'] ||
+									hash['margin-right'] ||
+									hash['margin-bottom'] ||
+									hash['margin-left'] ) {
 									res = false;
 								}
 								else {
@@ -300,7 +300,7 @@ define(function(require, exports) {
 							case 'margin-right':
 							case 'margin-bottom':
 							case 'margin-top':
-								if(hash['margin'] && n.p == hash['margin'].p) {
+								if(hash['margin']) {
 									res = false;
 								}
 								else {
@@ -308,10 +308,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'padding':
-								if( (hash['padding-top'] && n.p == hash['padding-top'].p) ||
-									(hash['padding-right'] && n.p == hash['padding-right'].p) ||
-									(hash['padding-bottom'] && n.p == hash['padding-bottom'].p) ||
-									(hash['padding-left'] && n.p == hash['padding-left'].p) ) {
+								if( hash['padding-top'] ||
+									hash['padding-right'] ||
+									hash['padding-bottom'] ||
+									hash['padding-left'] ) {
 									res = false;
 								}
 								else {
@@ -322,7 +322,7 @@ define(function(require, exports) {
 							case 'padding-right':
 							case 'padding-bottom':
 							case 'padding-top':
-								if(hash['padding'] && n.p == hash['padding'].p) {
+								if(hash['padding']) {
 									res = false;
 								}
 								else {
@@ -330,9 +330,9 @@ define(function(require, exports) {
 								}
 							break;
 							case 'list-style':
-								if( (hash['list-style-image'] && n.p == hash['list-style-image'].p) ||
-									(hash['list-style-position'] && n.p == hash['list-style-position'].p) ||
-									(hash['list-style-type'] && n.p == hash['list-style-type'].p) ) {
+								if( hash['list-style-image'] ||
+									hash['list-style-position'] ||
+									hash['list-style-type'] ) {
 									res = false;
 								}
 								else {
@@ -342,7 +342,7 @@ define(function(require, exports) {
 							case 'list-style-image':
 							case 'list-style-position':
 							case 'list-style-type':
-								if(hash['list-style'] && n.p == hash['list-style'].p) {
+								if(hash['list-style']) {
 									res = false;
 								}
 								else {
@@ -350,8 +350,8 @@ define(function(require, exports) {
 								}
 							break;
 							case 'overflow':
-								if( (hash['overflow-x'] && n.p == hash['overflow-x'].p) ||
-									(hash['overflow-y'] && n.p == hash['overflow-y'].p) ) {
+								if( hash['overflow-x'] ||
+									hash['overflow-y'] ) {
 									res = false;
 								}
 								else {
@@ -360,7 +360,7 @@ define(function(require, exports) {
 							break;
 							case 'overlfow-x':
 							case 'overlfow-y':
-								if(hash['overlfow'] && n.p == hash['overlfow'].p) {
+								if(hash['overlfow']) {
 									res = false;
 								}
 								else {
@@ -368,25 +368,25 @@ define(function(require, exports) {
 								}
 							break;
 							case 'border':
-								if( (hash['border-left'] && n.p == hash['border-left'].p) ||
-									(hash['border-top'] && n.p == hash['border-top'].p) ||
-									(hash['border-right'] && n.p == hash['border-right'].p) ||
-									(hash['border-bottom'] && n.p == hash['border-bottom'].p) ||
-									(hash['border-width'] && n.p == hash['border-width'].p) ||
-									(hash['border-color'] && n.p == hash['border-color'].p) ||
-									(hash['border-style'] && n.p == hash['border-style'].p) ||
-									(hash['border-left-width'] && n.p == hash['border-left-width'].p) ||
-									(hash['border-left-color'] && n.p == hash['border-left-color'].p) ||
-									(hash['border-left-style'] && n.p == hash['border-left-style'].p) ||
-									(hash['border-top-width'] && n.p == hash['border-top-width'].p) ||
-									(hash['border-top-color'] && n.p == hash['border-top-color'].p) ||
-									(hash['border-top-style'] && n.p == hash['border-top-style'].p) ||
-									(hash['border-right-width'] && n.p == hash['border-right-width'].p) ||
-									(hash['border-right-color'] && n.p == hash['border-right-color'].p) ||
-									(hash['border-right-style'] && n.p == hash['border-right-style'].p) ||
-									(hash['border-bottom-width'] && n.p == hash['border-bottom-width'].p) ||
-									(hash['border-bottom-color'] && n.p == hash['border-bottom-color'].p) ||
-									(hash['border-bottom-style'] && n.p == hash['border-bottom-style'].p) ) {
+								if( hash['border-left'] ||
+									hash['border-top'] ||
+									hash['border-right'] ||
+									hash['border-bottom'] ||
+									hash['border-width'] ||
+									hash['border-color'] ||
+									hash['border-style'] ||
+									hash['border-left-width'] ||
+									hash['border-left-color'] ||
+									hash['border-left-style'] ||
+									hash['border-top-width'] ||
+									hash['border-top-color'] ||
+									hash['border-top-style'] ||
+									hash['border-right-width'] ||
+									hash['border-right-color'] ||
+									hash['border-right-style'] ||
+									hash['border-bottom-width'] ||
+									hash['border-bottom-color'] ||
+									hash['border-bottom-style'] ) {
 									res = false;
 								}
 								else {
@@ -396,8 +396,8 @@ define(function(require, exports) {
 							case 'border-left-width':
 							case 'border-left-color':
 							case 'border-left-style':
-								if( (hash['border-left'] && n.p == hash['border-left'].p) ||
-									(hash['border'] && n.p == hash['border']) ) {
+								if( hash['border-left'] ||
+									hash['border'] ) {
 									res = false;
 								}
 								else {
@@ -407,8 +407,8 @@ define(function(require, exports) {
 							case 'border-right-width':
 							case 'border-right-color':
 							case 'border-right-style':
-								if( (hash['border-right'] && n.p == hash['border-right'].p) ||
-									(hash['border'] && n.p == hash['border']) ) {
+								if( hash['border-right'] ||
+									hash['border'] ) {
 									res = false;
 								}
 								else {
@@ -418,8 +418,8 @@ define(function(require, exports) {
 							case 'border-top-width':
 							case 'border-top-color':
 							case 'border-top-style':
-								if( (hash['border-top'] && n.p == hash['border-top'].p) ||
-									(hash['border'] && n.p == hash['border']) ) {
+								if( hash['border-top'] ||
+									hash['border'] ) {
 									res = false;
 								}
 								else {
@@ -429,8 +429,8 @@ define(function(require, exports) {
 							case 'border-bottom-width':
 							case 'border-bottom-color':
 							case 'border-bottom-style':
-								if( (hash['border-bottom'] && n.p == hash['border-bottom'].p) ||
-									(hash['border'] && n.p == hash['border']) ) {
+								if( hash['border-bottom'] ||
+									hash['border'] ) {
 									res = false;
 								}
 								else {
@@ -438,10 +438,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'border-left':
-								if( (hash['border'] && n.p == hash['border']) ||
-									(hash['border-left-width'] && n.p == hash['border-left-width'].p) ||
-									(hash['border-left-color'] && n.p == hash['border-left-color'].p) ||
-									(hash['border-left-style'] && n.p == hash['border-left-style'].p) ) {
+								if( hash['border'] ||
+									hash['border-left-width'] ||
+									hash['border-left-color'] ||
+									hash['border-left-style'] ) {
 									res = false;
 								}
 								else {
@@ -449,10 +449,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'border-top':
-								if( (hash['border'] && n.p == hash['border']) ||
-									(hash['border-top-width'] && n.p == hash['border-top-width'].p) ||
-									(hash['border-top-color'] && n.p == hash['border-top-color'].p) ||
-									(hash['border-top-style'] && n.p == hash['border-top-style'].p) ) {
+								if( hash['border'] ||
+									hash['border-top-width'] ||
+									hash['border-top-color'] ||
+									hash['border-top-style'] ) {
 									res = false;
 								}
 								else {
@@ -460,10 +460,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'border-right':
-								if( (hash['border'] && n.p == hash['border']) ||
-									(hash['border-right-width'] && n.p == hash['border-right-width'].p) ||
-									(hash['border-right-color'] && n.p == hash['border-right-color'].p) ||
-									(hash['border-right-style'] && n.p == hash['border-right-style'].p) ) {
+								if( hash['border'] ||
+									hash['border-right-width'] ||
+									hash['border-right-color'] ||
+									hash['border-right-style'] ) {
 									res = false;
 								}
 								else {
@@ -471,10 +471,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'border-bottom':
-								if( (hash['border'] && n.p == hash['border']) ||
-									(hash['border-bottom-width'] && n.p == hash['border-bottom-width'].p) ||
-									(hash['border-bottom-color'] && n.p == hash['border-bottom-color'].p) ||
-									(hash['border-bottom-style'] && n.p == hash['border-bottom-style'].p) ) {
+								if( hash['border'] ||
+									hash['border-bottom-width'] ||
+									hash['border-bottom-color'] ||
+									hash['border-bottom-style'] ) {
 									res = false;
 								}
 								else {
@@ -482,10 +482,10 @@ define(function(require, exports) {
 								}
 							break;
 							case 'border-radius':
-								if( (hash['border-top-left-radius'] && n.p == hash['border-top-left-radius'].p) ||
-									(hash['border-top-right-radius'] && n.p == hash['border-top-right-radius'].p) ||
-									(hash['border-bottom-left-radius'] && n.p == hash['border-bottom-left-radius'].p) ||
-									(hash['border-bottom-right-radius'] && n.p == hash['border-bottom-right-radius'].p) ) {
+								if( hash['border-top-left-radius'] ||
+									hash['border-top-right-radius'] ||
+									hash['border-bottom-left-radius'] ||
+									hash['border-bottom-right-radius'] ) {
 									res = false;
 								}
 								else {
@@ -496,7 +496,7 @@ define(function(require, exports) {
 							case 'border-top-right-radius':
 							case 'border-bottom-left-radius':
 							case 'border-bottom-right-radius':
-								if(hash['border-radius'] && n.p == hash['border-radius'].p) {
+								if(hash['border-radius']) {
 									res = false;
 								}
 								else {
