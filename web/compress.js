@@ -139,6 +139,10 @@ define(function(require, exports) {
 		return s;
 	}
 	function noImpact(node, first, other, child) {
+		var mode = false;
+		if(typeof child == 'number') {
+			mode = true;
+		}
 		//紧邻选择器无优先级影响
 		if(first == other - 1) {
 			return true;
@@ -158,7 +162,46 @@ define(function(require, exports) {
 				'border-top': true,
 				'border-right': true,
 				'border-bottom': true,
-				'border-radius': true
+				'border-radius': true,
+				'background-position': true,
+				'background-color': true,
+				'background-repeat': true,
+				'background-attachment': true,
+				'background-image': true,
+				'font-style': true,
+				'line-height': true,
+				'font-family': true,
+				'font-variant': true,
+				'font-size': true,
+				'margin-left': true,
+				'margin-right': true,
+				'margin-bottom': true,
+				'margin-top': true,
+				'padding-left': true,
+				'padding-right': true,
+				'padding-bottom': true,
+				'padding-top': true,
+				'list-style-image': true,
+				'list-style-position': true,
+				'list-style-type': true,
+				'overlfow-x': true,
+				'overlfow-y': true,
+				'border-left-width': true,
+				'border-left-color': true,
+				'border-left-style': true,
+				'border-right-width': true,
+				'border-right-color': true,
+				'border-right-style': true,
+				'border-top-width': true,
+				'border-top-color': true,
+				'border-top-style': true,
+				'border-bottom-width': true,
+				'border-bottom-color': true,
+				'border-bottom-style': true,
+				'border-top-left-radius': true,
+				'border-top-right-radius': true,
+				'border-bottom-left-radius': true,
+				'border-bottom-right-radius': true
 			};
 			for(var i = first + 1; i < other; i++) {
 				node[i].block.forEach(function(o) {
@@ -179,7 +222,7 @@ define(function(require, exports) {
 			var res = true;
 			var block = node[other].block;
 			//有child索引时仅检查other样式的索引冲突，否则为other全部
-			if(typeof child == 'number') {
+			if(mode) {
 				block = block.slice(child, child + 1);
 			}
 			block.forEach(function(o) {
@@ -195,108 +238,268 @@ define(function(require, exports) {
 					else if(keys[key]) {
 						switch(key) {
 							case 'background':
-								if( (hash['background-position'] && n.p <= hash['background-position'].p) ||
-									(hash['background-color'] && n.p <= hash['background-color'].p) ||
-									(hash['background-repeat'] && n.p <= hash['background-repeat'].p) ||
-									(hash['background-attachment'] && n.p <= hash['background-attachment'].p) ||
-									(hash['background-image'] && n.p <= hash['background-image'].p) ) {
+								if( (hash['background-position'] && n.p == hash['background-position'].p) ||
+									(hash['background-color'] && n.p == hash['background-color'].p) ||
+									(hash['background-repeat'] && n.p == hash['background-repeat'].p) ||
+									(hash['background-attachment'] && n.p == hash['background-attachment'].p) ||
+									(hash['background-image'] && n.p == hash['background-image'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'background-position':
+							case 'background-color':
+							case 'background-repeat':
+							case 'background-attachment':
+							case 'background-image':
+								if(hash['background'] && n.p == hash['background'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'font':
-								if( (hash['font-style'] && n.p <= hash['font-style'].p) ||
-									(hash['line-height'] && n.p <= hash['line-height'].p) ||
-									(hash['font-family'] && n.p <= hash['font-family'].p) ||
-									(hash['font-variant'] && n.p <= hash['font-variant'].p) ||
-									(hash['font-size'] && n.p <= hash['font-size'].p) ) {
+								if( (hash['font-style'] && n.p == hash['font-style'].p) ||
+									(hash['line-height'] && n.p == hash['line-height'].p) ||
+									(hash['font-family'] && n.p == hash['font-family'].p) ||
+									(hash['font-variant'] && n.p == hash['font-variant'].p) ||
+									(hash['font-size'] && n.p == hash['font-size'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'font-style':
+							case 'line-height':
+							case 'font-family':
+							case 'font-variant':
+							case 'font-size':
+								if(hash['font'] && n.p == hash['font'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'margin':
-								if( (hash['margin-top'] && n.p <= hash['margin-top'].p) ||
-									(hash['margin-right'] && n.p <= hash['margin-right'].p) ||
-									(hash['margin-bottom'] && n.p <= hash['margin-bottom'].p) ||
-									(hash['margin-left'] && n.p <= hash['margin-left'].p) ) {
+								if( (hash['margin-top'] && n.p == hash['margin-top'].p) ||
+									(hash['margin-right'] && n.p == hash['margin-right'].p) ||
+									(hash['margin-bottom'] && n.p == hash['margin-bottom'].p) ||
+									(hash['margin-left'] && n.p == hash['margin-left'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'margin-left':
+							case 'margin-right':
+							case 'margin-bottom':
+							case 'margin-top':
+								if(hash['margin'] && n.p == hash['margin'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'padding':
-								if( (hash['padding-top'] && n.p <= hash['padding-top'].p) ||
-									(hash['padding-right'] && n.p <= hash['padding-right'].p) ||
-									(hash['padding-bottom'] && n.p <= hash['padding-bottom'].p) ||
-									(hash['padding-left'] && n.p <= hash['padding-left'].p) ) {
+								if( (hash['padding-top'] && n.p == hash['padding-top'].p) ||
+									(hash['padding-right'] && n.p == hash['padding-right'].p) ||
+									(hash['padding-bottom'] && n.p == hash['padding-bottom'].p) ||
+									(hash['padding-left'] && n.p == hash['padding-left'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'padding-left':
+							case 'padding-right':
+							case 'padding-bottom':
+							case 'padding-top':
+								if(hash['padding'] && n.p == hash['padding'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'list-style':
-								if( (hash['list-style-image'] && n.p <= hash['list-style-image'].p) ||
-									(hash['list-style-position'] && n.p <= hash['list-style-position'].p) ||
-									(hash['list-style-type'] && n.p <= hash['list-style-type'].p) ) {
+								if( (hash['list-style-image'] && n.p == hash['list-style-image'].p) ||
+									(hash['list-style-position'] && n.p == hash['list-style-position'].p) ||
+									(hash['list-style-type'] && n.p == hash['list-style-type'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'list-style-image':
+							case 'list-style-position':
+							case 'list-style-type':
+								if(hash['list-style'] && n.p == hash['list-style'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'overflow':
-								if( (hash['overflow-x'] && n.p <= hash['overflow-x'].p) ||
-									(hash['overflow-y'] && n.p <= hash['overflow-y'].p) ) {
+								if( (hash['overflow-x'] && n.p == hash['overflow-x'].p) ||
+									(hash['overflow-y'] && n.p == hash['overflow-y'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'overlfow-x':
+							case 'overlfow-y':
+								if(hash['overlfow'] && n.p == hash['overlfow'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'border':
-								if( (hash['border-left'] && n.p <= hash['border-left'].p) ||
-									(hash['border-top'] && n.p <= hash['border-top'].p) ||
-									(hash['border-right'] && n.p <= hash['border-right'].p) ||
-									(hash['border-bottom'] && n.p <= hash['border-bottom'].p) ||
-									(hash['border-width'] && n.p <= hash['border-width'].p) ||
-									(hash['border-color'] && n.p <= hash['border-color'].p) ||
-									(hash['border-style'] && n.p <= hash['border-style'].p) ||
-									(hash['border-left-width'] && n.p <= hash['border-left-width'].p) ||
-									(hash['border-left-color'] && n.p <= hash['border-left-color'].p) ||
-									(hash['border-left-style'] && n.p <= hash['border-left-style'].p) ||
-									(hash['border-top-width'] && n.p <= hash['border-top-width'].p) ||
-									(hash['border-top-color'] && n.p <= hash['border-top-color'].p) ||
-									(hash['border-top-style'] && n.p <= hash['border-top-style'].p) ||
-									(hash['border-right-width'] && n.p <= hash['border-right-width'].p) ||
-									(hash['border-right-color'] && n.p <= hash['border-right-color'].p) ||
-									(hash['border-right-style'] && n.p <= hash['border-right-style'].p) ||
-									(hash['border-bottom-width'] && n.p <= hash['border-bottom-width'].p) ||
-									(hash['border-bottom-color'] && n.p <= hash['border-bottom-color'].p) ||
-									(hash['border-bottom-style'] && n.p <= hash['border-bottom-style'].p) ) {
+								if( (hash['border-left'] && n.p == hash['border-left'].p) ||
+									(hash['border-top'] && n.p == hash['border-top'].p) ||
+									(hash['border-right'] && n.p == hash['border-right'].p) ||
+									(hash['border-bottom'] && n.p == hash['border-bottom'].p) ||
+									(hash['border-width'] && n.p == hash['border-width'].p) ||
+									(hash['border-color'] && n.p == hash['border-color'].p) ||
+									(hash['border-style'] && n.p == hash['border-style'].p) ||
+									(hash['border-left-width'] && n.p == hash['border-left-width'].p) ||
+									(hash['border-left-color'] && n.p == hash['border-left-color'].p) ||
+									(hash['border-left-style'] && n.p == hash['border-left-style'].p) ||
+									(hash['border-top-width'] && n.p == hash['border-top-width'].p) ||
+									(hash['border-top-color'] && n.p == hash['border-top-color'].p) ||
+									(hash['border-top-style'] && n.p == hash['border-top-style'].p) ||
+									(hash['border-right-width'] && n.p == hash['border-right-width'].p) ||
+									(hash['border-right-color'] && n.p == hash['border-right-color'].p) ||
+									(hash['border-right-style'] && n.p == hash['border-right-style'].p) ||
+									(hash['border-bottom-width'] && n.p == hash['border-bottom-width'].p) ||
+									(hash['border-bottom-color'] && n.p == hash['border-bottom-color'].p) ||
+									(hash['border-bottom-style'] && n.p == hash['border-bottom-style'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'border-left-width':
+							case 'border-left-color':
+							case 'border-left-style':
+								if( (hash['border-left'] && n.p == hash['border-left'].p) ||
+									(hash['border'] && n.p == hash['border']) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'border-right-width':
+							case 'border-right-color':
+							case 'border-right-style':
+								if( (hash['border-right'] && n.p == hash['border-right'].p) ||
+									(hash['border'] && n.p == hash['border']) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'border-top-width':
+							case 'border-top-color':
+							case 'border-top-style':
+								if( (hash['border-top'] && n.p == hash['border-top'].p) ||
+									(hash['border'] && n.p == hash['border']) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'border-bottom-width':
+							case 'border-bottom-color':
+							case 'border-bottom-style':
+								if( (hash['border-bottom'] && n.p == hash['border-bottom'].p) ||
+									(hash['border'] && n.p == hash['border']) ) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'border-left':
-								if( (hash['border-left-width'] && n.p <= hash['border-left-width'].p) ||
-									(hash['border-left-color'] && n.p <= hash['border-left-color'].p) ||
-									(hash['border-left-style'] && n.p <= hash['border-left-style'].p) ) {
+								if( (hash['border'] && n.p == hash['border']) ||
+									(hash['border-left-width'] && n.p == hash['border-left-width'].p) ||
+									(hash['border-left-color'] && n.p == hash['border-left-color'].p) ||
+									(hash['border-left-style'] && n.p == hash['border-left-style'].p) ) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'border-top':
-								if( (hash['border-top-width'] && n.p <= hash['border-top-width'].p) ||
-									(hash['border-top-color'] && n.p <= hash['border-top-color'].p) ||
-									(hash['border-top-style'] && n.p <= hash['border-top-style'].p) ) {
+								if( (hash['border'] && n.p == hash['border']) ||
+									(hash['border-top-width'] && n.p == hash['border-top-width'].p) ||
+									(hash['border-top-color'] && n.p == hash['border-top-color'].p) ||
+									(hash['border-top-style'] && n.p == hash['border-top-style'].p) ) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'border-right':
-								if( (hash['border-right-width'] && n.p <= hash['border-right-width'].p) ||
-									(hash['border-right-color'] && n.p <= hash['border-right-color'].p) ||
-									(hash['border-right-style'] && n.p <= hash['border-right-style'].p) ) {
+								if( (hash['border'] && n.p == hash['border']) ||
+									(hash['border-right-width'] && n.p == hash['border-right-width'].p) ||
+									(hash['border-right-color'] && n.p == hash['border-right-color'].p) ||
+									(hash['border-right-style'] && n.p == hash['border-right-style'].p) ) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'border-bottom':
-								if( (hash['border-bottom-width'] && n.p <= hash['border-bottom-width'].p) ||
-									(hash['border-bottom-color'] && n.p <= hash['border-bottom-color'].p) ||
-									(hash['border-bottom-style'] && n.p <= hash['border-bottom-style'].p) ) {
+								if( (hash['border'] && n.p == hash['border']) ||
+									(hash['border-bottom-width'] && n.p == hash['border-bottom-width'].p) ||
+									(hash['border-bottom-color'] && n.p == hash['border-bottom-color'].p) ||
+									(hash['border-bottom-style'] && n.p == hash['border-bottom-style'].p) ) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
 							case 'border-radius':
-								if( (hash['border-top-left-radius'] && n.p <= hash['border-top-left-radius'].p) ||
-									(hash['border-top-right-radius'] && n.p <= hash['border-top-right-radius'].p) ||
-									(hash['border-bottom-left-radius'] && n.p <= hash['border-bottom-left-radius'].p) ||
-									(hash['border-bottom-right-radius'] && n.p <= hash['border-bottom-right-radius'].p) ) {
+								if( (hash['border-top-left-radius'] && n.p == hash['border-top-left-radius'].p) ||
+									(hash['border-top-right-radius'] && n.p == hash['border-top-right-radius'].p) ||
+									(hash['border-bottom-left-radius'] && n.p == hash['border-bottom-left-radius'].p) ||
+									(hash['border-bottom-right-radius'] && n.p == hash['border-bottom-right-radius'].p) ) {
+									res = false;
+								}
+								else {
+									res = true;
+								}
+							break;
+							case 'border-top-left-radius':
+							case 'border-top-right-radius':
+							case 'border-bottom-left-radius':
+							case 'border-bottom-right-radius':
+								if(hash['border-radius'] && n.p == hash['border-radius'].p) {
+									res = false;
+								}
+								else {
 									res = true;
 								}
 							break;
@@ -647,52 +850,50 @@ define(function(require, exports) {
 				var temp = {};
 				same.forEach(function(o2) {
 					temp[o2.i] = true;
+					max = Math.max(max, o2.i);
 				});
 				index.push(temp);
-				max = Math.max(max, same.length);
 			}
-		});//console.log(keys);console.log(hash)
+		});
 		//排列好map的位置，索引和位置对应，空的地方填null
 		var map = [];
 		index.forEach(function(temp, idx) {
 			var arr = new Array(max);
 			for(var i = 0; i <= max; i++) {
-				arr[i] = null;
+				arr[i] = 0;
 			}
 			Object.keys(temp).forEach(function(i) {
-				arr[parseInt(i)] = true;
+				arr[parseInt(i)] = 1;
 			});
 			map.push(arr);console.log(arr, keys[idx]);
 		});
-		//同列相同部分视为一块矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器。优先取最大面积者合并。当然至少要2列，因为1列为只出现在一个选择器中没必要提。
+		//同列相同部分视为一块矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器。优先取最大面积者合并。当然至少要2列，因为1列为只出现在一个选择器中没必要提
+		//to do 面积择优算法。目前想到的复杂度过高，无法用于实际场景
+		//舍弃之采用单行合并，即拥有某一个样式的所有选择器尝试合并，当然因为优先级冲突不一定能够整行合并，递归其所有组合尝试
+		map.forEach(function(row, i) {
+			var start = row.indexOf(1);
+			var end = row.lastIndexOf(1);console.log(start, end);
+			var same = hash[keys[i]];console.log(same);
+			if(noImpact(node, start, end, same[same.length - 1].j)) {console.log('m', i);
+			}
+			else {console.log('confilct');
+			}
+		});
 	}
 
 	function join(node) {
 		node.forEach(function(o) {
-			//提取合并可能会出现空的情况
-			var num = 0;
-			o.block.forEach(function(style) {
-				if(style.extract) {
-					num++;
-				}
-			});
-			if(num == o.block.length) {
-				return;
-			}
 			body += o.selectors.join(',');
 			body += '{';
 			o.block.forEach(function(style, i) {
-				if(style.extract) {
-					return;
-				}
 				body += style.key;
 				body += ':';
 				body += style.value;
-				if(style.hack) {
-					body += style.hack;
-				}
 				if(style.impt) {
 					body += '!important';
+				}
+				if(style.hack) {
+					body += style.hack;
 				}
 				if(i < o.block.length - 1) {
 					body += ';';

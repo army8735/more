@@ -165,10 +165,15 @@ require(['../web/more', 'jssc'], function(more, jssc) {
 		npre.appendChild(ncode);
 		pre.parentNode.insertBefore(npre, pre.nextSibling);
 		if(tree) {
-			draw(i, tree, npre.nextSibling);
+			//draw(i, tree, npre.nextSibling);
 		}
 	});
 	jssc.exec();
+
+	var s = 'body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{color:#000}.test{color:#000}';
+	s = '.a{color:#000}.a{line-height:2}.b{margin:0;width:0;*height:0;opacity:0\\9;float:left!important}.a{padding:0}.a{margin:0}.a{width:2px}.a{width:3px!important}.a{height:0}.a{opacity:1}.a{float:none!important}.a{*width:0}.c{width:0;-width:0;-height:0;height:0;border-left:1px solid #000;border:none;*margin-left:0;margin:0;}.d{margin:0;padding:0}.n{margin:0}.e{padding:0;margin:0}.f{margin:0;padding:0;display:none}.g{margin:2px}.h{padding:0;margin:0;width:0}';
+	console.log(s)
+	console.log(more.compress(s))
 });
 </script>
 </body>
