@@ -967,7 +967,7 @@ define(function(require, exports) {
 			node = parser.program();
 			ignore = parser.ignore();
 		} catch(e) {
-			if(console) {
+			if(window.console) {
 				console.error(e);
 			}
 			return e.toString();
