@@ -208,6 +208,10 @@ define(function(require, exports) {
 				'border-bottom-right-radius': true
 			};
 			for(var i = first + 1; i < other; i++) {
+				//»º´æ
+				if(imCache[i + ',' + (i + 1)]) {
+					continue;
+				}
 				node[i].block.forEach(function(o) {
 					var k = getK(o.key);
 					if(hash[k]) {
