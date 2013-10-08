@@ -4,7 +4,7 @@ The css lexer bases on jssc: https://github.com/army8735/jssc
 
 相对于less，more的命名意思是比原本的css多做了一点点，定位于普通产品简化开发位置，而非广义CSS下游框架重量级功能。
 
-目前仅提供层级功能、子文件拆分和层级变量（实际上就是原标准的@import语法，并不擅自发明规范之外的新语法，合并工具请自行实现），AST部分预研css增量压缩器。
+目前仅提供层级功能、子文件拆分和层级变量（实际上就是原标准的@import语法，并不擅自发明规范之外的新语法，合并工具请自行实现）；还有css激进压缩器。
 
 web目录下为书写符合AMD/CMD规范的js文件；
 server目录下为nodejs环境的module模块。
@@ -37,7 +37,9 @@ more.imports():Array
 
 more.compress(src:String, agressive:Boolean):String
 
-压缩css文件。此方法基于clean-css，在不传入agressive参数或为false时即为clean-css的原有压缩功能；agressive为true时进行增量压缩，删除重复声明以及合并同类项。
+压缩css文件。此方法基于clean-css，在不传入agressive参数或为false时即为clean-css的原有压缩功能；agressive为true时进行激进压缩，合并去重聚合以及择优提取公因子，也是安全无冲突的。
+
+激进压缩5个步骤：合并相同选择器merge、去除同一选择器中重复样式声明duplicate、去除同一选择器中被覆盖的样式声明override、聚合相同样式的选择器union、提取公因子extract。
 
 # License
 
