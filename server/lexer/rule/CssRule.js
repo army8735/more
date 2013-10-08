@@ -31,7 +31,7 @@ var Rule = require('./Rule'),
 		self.addMatch(new RegMatch(Token.NUMBER, /^-\d+\.?\d*[a-z%]*/i));
 
 		self.addMatch(new RegMatch(Token.ID, /^[a-z_\-*][\w\-_]+/i));
-		self.addMatch(new RegMatch(Token.ID, /^\\[a-z\d]{4}/i));
+		self.addMatch(new RegMatch(Token.ID, /^(\\[a-z\d]{4})+/i));
 		self.addMatch(new CompleteEqual(Token.IMPORTANT, '!important'));
 
 		self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+[a-z%]*/i));

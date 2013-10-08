@@ -5,6 +5,7 @@ var CssLexer = require('./lexer/CssLexer'),
 	Node = require('./parser/Node'),
 	character = require('./util/character'),
 	compress = require('./compress'),
+	cleanCSS = require('clean-css'),
 	res,
 	node,
 	token,
@@ -225,15 +226,14 @@ exports.imports = function() {
 	return imports;
 };
 exports.compress = function(src, agressive) {
-	var cleanCSS = require('clean-css');
-	var minimized = cleanCSS.process(src, {
-		removeEmpty: true
-	});
-	if(agressive) {
-		minimized = compress.compress(minimized);
+	src = src || '';
+	if(cleanCSS.process) {
+		src = cleanCSS.process(src, {
+			removeEmpty: true
+		});
 	}
-	return minimized;
-};
-exports.test = function(src) {
-	return compress.compress(src);
+	if(agressive) {
+		src = compress.compress(src);
+	}
+	return src;
 };
