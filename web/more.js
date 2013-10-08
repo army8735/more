@@ -6,6 +6,7 @@ define(function(require, exports) {
 		Node = require('./parser/Node'),
 		character = require('./util/character'),
 		compress = require('./compress'),
+		cleanCSS = require('clean-css'),
 		res,
 		node,
 		token,
@@ -227,20 +228,14 @@ define(function(require, exports) {
 	};
 	exports.compress = function(src, agressive) {
 		src = src || '';
-		var web = !!(window && window.define);
-		var minimized;
-		if(web) {
-			minimized = src;
-		}
-		else {
-			var cleanCSS = require('clean-css');
-			minimized = cleanCSS.process(src, {
+		if(cleanCSS.process) {
+			src = cleanCSS.process(src, {
 				removeEmpty: true
 			});
 		}
-		if(web || agressive) {
-			minimized = compress.compress(minimized);
+		if(agressive) {
+			src = compress.compress(src);
 		}
-		return minimized;
+		return src;
 	};
 });
