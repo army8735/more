@@ -923,40 +923,55 @@ define(function(require, exports) {
 						s2s: ss.join(',')
 					});
 				}
+				//本行清空
+				for(var j = 0; j < row.length; j++) {
+					row[j] = 0;
+				}
 			}
 			else {
-				var count = 0;
 				for(var m = 0; m < row.length - 1; m++) {
-					if(row[m]) {
-						count++;
-						for(var n = m + 1; n < row.length; n++) {
+					//相邻必须有2个以上才合并
+					if(row[m] && row[m + 1]) {
+						for(var n = m + 2; n < row.length; n++) {
 							if(!row[n]) {
 								break;
 							}
 						}
-						//相邻必须有2个以上才合并
-						if(n > m + 1) {
-							var reduce = style.length * (n - m - 1);
-							var add = 0;
-							for(var j = count - 1; j < count + n - m - 1; j++) {
-								add += same[j].parent.s2s.length;
-							}
-							if(reduce > add + n - m - 1) {
-								var ss = [];
-								for(j = count - 1; j < count + n - m - 1; j++) {
-									ss = ss.concat(same[j].parent.selectors);
-									record.push(same[j]);
-								}
-								sort(ss);
-								insert.push({
-									i: same[count - 1].i + 1,
-									selectors: ss,
-									block: [same[count - 1].parent.block[same[count - 1].j]],
-									s2s: ss.join(',')
-								});
+						//同时进行纵向相同可合并行搜索，即这些选择器拥有的相同样式合并
+						var ri = [i];
+						var reduce = style.length * (n - m - 1);
+						for(var l = 0, compare = row.slice(m, n).join(''); l < map.length; l++) {
+							if(l != i && map[l].slice(m, n).join('') == compare) {
+								ri.push(l);
+								reduce += keys[l].length * (n - m - 1);
 							}
 						}
-						count += n - m - 1;
+						var add = 0;
+						for(var j = m + 1; j < n; j++) {
+							add += same[j].parent.s2s.length;
+						}
+						if(reduce > add + n - m - 1) {
+							var ss = [];
+							for(j = m; j < n; j++) {
+								ss = ss.concat(same[j].parent.selectors);
+							}
+							sort(ss);
+							var ins = {
+								i: same[m].i + 1,
+								selectors: ss,
+								block: [],
+								s2s: ss.join(',')
+							};
+							ri.forEach(function(l) {
+								var same = hash[keys[l]];
+								for(var k = m; k < n; k++) {
+									map[l][k] = 0;
+									record.push(same[k]);
+								}
+								ins.block.push(same[k].parent.block[same[k].j]);
+							});
+							insert.push(ins);
+						}
 						m = n;
 					}
 				}
@@ -973,9 +988,8 @@ define(function(require, exports) {
 			node.splice(o.i, 0, o);
 		});
 		clean(node);
-		//再次合并相同的选择器
+		//再次合并因提取公因子产生的具有相同样式的选择器
 		if(insert.length) {
-			merge(node);
 			union(node);
 		}
 	}
