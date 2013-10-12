@@ -1,6 +1,6 @@
 {
   "name": "more-css",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "a css pre-compiler & agressive compressor",
   "maintainers": [
     {
@@ -28,6 +28,7 @@
     }
   ],
   "dependencies": {},
+  "main": "./server/more",
   "engines": {
     "node": ">= 0.10.0"
   },
