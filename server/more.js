@@ -83,10 +83,14 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, pr
 		if(!isVirtual) {
 			var token = node.token();
 			if(inHead) {
-				res += replaceVar(token.content(), token.type());
+				var s = replaceVar(token.content(), token.type());
 				if(isImport && token.type() == Token.STRING) {
 					imports.push(token.val().replace(/\?.*$/, ''));
+					if(s.indexOf('.css') == -1 && !/\.\w+$/.test(s)) {
+						s = s.replace(/(['"]?)$/, '.css$1');
+					}
 				}
+				res += s;
 			}
 			else if(isVar) {
 				//ºöÂÔ±äÁ¿ÉùÃ÷
