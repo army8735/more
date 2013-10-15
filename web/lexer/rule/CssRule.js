@@ -37,6 +37,41 @@ define(function(require, exports, module) {
 
 			self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+[a-z%]*/i));
 
+			self.addMatch(new CompleteEqual(Token.ID, '::first-letter'));
+			self.addMatch(new CompleteEqual(Token.ID, ':first-letter'));
+			self.addMatch(new CompleteEqual(Token.ID, '::first-line'));
+			self.addMatch(new CompleteEqual(Token.ID, '::first-line'));
+			self.addMatch(new CompleteEqual(Token.ID, '::before'));
+			self.addMatch(new CompleteEqual(Token.ID, ':before'));
+			self.addMatch(new CompleteEqual(Token.ID, '::after'));
+			self.addMatch(new CompleteEqual(Token.ID, ':after'));
+			self.addMatch(new CompleteEqual(Token.ID, '::selection'));
+			self.addMatch(new CompleteEqual(Token.ID, ':link'));
+			self.addMatch(new CompleteEqual(Token.ID, ':visited'));
+			self.addMatch(new CompleteEqual(Token.ID, ':hover'));
+			self.addMatch(new CompleteEqual(Token.ID, ':active'));
+			self.addMatch(new CompleteEqual(Token.ID, ':focus'));
+			self.addMatch(new RegMatch(Token.ID, /^:lang\([\w-]+\)/));
+			self.addMatch(new CompleteEqual(Token.ID, /^:not\([\w-]+\)/));
+			self.addMatch(new CompleteEqual(Token.ID, ':root'));
+			self.addMatch(new CompleteEqual(Token.ID, ':first-child'));
+			self.addMatch(new CompleteEqual(Token.ID, ':last-child'));
+			self.addMatch(new CompleteEqual(Token.ID, ':only-child'));
+			self.addMatch(new CompleteEqual(Token.ID, /^:nth-child\(\d+\)/));
+			self.addMatch(new CompleteEqual(Token.ID, /^:nth-last-child\(\d+\)/));
+			self.addMatch(new CompleteEqual(Token.ID, ':first-of-type'));
+			self.addMatch(new CompleteEqual(Token.ID, ':last-of-type'));
+			self.addMatch(new CompleteEqual(Token.ID, ':only-of-type'));
+			self.addMatch(new CompleteEqual(Token.ID, /^:nth-of-type\(\d+\)/));
+			self.addMatch(new CompleteEqual(Token.ID, /^:nth-last-of-type\(\d+\)/));
+			self.addMatch(new CompleteEqual(Token.ID, ':empty'));
+			self.addMatch(new CompleteEqual(Token.ID, ':checked'));
+			self.addMatch(new CompleteEqual(Token.ID, ':enabled'));
+			self.addMatch(new CompleteEqual(Token.ID, ':disabled'));
+			self.addMatch(new CompleteEqual(Token.ID, '@page:first'));
+			self.addMatch(new CompleteEqual(Token.ID, '@page:left'));
+			self.addMatch(new CompleteEqual(Token.ID, '@page:right'));
+
 			['{', '}', ',', ';', '::', ':', '-', '(', ')', '>', '+', '/', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '~', '*'].forEach(function(o) {
 				self.addMatch(new CompleteEqual(Token.SIGN, o));
 			});
