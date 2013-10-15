@@ -11,6 +11,10 @@ server目录下为nodejs环境的module模块。
 
 more的核心理念是：原有的浏览器标准不修改，编译后的代码严格保持调试一致，行数不变更，文件对应关系不改变，满足GoToDefine的先决条件。
 
+##INSTALL
+
+npm install more-css
+
 ##API
 
 more.parse(code:String, preVars:Object):String
