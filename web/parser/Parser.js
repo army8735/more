@@ -291,7 +291,7 @@ define(function(require, exports, module) {
 				if([Token.VARS, Token.ID, Token.PROPERTY, Token.NUMBER, Token.STRING, Token.HEAD].indexOf(this.look.type()) > -1) {
 					node.add(this.match());
 				}
-				else if([',', '(', ')', '/'].indexOf(this.look.content()) != -1) {
+				else if([',', '(', ')', '/', '~'].indexOf(this.look.content()) != -1) {
 					node.add(this.match());
 				}
 				while(this.look) {

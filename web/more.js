@@ -13,7 +13,8 @@ define(function(require, exports) {
 		index,
 		stack,
 		varHash,
-		imports;
+		imports,
+		autoSplit;
 
 	function init(ignore) {
 		res = '';
@@ -30,6 +31,7 @@ define(function(require, exports) {
 		stack = [];
 		varHash = {};
 		imports = [];
+		autoSplit = false;
 	}
 	function preVar(node) {
 		var isToken = node.name() == Node.TOKEN;
@@ -106,7 +108,27 @@ define(function(require, exports) {
 					}
 				}
 				else {
-					res += replaceVar(token.content(), token.type());
+					//¼æÈÝlessµÄ~String²ð·ÖÓï·¨
+					if(autoSplit && token.type() == Token.STRING) {
+						var s = token.content();
+						var c = s.charAt(0);
+						if(c != "'" && c != '"') {
+							c = '"';
+							s = c + s + c;
+						}
+						s = s.replace(/,/g, c + ',' + c);
+						res = res.replace(/~\s*$/, '');
+						res += replaceVar(s, token.type());
+					}
+					else {
+						res += replaceVar(token.content(), token.type());
+					}
+					if(token.content() == '~') {
+						autoSplit = true;
+					}
+					else {
+						autoSplit = false;
+					}
 				}
 				while(ignore[++index]) {
 					var ig = ignore[index];
