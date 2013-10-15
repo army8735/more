@@ -262,6 +262,9 @@ define(function(require, exports, module) {
 					else if(this.look.type() == Token.KEYWORD) {
 						node.add(this.style());
 					}
+					else if(this.look.content() == ';') {
+						node.add(this.match());
+					}
 					else {
 						break;
 					}

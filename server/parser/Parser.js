@@ -261,6 +261,9 @@ var Class = require('../util/Class'),
 				else if(this.look.type() == Token.KEYWORD) {
 					node.add(this.style());
 				}
+				else if(this.look.content() == ';') {
+					node.add(this.match());
+				}
 				else {
 					break;
 				}
