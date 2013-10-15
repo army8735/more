@@ -41,6 +41,14 @@ more.compress(src:String, agressive:Boolean):String
 
 激进压缩5个步骤：合并相同选择器merge、去除同一选择器中重复样式声明duplicate、去除同一选择器中被覆盖的样式声明override、聚合相同样式的选择器union、提取公因子extract。
 
+more.root(root:String):String
+
+设置相对根路径的根路径，此在build()方法中用到，且不使用相对根路径的情况下无需设置。
+
+more.build(file:String, noImport:Boolean = false):String
+
+构建css文件，将一个可能包含多个文件的文件打包为一个单独的字符串。noImport为true时不处理@import的文件，默认包括。
+
 # License
 
 [MIT License]

@@ -315,11 +315,12 @@ define(function(require, exports) {
 		var s = fs.readFileSync(file, {
 			encoding: 'utf-8'
 		});
-		s = module.exports.parse(s);
+		var cur = file.replace(/\w+\.css$/, '');
+		s = module.exports.parse(s, buildHash[file]);
 		if(!noImport) {
 			s = removeImport(s);
 			var impts = module.exports.imports();
-			var cur = file.replace(/\w+\.css$/, '');
+			var vars = module.exports.vars();
 			impts.forEach(function(impt) {
 				if(impt.charAt(0) == '/') {
 					if(!root) {
@@ -330,12 +331,15 @@ define(function(require, exports) {
 				else {
 					impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
 				}
+				buildHash[impt] = vars;
 				build(impt, res, noImport);
 			});
 		}
 		res.push(s);
 	}
+	var buildHash;
 	exports.build = function(file, noImport) {
+		buildHash = {};
 		var res = [];
 		if(fs.readFileSync) {
 			build(file, res, noImport);
