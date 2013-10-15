@@ -62,14 +62,17 @@ body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-heigh
 @page thin:first { size: 3in 8in }
 $a:1;
 @b: 'Verdana';
+$img = '../../img/rss/ico.png';
 .gbtn {
+  background: url($img);
   font-family:@b,"\5b8b\4f53 $b";
   font-family: tahoma,arial,\5b8b\4f53,sans-serif;
   position: fixed\9;
-  -position: absolute;
+  -position: absolute;;;
   *position: absolute;
   _position: absolute !important;
   height: 10px\0;
+  font-family: ~"test,test2";
 }
 #fff:hover, .test {
 	text-align: center;
@@ -169,6 +172,7 @@ require(['../web/more', 'jssc'], function(more, jssc) {
 		}
 	});
 	jssc.exec();
+
 });
 </script>
 </body>

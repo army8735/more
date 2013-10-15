@@ -63,7 +63,8 @@ define(function(require, exports, module) {
 						return this.page();
 					default:
 						//¼æÈÝless
-						if(this.tokens[this.index] && this.tokens[this.index].content() == ':') {
+						var next = this.tokens[this.index];
+						if(next && (next.content() == ':' || next.content() == '=')) {
 							this.look.type(Token.VARS);
 							return this.vars();
 						}
@@ -202,7 +203,9 @@ define(function(require, exports, module) {
 			vars: function() {
 				var node = new Node(Node.VARS);
 				node.add(this.match());
-				node.add(this.match(':'));
+				if([':', '='].indexOf(this.look.content()) > -1) {
+					node.add(this.match());
+				}
 				node.add(this.match([Token.STRING, Token.NUMBER]));
 				node.add(this.match(';'));
 				return node;
