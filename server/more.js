@@ -63,14 +63,14 @@ function replaceVar(s, type) {
 					if(j > -1) {
 						c = s.slice(i + 2, j);
 						if(varHash[c]) {
-							s = s.slice(0, i) + (type == Token.STRING ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(j + 1);
+							s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(j + 1);
 						}
 					}
 				}
 				else if(/[\w-]/.test(c)) {
 					c = /^[\w-]+/.exec(s.slice(i + 1))[0];
 					if(varHash[c]) {
-						s = s.slice(0, i) + (type == Token.STRING ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(i + c.length + 1);
+						s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(i + c.length + 1);
 					}
 				}
 			}
