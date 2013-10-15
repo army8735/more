@@ -6,6 +6,7 @@ var CssLexer = require('./lexer/CssLexer'),
 	character = require('./util/character'),
 	compress = require('./compress'),
 	cleanCSS = require('clean-css'),
+	fs = require('fs'),
 	res,
 	node,
 	token,
@@ -263,3 +264,80 @@ exports.compress = function(src, agressive) {
 	}
 	return src;
 };
+var root;
+exports.root = function(r) {
+	if(r) {
+		root = r;
+	}
+	return root;
+};
+function removeImport(s) {
+	//0初始，1字符串
+	var state = 0;
+	for(var i = 0; i < s.length; i++) {
+		var c = s.charAt(i);
+		if(c == '/') {
+			c = s.charAt(i + 1);
+			if(c == '/') {
+				i = s.indexOf('\n', i + 2);
+				if(i == -1) {
+					i = s.length;
+				}
+			}
+			else if(c == '*') {
+				i = s.indexOf('*/', i + 2);
+				if(i == -1) {
+					i = s.length;
+				}
+			}
+		}
+		else if(c == '"' || c == "'") {
+			for(var j = i + 1; j < s.length; j++) {
+				var c2 = s.charAt(j);
+				if(c == c2) {
+					i = j;
+					break;
+				}
+				else if(c2 == '\\') {
+					j++;
+				}
+			}
+		}
+		else if(c == '@' && s.slice(i, i + 7) == '@import') {
+			var j = s.indexOf(';', i + 7) + 1;
+			s = s.slice(0, i) + s.slice(j);
+		}
+	}
+	return s;
+}
+function build(file, res, noImport) {
+	var s = fs.readFileSync(file, {
+		encoding: 'utf-8'
+	});
+	s = module.exports.parse(s);
+	if(!noImport) {
+		s = removeImport(s);
+		var impts = module.exports.imports();
+		var cur = file.replace(/\w+\.css$/, '');
+		impts.forEach(function(impt) {
+			if(impt.charAt(0) == '/') {
+				if(!root) {
+					throw new Error('构建@import的相对根路径文件需要首先设置root:\n' + file + ' -> ' + impt);
+				}
+				impt = root.replace(/[/\\]$/, '') + impt;
+			}
+			else {
+				impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
+			}
+			build(impt, res, noImport);
+		});
+	}
+	res.push(s);
+}
+exports.build = function(file, noImport) {
+	var res = [];
+	if(fs.readFileSync) {
+		build(file, res, noImport);
+	}
+	return res.join('');
+}
