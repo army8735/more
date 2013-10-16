@@ -58,7 +58,8 @@ define(function(require, exports, module) {
 			LINEARGRADIENT: 'lineargradient',
 			LENGTH: 'length',
 			COLOR: 'color',
-			VARS: 'vars'
+			VARS: 'vars',
+			EXTEND: 'extend'
 		});
 	module.exports = Node;
 });

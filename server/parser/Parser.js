@@ -267,11 +267,21 @@ var Class = require('../util/Class'),
 				else if(this.look.content() == ';') {
 					node.add(this.match());
 				}
+				else if(this.look.content() == '@extend') {
+					node.add(this.extend());
+				}
 				else {
 					break;
 				}
 			}
 			node.add(this.match('}'));
+			return node;
+		},
+		extend: function() {
+			var node = new Node(Node.EXTEND);
+			node.add(this.match());
+			node.add(this.selectors());
+			node.add(this.match(';'));
 			return node;
 		},
 		style: function() {
