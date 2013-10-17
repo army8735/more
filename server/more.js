@@ -14,7 +14,11 @@ var CssLexer = require('./lexer/CssLexer'),
 	stack,
 	varHash,
 	imports,
-	autoSplit;
+	autoSplit,
+	exHash,
+	styleMap,
+	levels,
+	exArr;
 
 function init(ignore) {
 	res = '';
@@ -32,6 +36,10 @@ function init(ignore) {
 	varHash = {};
 	imports = [];
 	autoSplit = false;
+	exHash = {};
+	styleMap = {};
+	levels = [];
+	exArr = [];
 }
 function preVar(node) {
 	var isToken = node.name() == Node.TOKEN;
@@ -79,7 +87,7 @@ function replaceVar(s, type) {
 	}
 	return s;
 }
-function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, prev, next) {
+function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, prev, next) {
 	var isToken = node.name() == Node.TOKEN,
 		isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 	if(isToken) {
@@ -98,7 +106,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, pr
 			else if(isVar) {
 				//忽略变量声明
 			}
-			else if(isSelectors || isSelector) {
+			else if(isSelectors || isSelector && !isExtend) {
 				var temp = stack[stack.length - 1];
 				if(isSelectors) {
 					temp.push('');
@@ -107,7 +115,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, pr
 					temp[temp.length - 1] += token.content();
 				}
 			}
-			else {
+			else if(!isExtend) {
 				//兼容less的~String拆分语法
 				if(autoSplit && token.type() == Token.STRING) {
 					var s = token.content();
@@ -144,28 +152,32 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, pr
 		}
 	}
 	else {
+		isSelectors = node.name() == Node.SELECTORS;
+		isSelector = node.name() == Node.SELECTOR;
 		if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
 			inHead = true;
 		}
-		if(node.name() == Node.VARS) {
+		else if(node.name() == Node.VARS) {
 			isVar = true;
 		}
 		//将层级拆开
-		if(node.name() == Node.STYLESET && !inHead) {
+		else if(node.name() == Node.STYLESET && !inHead) {
 			styleset(true, node, prev, next);
 		}
 		else if(node.name() == Node.BLOCK && !inHead) {
 			block(true, node);
 		}
-		if(node.name() == Node.IMPORT) {
+		else if(node.name() == Node.IMPORT) {
 			isImport = true;
 		}
-		isSelectors = node.name() == Node.SELECTORS;
-		isSelector = node.name() == Node.SELECTOR;
+		else if(node.name() == Node.EXTEND) {
+			isExtend = true;
+			record(node);
+		}
 		var leaves = node.leaves();
 		//递归子节点
 		leaves.forEach(function(leaf, i) {
-			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, leaves[i - 1], leaves[i + 1]);
+			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, leaves[i - 1], leaves[i + 1]);
 		});
 		if(node.name() == Node.STYLESET & !inHead) {
 			styleset(false, node, prev, next);
@@ -198,26 +210,105 @@ function styleset(startOrEnd, node, prev, next) {
 			}
 		}
 		stack.push(['']);
+		if(levels.length) {
+			exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
+		}
 	}
 	else {
 		stack.pop();
 		if(stack.length) {
-			//当多级styleset结束时下个还是styleset或}，会造成空白样式表，取消输出
+			//当多级styleset结束时下个还是styleset或}，会造成空白样式表
 			if(next && next.name() == Node.STYLESET) {
-				return;
 			}
-			res += concatSt(0, '', [], true).join(',') + '{';
+			else {
+				res += concatSt(0, '', [], true).join(',') + '{';
+			}
+		}
+		if(levels.length) {
+			exHash[levels[levels.length - 1]].start.push(res.length);
 		}
 	}
 }
 function block(startOrEnd, node) {
 	if(startOrEnd) {
-		res += concatSt(0, '', [], stack.length > 1).join(',');
+		var s = concatSt(0, '', [], stack.length > 1).join(','); 
+		res += s;
+		exHash[s] = {
+			start: [res.length + 1],
+			end: []
+		};
+		levels.push(s);
+	}
+	else {
+		exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
+		levels.pop();
+	}
+}
+function getSimpleSelector(s) {
+	s = s.trim().replace(/\s{2,}/g, ' ').replace(/\s+:/g, ':').replace(/\s+\[/g, '[').replace(/\]\s+/g, ']').replace(/\s*([>+~\]])+\s*/g, '$1');
+	return s.split(',');
+}
+function record(node) {
+	var s = '';
+	node.leaves()[1].leaves().forEach(function(selector, i) {
+		if(i % 2 == 0) {
+			selector.leaves().forEach(function(token, j) {
+				token = token.leaves();
+				s += ' ' + token.content();
+			});
+		}
+		else {
+			s += ',';
+		}
+	});
+	exArr.push({
+		index: res.length,
+		fathers: getSimpleSelector(s),
+		selectors: getSimpleSelector(levels[levels.length - 1])
+	});
+}
+function delExtend(selector, father, hash, list) {
+	hash = hash || {};
+	list = list || [selector];
+	if(hash[selector]) {
+		throw new Error('cyclic extend:\n' + list.join('\n'));
+	}
+	hash[selector] = true;
+	list.push(father);
+	styleMap[selector] += styleMap[father] || '';
+}
+function extend() {
+	Object.keys(exHash).forEach(function(s) {
+		var o = exHash[s];
+		var selectors = getSimpleSelector(s);
+		var v = '';
+		o.start.forEach(function(start, i) {
+			v += res.slice(start, o.end[i]).replace(/\s*\n\s*/g, '').trim();
+		});
+		selectors.forEach(function(selector) {
+			styleMap[selector] = v;
+		});
+	});
+	exArr.forEach(function(o) {
+		o.selectors.forEach(function(selector) {
+			o.fathers.forEach(function(father) {
+				delExtend(selector, father);
+			});
+		});
+	});
+	for(var i = exArr.length - 1; i >= 0; i--) {
+		var o = exArr[i];
+		var s = '';
+		o.fathers.forEach(function(father) {
+			s += styleMap[father] || '';
+		});
+		res = res.slice(0, o.index) + s + res.slice(o.index);
 	}
 }
 
-exports.parse = function(code, vars) {
+exports.parse = function(code, vars, style) {
 	vars = vars || {};
+	style = style || {};
 	var lexer = new CssLexer(new CssRule()),
 		parser = new Parser(lexer),
 		ignore = {};
@@ -236,8 +327,13 @@ exports.parse = function(code, vars) {
 	Object.keys(vars).forEach(function(k) {
 		varHash[k] = vars[k];
 	});
+	//传入初始化继承
+	Object.keys(style).forEach(function(k) {
+		styleMap[k] = style[k];
+	});
 	preVar(node);
 	join(node, ignore);
+	extend();
 	return character.escapeHTML(res);
 };
 exports.tree = function() {
@@ -251,6 +347,9 @@ exports.vars = function() {
 };
 exports.imports = function() {
 	return imports;
+};
+exports.styles = function() {
+	return styleMap;
 };
 exports.compress = function(src, agressive) {
 	src = src || '';

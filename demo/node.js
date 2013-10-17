@@ -3,6 +3,7 @@ var url = require('url');
 var fs = require('fs');
 var more = require('../server/more.js');
 var hash = {};
+var hash2 = {};
 
 http.createServer(function(request, response) {
 	var params = url.parse(request.url, true);
@@ -16,17 +17,21 @@ http.createServer(function(request, response) {
 			encoding: 'utf-8'
 		});
 		var pre = hash[params.path];
-		var str = more.parse(s, pre);
+		var pre2 = hash2[params.path];
+		var str = more.parse(s, pre, pre2);
 		var vars = more.vars();
+		var styles = more.styles();
 		var imports = more.imports();
 		imports.forEach(function(im) {
 			if(im.charAt(0) == '/') {
 				hash[im] = vars;
+				hash2[im] = styles;
 			}
 			else {
 				im = parent + im;
 				im = im.replace(/\w+\/\.\.\//g, '').replace(/\.\//g, '');
 				hash[im] = vars;
+				hash2[im] = styles;
 			}
 		});
 		response.write(str);
