@@ -156,6 +156,9 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 		isSelector = node.name() == Node.SELECTOR;
 		if(!inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
 			inHead = true;
+			if(node.name() == Node.IMPORT) {
+				isImport = true;
+			}
 		}
 		else if(node.name() == Node.VARS) {
 			isVar = true;
@@ -166,9 +169,6 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 		}
 		else if(node.name() == Node.BLOCK && !inHead) {
 			block(true, node);
-		}
-		else if(node.name() == Node.IMPORT) {
-			isImport = true;
 		}
 		else if(node.name() == Node.EXTEND) {
 			isExtend = true;
