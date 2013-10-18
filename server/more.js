@@ -7,6 +7,7 @@ var CssLexer = require('./lexer/CssLexer'),
 	compress = require('./compress'),
 	cleanCSS = require('clean-css'),
 	fs = require('fs'),
+	suffix = 'css',
 	res,
 	node,
 	token,
@@ -96,9 +97,12 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			if(inHead) {
 				var s = replaceVar(token.content(), token.type());
 				if(isImport && token.type() == Token.STRING) {
-					imports.push(token.val().replace(/\?.*$/, ''));
-					if(s.indexOf('.css') == -1 && !/\.\w+$/.test(s)) {
+					if(!/\.css['"]?$/.test(s)) {
 						s = s.replace(/(['"]?)$/, '.css$1');
+						imports.push(token.val() + '.css');
+					}
+					else {
+						imports.push(token.val());
 					}
 				}
 				res += s;
@@ -370,6 +374,12 @@ exports.root = function(r) {
 	}
 	return root;
 };
+exports.suffix = function(s) {
+	if(s) {
+		suffix = s;
+	}
+	return suffix;
+};
 function removeImport(s) {
 	//0³õÊ¼£¬1×Ö·û´®
 	var state = 0;
@@ -410,6 +420,9 @@ function removeImport(s) {
 	return s;
 }
 function build(file, res, noImport) {
+	if(suffix != 'css') {
+		file = file.replace(/\.css$/, '.' + file);
+	}
 	var s = fs.readFileSync(file, {
 		encoding: 'utf-8'
 	});

@@ -54,6 +54,10 @@ more.root(root:String):String
 
 设置相对根路径的根路径，此在build()方法中用到，且不使用相对根路径的情况下无需设置。
 
+more.suffix(s:String):String
+
+设置css文件的后缀名，默认为css，它影响构建@import的文件后缀名。
+
 more.build(file:String, noImport:Boolean = false):String
 
 构建css文件，将一个可能包含多个文件的文件合并为一个单独的字符串。noImport为true时不处理@import的文件，默认包括。
