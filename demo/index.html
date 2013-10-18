@@ -75,6 +75,7 @@ body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-heigh
 $a:1;
 @b: 'Verdana';
 $img = '../../img/rss/ico.png';
+$cssimg:  url("/v3/dist/img/home/v.png");
 .gbtn::after {
   background: url($img);
   font-family:@b,"\5b8b\4f53 $b";
@@ -85,6 +86,7 @@ $img = '../../img/rss/ico.png';
   _position: absolute !important;
   height: 10px\0;
   font-family: ~"test,test2";
+  background: $cssimg;
 }
 #fff:hover, .test {
 	@extend .gbtn::after;

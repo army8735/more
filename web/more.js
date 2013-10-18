@@ -49,7 +49,12 @@ define(function(require, exports) {
 			if(node.name() == Node.VARS) {
 				var leaves = node.leaves(),
 					k = leaves[0].leaves().content().slice(1),
-					v = leaves[2].leaves().content();
+					v = '';
+				leaves[2].leaves().forEach(function(leaf, i) {
+					var token = leaf.leaves();
+					if(i) v += ' ';
+					v += token.content();
+				});
 				varHash[k] = v;
 			}
 			else {

@@ -246,7 +246,7 @@ define(function(require, exports, module) {
 				if([':', '='].indexOf(this.look.content()) > -1) {
 					node.add(this.match());
 				}
-				node.add(this.match([Token.STRING, Token.NUMBER]));
+				node.add(this.value());
 				node.add(this.match(';'));
 				return node;
 			},
@@ -339,7 +339,7 @@ define(function(require, exports, module) {
 				node.add(this.match(Token.KEYWORD));
 				return node;
 			},
-			value: function(key) {
+			value: function() {
 				var node = new Node(Node.VALUE);
 				if(!this.look) {
 					this.error();
