@@ -162,7 +162,12 @@ var Class = require('../util/Class'),
 			key.add(this.match('font-family'));
 			style.add(key);
 			style.add(this.match(':'));
-			value.add(this.match(Token.ID));
+			if(this.look.type() == Token.STRING) {
+				value.add(this.match());
+			}
+			else {
+				value.add(this.match(Token.ID));
+			}
 			style.add(value);
 			style.add(this.match(';'));
 			node2.add(style);
@@ -173,9 +178,44 @@ var Class = require('../util/Class'),
 			style.add(key);
 			style.add(this.match(':'));
 			value.add(this.url());
+			if(this.look && this.look.content() == 'format') {
+				value.add(this.format());
+			}
+			while(this.look && this.look.content() == ',') {
+				value.add(this.match());
+				value.add(this.url());
+				if(this.look && this.look.content() == 'format') {
+					value.add(this.format());
+				}
+			}
 			style.add(value);
 			style.add(this.match(';'));
 			node2.add(style);
+			while(this.look && this.look.content() == 'src') {
+				style = new Node(Node.STYLE);
+				key = new Node(Node.KEY);
+				value = new Node(Node.VALUE);
+				key.add(this.match('src'));
+				style.add(key);
+				style.add(this.match(':'));
+				value.add(this.url());
+				if(this.look && this.look.content() == 'format') {
+					value.add(this.format());
+				}
+				while(this.look && this.look.content() == ',') {
+					value.add(this.match());
+					value.add(this.url());
+					if(this.look && this.look.content() == 'format') {
+						value.add(this.format());
+					}
+				}
+				style.add(value);
+				style.add(this.match(';'));
+				node2.add(style);
+			}
+			while(this.look && this.look.content() != '}') {
+				node2.add(this.style());
+			}
 			node2.add(this.match('}'));
 			node.add(node2);
 			return node;
@@ -349,6 +389,14 @@ var Class = require('../util/Class'),
 					this.match(')')
 				);
 			}
+			return node;
+		},
+		format: function() {
+			var node = new Node(Node.FORMAT);
+			node.add(this.match());
+			node.add(this.match('('));
+			node.add(this.match(Token.STRING));
+			node.add(this.match(')'));
 			return node;
 		},
 		match: function(type, msg) {

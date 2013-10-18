@@ -59,7 +59,8 @@ define(function(require, exports, module) {
 			LENGTH: 'length',
 			COLOR: 'color',
 			VARS: 'vars',
-			EXTEND: 'extend'
+			EXTEND: 'extend',
+			FORMAT: 'format'
 		});
 	module.exports = Node;
 });

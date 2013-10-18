@@ -32,7 +32,6 @@ var Lexer = require('./Lexer'),
 							}
 							else if(token.content() == ')') {
 								this.parenthese = false;
-								this.isUrl = false;
 							}
 							else {
 								this.dealPt(temp);
@@ -109,13 +108,7 @@ var Lexer = require('./Lexer'),
 						if(token.type() == Token.NUMBER && !this.isValue && token.content().charAt(0) == '#') {
 							token.type(Token.ID);
 						}
-						if(token.content() == 'url') {
-							this.isUrl = true;
-						}
-						else if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(token.type()) != -1) {
-							this.isUrl = false;
-						}
-						this.isUrl = token.content() == 'url';
+						this.isUrl = token.content() == 'url' || token.content() == 'format';
 						temp.push(token);
 						this.tokenList.push(token);
 						this.index += matchLen - 1;
@@ -165,7 +158,7 @@ var Lexer = require('./Lexer'),
 					var i = token.content().indexOf(character.LINE),
 						j = token.content().lastIndexOf(character.LINE);
 					this.colMax = Math.max(this.colMax, this.colNum + i);
-					this.colNum = match.content().length - j;
+					this.colNum = token.content().length - j;
 				}
 				else {
 					this.colNum += token.content().length;
@@ -189,7 +182,7 @@ var Lexer = require('./Lexer'),
 				var i = token.content().indexOf(character.LINE),
 					j = token.content().lastIndexOf(character.LINE);
 				this.colMax = Math.max(this.colMax, this.colNum + i);
-				this.colNum = match.content().length - j;
+				this.colNum = token.content().length - j;
 			}
 			else {
 				this.colNum += token.content().length;
