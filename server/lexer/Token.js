@@ -15,13 +15,22 @@ var Class = require('../util/Class'),
 			}
 			return this.t;
 		},
-		content: function() {
+		content: function(c) {
+			if(!character.isUndefined(c)) {
+				this.c = c;
+			}
 			return this.c;
 		},
-		val: function() {
+		val: function(v) {
+			if(!character.isUndefined(v)) {
+				this.v = v;
+			}
 			return this.v;
 		},
-		tag: function() {
+		tag: function(t) {
+			if(!character.isUndefined(t)) {
+				this.t = t;
+			}
 			return Token.type(this.t);
 		}
 	}).statics({

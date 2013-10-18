@@ -250,6 +250,9 @@ var Class = require('../util/Class'),
 			return node;
 		},
 		styleset: function(numCanBeKey) {
+			if(this.look && this.look.content() == '&') {
+				this.look.content('');
+			}
 			var node = new Node(Node.STYLESET);
 			node.add(this.selectors(numCanBeKey));
 			node.add(this.block());
@@ -298,7 +301,7 @@ var Class = require('../util/Class'),
 			var node = new Node(Node.BLOCK);
 			node.add(this.match('{'));
 			while(this.look) {
-				if(this.look.type() == Token.ID || ['*', '>', '~', ':'].indexOf(this.look.content()) != -1) {
+				if(this.look.type() == Token.ID || ['*', '>', '~', ':', '&'].indexOf(this.look.content()) != -1) {
 					node.add(this.styleset());
 				}
 				else if(this.look.type() == Token.KEYWORD) {
