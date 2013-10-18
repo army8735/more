@@ -36,6 +36,10 @@ more.vars():Object<String, String>
 
 获取解析后的变量声明哈希表。键为变量名，值为变量值。
 
+more.global(global:Object<String, String/Number/Boolean>):Object<String, String/Number/Boolean>
+
+设置全局变量，可在所有文件中被访问。局部变量拥有更高优先级。
+
 more.styles():Object<String, String>
 
 获取样式集。键为标准选择器名，值为其对应的样式集和。

@@ -20,7 +20,8 @@ define(function(require, exports) {
 		exHash,
 		styleMap,
 		levels,
-		exArr;
+		exArr,
+		global;
 
 	function init(ignore) {
 		res = '';
@@ -42,6 +43,7 @@ define(function(require, exports) {
 		styleMap = {};
 		levels = [];
 		exArr = [];
+		global = {};
 	}
 	function preVar(node) {
 		var isToken = node.name() == Node.TOKEN;
@@ -78,15 +80,17 @@ define(function(require, exports) {
 						var j = s.indexOf('}', i + 3);
 						if(j > -1) {
 							c = s.slice(i + 2, j);
-							if(varHash[c]) {
-								s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(j + 1);
+							var vara = varHash[c] || global[c];
+							if(vara) {
+								s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(j + 1);
 							}
 						}
 					}
 					else if(/[\w-]/.test(c)) {
 						c = /^[\w-]+/.exec(s.slice(i + 1))[0];
-						if(varHash[c]) {
-							s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? varHash[c].replace(/^(['"])(.*)\1$/, '$2') : varHash[c]) + s.slice(i + c.length + 1);
+						var vara = varHash[c] || global[c];
+						if(vara) {
+							s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(i + c.length + 1);
 						}
 					}
 				}
@@ -354,6 +358,10 @@ define(function(require, exports) {
 	};
 	exports.vars = function() {
 		return varHash;
+	};
+	exports.global = function(g) {
+		global = g;
+		return global;
 	};
 	exports.imports = function() {
 		return imports;
