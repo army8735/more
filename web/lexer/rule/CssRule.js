@@ -71,6 +71,7 @@ define(function(require, exports, module) {
 			self.addMatch(new CompleteEqual(Token.ID, '@page:first'));
 			self.addMatch(new CompleteEqual(Token.ID, '@page:left'));
 			self.addMatch(new CompleteEqual(Token.ID, '@page:right'));
+			self.addMatch(new RegMatch(Token.ID, /^::?(?:-(?:moz|webkit|ms)-)?(?:placeholder|clear)/));
 
 			['{', '}', ',', ';', '::', ':', '-', '(', ')', '>', '+', '/', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '~', '*'].forEach(function(o) {
 				self.addMatch(new CompleteEqual(Token.SIGN, o));

@@ -88,6 +88,10 @@ $cssimg:  url("/v3/dist/img/home/v.png");
   font-family: ~"test,test2";
   background: $cssimg;
 }
+input:-moz-placeholder{color:#808080;}
+input:-webkit-placeholder{color:#808080;}
+input:placeholder{color:#808080;}
+input::-ms-clear{display:none;}
 #fff:hover, .test {
 	@extend .gbtn::after;
 	text-align: center;
