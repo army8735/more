@@ -247,15 +247,13 @@ define(function(require, exports) {
 	}
 	function block(startOrEnd, node) {
 		if(startOrEnd) {
-			var s = concatSt(0, '', [], stack.length > 1).join(','); 
+			var s = concatSt(0, '', [], stack.length > 1).join(',').replace(/\s*&\s*/g, ''); 
 			res += s;
 			exHash[s] = {
 				start: [res.length + 1],
 				end: []
 			};
 			levels.push(s);
-			//È¥³ý&ºÅ
-			res = res.replace(/\s*&\s*/g, '');
 		}
 		else {
 			exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
