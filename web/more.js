@@ -43,7 +43,6 @@ define(function(require, exports) {
 		styleMap = {};
 		levels = [];
 		exArr = [];
-		global = {};
 	}
 	function preVar(node) {
 		var isToken = node.name() == Node.TOKEN;
