@@ -250,9 +250,6 @@ var Class = require('../util/Class'),
 			return node;
 		},
 		styleset: function(numCanBeKey) {
-			if(this.look && this.look.content() == '&') {
-				this.look.content('');
-			}
 			var node = new Node(Node.STYLESET);
 			node.add(this.selectors(numCanBeKey));
 			node.add(this.block());

@@ -43,6 +43,7 @@ define(function(require, exports) {
 		styleMap = {};
 		levels = [];
 		exArr = [];
+		global = global || {};
 	}
 	function preVar(node) {
 		var isToken = node.name() == Node.TOKEN;
@@ -243,6 +244,8 @@ define(function(require, exports) {
 		}
 		//去除层级造成的空样式
 		res = res.replace(/(}\s*).+{}(\s*)$/, '$1$2');
+		//去除&号
+		res = res.replace(/\s*&\s*/g, '');
 	}
 	function block(startOrEnd, node) {
 		if(startOrEnd) {
