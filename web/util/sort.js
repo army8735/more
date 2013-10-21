@@ -1,4 +1,4 @@
-define(function() {
+define(function(require, exports, module) {
 	function quickSort(arr, begin, end, compare) {
 		if(begin >= end) {
 			return;
@@ -55,7 +55,7 @@ define(function() {
 			j: j
 		};
 	}
-	return function(arr, compare) {
+	module.exports =  function(arr, compare) {
 		if(!Array.isArray(arr)) {
 			throw new Error('quick sort need an array');
 		}

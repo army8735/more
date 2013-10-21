@@ -54,7 +54,7 @@ function getM(arr, a, b) {
 		j: j
 	};
 }
-return function(arr, compare) {
+module.exports =  function(arr, compare) {
 	if(!Array.isArray(arr)) {
 		throw new Error('quick sort need an array');
 	}

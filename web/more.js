@@ -437,7 +437,8 @@ define(function(require, exports) {
 		}
 		return s;
 	}
-	function build(file, res, noImport) {
+	function build(file, res, noImport, depth) {
+		depth = depth || 1;
 		if(suffix != 'css') {
 			file = file.replace(/\.css$/, '.' + file);
 		}
@@ -460,8 +461,11 @@ define(function(require, exports) {
 				else {
 					impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
 				}
+				var trace = '';
+				for(var i = 0; i < depth; i++) trace += '\t';
+				console.log(trace + impt);
 				buildHash[impt] = vars;
-				build(impt, res, noImport);
+				build(impt, res, noImport, depth+1);
 			});
 		}
 		res.push(s);

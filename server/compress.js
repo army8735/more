@@ -896,6 +896,10 @@ function extract(node) {
 	map.forEach(function(row, i) {
 		var start = row.indexOf(1);
 		var end = row.lastIndexOf(1);
+		//列操作可能将后面的某行清空，判断之
+		if(start == end) {
+			return;
+		}
 		var style = keys[i];
 		var same = hash[style];
 		//优先本行合并，若冲突，进行相邻列合并。因为相邻出现一定无冲突
@@ -946,17 +950,26 @@ function extract(node) {
 						}
 					}
 					var add = 0;
-					for(var j = m + 1; j < n; j++) {
-						add += same[j].parent.s2s.length;
-					}
+					var first;
+					same.forEach(function(o) {
+						if(o.i > m && o.i < n) {
+							if(!first) {
+								first = o;
+							}
+							add += o.parent.s2s.length;
+						}
+					});
 					if(reduce > add + n - m - 1) {
 						var ss = [];
-						for(j = m; j < n; j++) {
-							ss = ss.concat(same[j].parent.selectors);
-						}
+						same.forEach(function(o) {
+							if(o.i >= m && o.i < n) {
+								ss = ss.concat(o.parent.selectors);
+								record.push(o);
+							}
+						});
 						sort(ss);
 						var ins = {
-							i: same[m].i + 1,
+							i: first.i + 1,
 							selectors: ss,
 							block: [],
 							s2s: ss.join(',')
@@ -965,9 +978,8 @@ function extract(node) {
 							var same = hash[keys[l]];
 							for(var k = m; k < n; k++) {
 								map[l][k] = 0;
-								record.push(same[k]);
 							}
-							ins.block.push(same[k].parent.block[same[k].j]);
+							ins.block.push(same[0].parent.block[same[0].j]);
 						});
 						insert.push(ins);
 					}
