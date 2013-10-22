@@ -21,7 +21,8 @@ define(function(require, exports) {
 		styleMap,
 		levels,
 		exArr,
-		global;
+		global,
+		less;
 
 	function init(ignore) {
 		res = '';
@@ -113,6 +114,10 @@ define(function(require, exports) {
 						}
 						else {
 							imports.push(token.val());
+						}
+						//兼容less，相对路径为根路径
+						if(less) {
+							s = s.replace(/^(['"]?)([\w-])/, '$1/$2');
 						}
 					}
 					res += s;
@@ -364,6 +369,10 @@ define(function(require, exports) {
 	exports.global = function(g) {
 		global = g;
 		return global;
+	};
+	exports.less = function(l) {
+		less = l;
+		return less;
 	};
 	exports.imports = function() {
 		return imports;
