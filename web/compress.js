@@ -133,6 +133,9 @@ define(function(require, exports) {
 		else if(s.indexOf('-ms-') == 0) {
 			s = s.slice(4);
 		}
+		else if(s.indexOf('-o-') == 0) {
+			s = s.slice(3);
+		}
 		else if(/^[*_-]/.test(s)) {
 			s = s.slice(1);
 		}

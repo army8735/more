@@ -70,7 +70,7 @@ var Rule = require('./Rule'),
 		self.addMatch(new CompleteEqual(Token.ID, '@page:first'));
 		self.addMatch(new CompleteEqual(Token.ID, '@page:left'));
 		self.addMatch(new CompleteEqual(Token.ID, '@page:right'));
-		self.addMatch(new RegMatch(Token.ID, /^::?(?:-(?:moz|webkit|ms)-)?(?:placeholder|clear)/));
+		self.addMatch(new RegMatch(Token.ID, /^::?(?:-(?:moz|webkit|ms|o)-)?(?:placeholder|clear)/));
 		self.addMatch(new CompleteEqual(Token.ID, '&'));
 
 		['{', '}', ',', ';', '::', ':', '-', '(', ')', '>', '+', '/', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '~', '*'].forEach(function(o) {

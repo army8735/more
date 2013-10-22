@@ -58,6 +58,12 @@ var Lexer = require('./Lexer'),
 									token.type(Token.KEYWORD);
 								}
 							}
+							//-o-
+							else if(token.content().indexOf('-o-') == 0) {
+								if(this.rule.keyWords().hasOwnProperty(token.content().slice(3))) {
+									token.type(Token.KEYWORD);
+								}
+							}
 							//ie hackÒ²Ëã¹Ø¼ü×Ö
 							else if(/^[*\-_]/.test(token.content().charAt(0))) {
 								if(this.rule.keyWords().hasOwnProperty(token.content().slice(1))) {
