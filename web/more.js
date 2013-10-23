@@ -21,8 +21,7 @@ define(function(require, exports) {
 		styleMap,
 		levels,
 		exArr,
-		global,
-		less;
+		global;
 
 	function init(ignore) {
 		res = '';
@@ -117,7 +116,15 @@ define(function(require, exports) {
 						}
 						//兼容less，相对路径为根路径
 						if(less) {
-							s = s.replace(/^(['"]?)([\w-])/, '$1/$2');
+							if(/^(['"]?)\//.test(s)) {
+								s = s.replace(/^(['"]?)\//, '$1' + root);
+							}
+							else {
+								s = s.replace(/^(['"]?)([\w-])/, '$1' + root + '$2');
+							}
+						}
+						else {
+							s = s.replace(/^(['"]?)\//, '$1' + root);
 						}
 					}
 					res += s;
@@ -370,6 +377,7 @@ define(function(require, exports) {
 		global = g;
 		return global;
 	};
+	var less;
 	exports.less = function(l) {
 		less = l;
 		return less;
@@ -392,9 +400,18 @@ define(function(require, exports) {
 		}
 		return src;
 	};
-	var root;
+	var localRoot = '';
+	exports.localRoot = function(r) {
+		if(r) {
+			localRoot = r;
+		}
+		return localRoot;
+	};
+	var root = '';
 	exports.root = function(r) {
 		if(r) {
+			if(r.charAt(0) != '/') r = '/' + r;
+			if(r.lastIndexOf('/') != r.length - 1) r += '/';
 			root = r;
 		}
 		return root;
@@ -459,14 +476,27 @@ define(function(require, exports) {
 			var impts = module.exports.imports();
 			var vars = module.exports.vars();
 			impts.forEach(function(impt) {
-				if(impt.charAt(0) == '/') {
-					if(!root) {
-						throw new Error('构建@import的相对根路径文件需要首先设置root:\n' + file + ' -> ' + impt);
+				if(less) {
+					if(impt.charAt(0) == '.') {
+						impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
 					}
-					impt = root.replace(/[/\\]$/, '') + impt;
+					else {
+						if(!localRoot) {
+							throw new Error('构建@import的相对根路径文件需要首先设置root:\n' + file + ' -> ' + impt);
+						}
+						impt = localRoot.replace(/[/\\]$/, '') + '/' + impt.replace(/^[/\\]/, '');
+					}
 				}
 				else {
-					impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
+					if(impt.charAt(0) == '/') {
+						if(!localRoot) {
+							throw new Error('构建@import的相对根路径文件需要首先设置root:\n' + file + ' -> ' + impt);
+						}
+						impt = localRoot.replace(/[/\\]$/, '') + impt;
+					}
+					else {
+						impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
+					}
 				}
 				var trace = '';
 				for(var i = 0; i < depth; i++) trace += '\t';

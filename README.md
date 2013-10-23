@@ -56,11 +56,15 @@ more.compress(src:String, agressive:Boolean):String
 
 more.root(root:String):String
 
-设置相对根路径的根路径，此在build()方法中用到，且不使用相对根路径的情况下无需设置。
+设置uri的根路径，此在@import解析中会用到，且不使用相对根路径的情况下无需设置。
+
+more.localRoot(localRoot:String):String
+
+设置本地根路径，此在build()方法中用到，且不使用相对根路径的情况下无需设置。
 
 more.less(l:Boolean):Boolean
 
-是否兼容less的相对路径。在uri标准中，'/uri'为相对根路径，'uri'和'./uri'均为相对当前路径，兼容less为仅后者为当前路径，前2为相对根。此设置会干扰@import和构建。
+是否兼容less的相对路径。在uri标准中，'/uri'为相对根路径，'uri'和'./uri'均为相对当前路径，兼容less为仅后者为当前路径，前2为相对根。此设置会干扰@import和build()方法。
 
 more.suffix(s:String):String
 
