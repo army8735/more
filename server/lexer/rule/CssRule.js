@@ -77,7 +77,9 @@ var Rule = require('./Rule'),
 			self.addMatch(new CompleteEqual(Token.SIGN, o));
 		});
 		self.addMatch(new RegMatch(Token.HEAD, /^@[\w-]+/));
+		self.addMatch(new RegMatch(Token.VARS, /^@\{[\w-]+\}/));
 		self.addMatch(new RegMatch(Token.VARS, /^\$[\w-]+/));
+		self.addMatch(new RegMatch(Token.VARS, /^\$\{[\w-]+\}/));
 
 		self.addMatch(new RegMatch(Token.NUMBER, /^#[\da-f]{6}/i));
 		self.addMatch(new RegMatch(Token.NUMBER, /^#[\da-f]{3}/i));

@@ -13,6 +13,7 @@ define(function(require, exports) {
 		node,
 		token,
 		index,
+		preIndex,
 		stack,
 		varHash,
 		imports,
@@ -35,6 +36,7 @@ define(function(require, exports) {
 			}
 			index++;
 		}
+		preIndex = index;
 		stack = [];
 		varHash = {};
 		imports = [];
@@ -45,25 +47,34 @@ define(function(require, exports) {
 		exArr = [];
 		global = global || {};
 	}
-	function preVar(node) {
+	function preVar(node, ignore) {
 		var isToken = node.name() == Node.TOKEN;
+		var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 		if(!isToken) {
 			if(node.name() == Node.VARS) {
 				var leaves = node.leaves(),
 					k = leaves[0].leaves().content().slice(1),
 					v = '';
-				leaves[2].leaves().forEach(function(leaf, i) {
+				while(ignore[++preIndex]) {}
+				while(ignore[++preIndex]) {}
+				leaves[2].leaves().forEach(function(leaf) {
 					var token = leaf.leaves();
-					if(i) v += ' ';
 					v += token.content();
+					while(ignore[++preIndex]) {
+						v += ignore[preIndex].content();
+					}
 				});
+				while(ignore[++preIndex]) {}
 				varHash[k] = v;
 			}
 			else {
 				node.leaves().forEach(function(leaf) {
-					preVar(leaf);
+					preVar(leaf, ignore);
 				});
 			}
+		}
+		else if(!isVirtual) {
+			while(ignore[++preIndex]) {}
 		}
 	}
 	function replaceVar(s, type) {
@@ -359,7 +370,7 @@ define(function(require, exports) {
 		Object.keys(style).forEach(function(k) {
 			styleMap[k] = style[k];
 		});
-		preVar(node);
+		preVar(node, ignore);
 		join(node, ignore);
 		extend();
 		return character.escapeHTML(res);

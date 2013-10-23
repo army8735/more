@@ -63,14 +63,8 @@ define(function(require, exports, module) {
 						return this.page();
 					default:
 						//ºÊ»›less
-						var next = this.tokens[this.index];
-						if(next && (next.content() == ':' || next.content() == '=')) {
-							this.look.type(Token.VARS);
-							return this.vars();
-						}
-						else {
-							this.error('unknow head rules');
-						}
+						this.look.type(Token.VARS);
+						return this.vars();
 				}
 			},
 			impt: function() {
@@ -310,6 +304,9 @@ define(function(require, exports, module) {
 					}
 					else if(this.look.content() == '@extend') {
 						node.add(this.extend());
+					}
+					else if(this.look.type() == Token.VARS) {
+						node.add(this.match());
 					}
 					else {
 						break;
