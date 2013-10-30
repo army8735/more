@@ -43,6 +43,9 @@ define(function(require, exports, module) {
 				else if(this.look.type() == Token.VARS) {
 					return this.vars();
 				}
+				else if(['}', ';'].indexOf(this.look.content()) > -1) {
+					return this.match();
+				}
 				else {
 					return this.styleset();
 				}
