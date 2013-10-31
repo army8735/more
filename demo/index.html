@@ -75,8 +75,9 @@ $test: background: url("/v3/dist/img/home/v.png");
 @page thin:first { size: 3in 8in }
 $a:1;
 @b: 'Verdana';
-$img = '../../img/rss/ico.png';
-$cssimg:  url("/v3/dist/img/home/v.png");
+$inner: 'ico.png';
+$img = '../../img/rss/$inner';
+$cssimg:  url("/v3/dist/img/home/${inner}");
 .gbtn::after {
   background: url($img);
   font-family:@b,"\5b8b\4f53 $b";

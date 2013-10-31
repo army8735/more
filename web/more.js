@@ -59,7 +59,7 @@ define(function(require, exports) {
 				while(ignore[++preIndex]) {}
 				leaves[2].leaves().forEach(function(leaf) {
 					var token = leaf.leaves();
-					v += token.content();
+					v += replaceVar(token.content(), token.type());
 					while(ignore[++preIndex]) {
 						v += ignore[preIndex].content();
 					}
