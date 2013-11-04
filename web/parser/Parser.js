@@ -111,16 +111,14 @@ define(function(require, exports, module) {
 					'screen': true,
 					'tty': true,
 					'embossed': true,
-					'tv': true
+					'tv': true,
+					'(': true
 				};
 				if(!this.look) {
 					return node;
 				}
 				if(m[this.look.content()]) {
 					node.add(this.mediaQList());
-				}
-				else {
-					return node;
 				}
 				while(this.look && this.look.content() == ',') {
 					node.add(this.match());
