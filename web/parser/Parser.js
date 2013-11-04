@@ -4,7 +4,9 @@ define(function(require, exports, module) {
 		Lexer = require('../lexer/Lexer'),
 		Token = require('../lexer/Token'),
 		Node = require('./Node'),
-		Parser = Class(function(lexer) {
+		S = {};
+	S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
+	var Parser = Class(function(lexer) {
 			this.lexer = lexer;
 			this.look = null;
 			this.tokens = null;
@@ -43,7 +45,7 @@ define(function(require, exports, module) {
 				else if(this.look.type() == Token.VARS) {
 					return this.vars();
 				}
-				else if(['}', ';'].indexOf(this.look.content()) > -1) {
+				else if(['}', ';', ','].indexOf(this.look.content()) > -1) {
 					return this.match();
 				}
 				else {
@@ -74,7 +76,21 @@ define(function(require, exports, module) {
 				var node = new Node(Node.IMPORT);
 				node.add(this.match());
 				node.add(this.url(true));
-				if(['only', 'not', 'all', 'aural', 'braille', 'handheld', 'print', 'projection', 'screen', 'tty', 'embossed', 'tv'].indexOf(this.look.content()) != -1) {
+				var m = {
+					'only': true,
+					'not': true,
+					'all': true,
+					'aural': true,
+					'braille': true,
+					'handheld': true,
+					'print': true,
+					'projection': true,
+					'screen': true,
+					'tty': true,
+					'embossed': true,
+					'tv': true
+				};
+				if(m[this.look.content()]) {
 					node.add(this.mediaQList());
 				}
 				node.add(this.match(';'));
@@ -83,10 +99,24 @@ define(function(require, exports, module) {
 			media: function() {
 				var node = new Node(Node.MEDIA);
 				node.add(this.match());
+				var m = {
+					'only': true,
+					'not': true,
+					'all': true,
+					'aural': true,
+					'braille': true,
+					'handheld': true,
+					'print': true,
+					'projection': true,
+					'screen': true,
+					'tty': true,
+					'embossed': true,
+					'tv': true
+				};
 				if(!this.look) {
 					return node;
 				}
-				if(['only', 'not', 'all', 'aural', 'braille', 'handheld', 'print', 'projection', 'screen', 'tty', 'embossed', 'tv'].indexOf(this.look.content()) != -1) {
+				if(m[this.look.content()]) {
 					node.add(this.mediaQList());
 				}
 				else {
@@ -264,13 +294,30 @@ define(function(require, exports, module) {
 			},
 			selector: function(numCanBeKey) {
 				var node = new Node(Node.SELECTOR);
+				var sign = {
+					'*': true,
+					'>': true,
+					'~': true,
+					'::': true,
+					':': true,
+					'[': true,
+					']': true,
+					'$=': true,
+					'|=': true,
+					'*=': true,
+					'~=': true,
+					'^=': true,
+					'=': true,
+					'(': true,
+					')': true
+				};
 				if(!this.look) {
 					this.error();
 				}
 				if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
 					node.add(this.match());
 				}
-				else if(['*', '>', '~', '::', ':', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '(', ')'].indexOf(this.look.content()) != -1) {
+				else if(sign[this.look.content()]) {
 					node.add(this.match());
 				}
 				else if(numCanBeKey && this.look.type() == Token.NUMBER) {
@@ -283,7 +330,7 @@ define(function(require, exports, module) {
 					if([Token.STRING, Token.ID].indexOf(this.look.type()) != -1) {
 						node.add(this.match());
 					}
-					else if(['*', '>', '~', '::', ':', '[', ']', '$=', '|=', '*=', '~=', '^=', '=', '(', ')'].indexOf(this.look.content()) != -1) {
+					else if(sign[this.look.content()]) {
 						node.add(this.match());
 					}
 					else {
@@ -296,7 +343,21 @@ define(function(require, exports, module) {
 				var node = new Node(Node.BLOCK);
 				node.add(this.match('{'));
 				while(this.look) {
-					if(this.look.type() == Token.ID || ['*', '>', '~', ':', '&'].indexOf(this.look.content()) != -1) {
+					if(this.look.type() == Token.ID) {
+						for(var i = this.index; i < this.length; i++) {
+							var token = this.tokens[i];
+							if(!S[token.type()]) {
+								if(token.content() == ':') {
+									node.add(this.style(true));
+								}
+								else {
+									node.add(this.styleset());
+								}
+								break;
+							}
+						}
+					}
+					else if(['*', '>', '~', ':', '&'].indexOf(this.look.content()) != -1) {
 						node.add(this.styleset());
 					}
 					else if(this.look.type() == Token.KEYWORD) {
@@ -325,18 +386,22 @@ define(function(require, exports, module) {
 				node.add(this.match(';'));
 				return node;
 			},
-			style: function() {
+			style: function(unknow) {
 				var node = new Node(Node.STYLE);
-				var key = this.key();
-				node.add(key);
+				node.add(this.key(unknow));
 				node.add(this.match(':'));
-				node.add(this.value(key));
+				node.add(this.value());
 				node.add(this.match(';'));
 				return node;
 			},
-			key: function() {
+			key: function(unknow) {
 				var node = new Node(Node.KEY);
-				node.add(this.match(Token.KEYWORD));
+				if(unknow) {
+					node.add(this.match(Token.ID));
+				}
+				else {
+					node.add(this.match(Token.KEYWORD));
+				}
 				return node;
 			},
 			value: function() {
