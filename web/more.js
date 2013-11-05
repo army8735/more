@@ -475,7 +475,7 @@ define(function(require, exports) {
 	function build(file, res, noImport, depth) {
 		depth = depth || 1;
 		if(suffix != 'css') {
-			file = file.replace(/\.css$/, '.' + file);
+			file = file.replace(/\.css$/, '.' + suffix);
 		}
 		var s = fs.readFileSync(file, {
 			encoding: 'utf-8'
@@ -511,7 +511,12 @@ define(function(require, exports) {
 				}
 				var trace = '';
 				for(var i = 0; i < depth; i++) trace += '\t';
-				console.log(trace + impt);
+				if(suffix != 'css') {
+					console.log(trace + impt.replace(/\.css$/, '.' + suffix));
+				}
+				else {
+					console.log(trace + impt);
+				}
 				buildHash[impt] = vars;
 				build(impt, res, noImport, depth+1);
 			});
