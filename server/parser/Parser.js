@@ -52,7 +52,21 @@ var Parser = Class(function(lexer) {
 			}
 		},
 		head: function() {
-			switch(this.look.content()) {
+			var s = this.look.content();
+			var i = -1;
+			if((i = s.indexOf('-webkit-')) > -1) {
+				s = s.slice(0, i) + s.slice(i + 8);
+			}
+			else if((i = s.indexOf('-moz-')) > -1) {
+				s = s.slice(0, i) + s.slice(i + 5);
+			}
+			else if((i = s.indexOf('-ms-')) > -1) {
+				s = s.slice(0, i) + s.slice(i + 4);
+			}
+			else if((i = s.indexOf('-o-')) > -1) {
+				s = s.slice(0, i) + s.slice(i + 3);
+			}
+			switch(s) {
 				case '@import':
 					return this.impt();
 				case '@media':

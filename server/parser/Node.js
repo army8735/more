@@ -59,6 +59,7 @@ var Class = require('../util/Class'),
 		COLOR: 'color',
 		VARS: 'vars',
 		EXTEND: 'extend',
-		FORMAT: 'format'
+		FORMAT: 'format',
+		KEYFRAMES: 'keyframes'
 	});
 module.exports = Node;
