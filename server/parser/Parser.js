@@ -361,6 +361,9 @@ var Parser = Class(function(lexer) {
 							if(token.content() == ':') {
 								node.add(this.style(true));
 							}
+							else if(token.content() == ';' || token.content() == '}') {
+								node.add(this.extend(true));
+							}
 							else {
 								node.add(this.styleset());
 							}
@@ -390,9 +393,14 @@ var Parser = Class(function(lexer) {
 			node.add(this.match('}'));
 			return node;
 		},
-		extend: function() {
+		extend: function(miss) {
 			var node = new Node(Node.EXTEND);
-			node.add(this.match());
+			if(!miss) {
+				node.add(this.match());
+			}
+			else {
+				node.add(new Node(Node.TOKEN, new Token(Token.VIRTUAL, '@extend')));
+			}
 			node.add(this.selectors());
 			node.add(this.match(';'));
 			return node;
