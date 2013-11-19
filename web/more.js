@@ -480,7 +480,7 @@ define(function(require, exports) {
 		var s = fs.readFileSync(file, {
 			encoding: 'utf-8'
 		});
-		var cur = file.replace(/\w+\.css$/, '');
+		var cur = file.replace(/[\w-]+\.(less|css)$/, '');
 		s = module.exports.parse(s, buildHash[file]);
 		if(!noImport) {
 			s = removeImport(s);
@@ -489,7 +489,10 @@ define(function(require, exports) {
 			impts.forEach(function(impt) {
 				if(less) {
 					if(impt.charAt(0) == '.') {
-						impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
+						impt = cur + impt.replace(/[\w-]+\.\css$/g, '');
+						while(impt.indexOf('../') > 0)
+							impt = impt.replace(/[\w-.]+[\\/]\.\.\//, '');
+						impt = impt.replace(/\.\//g, '');
 					}
 					else {
 						if(!localRoot) {
@@ -506,7 +509,10 @@ define(function(require, exports) {
 						impt = localRoot.replace(/[/\\]$/, '') + impt;
 					}
 					else {
-						impt = cur + impt.replace(/\w+\/\.\.\\/g, '').replace(/\.\//g, '');
+						impt = cur + impt.replace(/[\w-]+\.\css$/g, '');
+						while(impt.indexOf('../') > 0)
+							impt = impt.replace(/[\w-.]+[\\/]\.\.\//, '');
+						impt = impt.replace(/\.\//g, '');
 					}
 				}
 				var trace = '';
