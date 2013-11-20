@@ -595,4 +595,3 @@ var Parser = Class(function(lexer) {
 		}
 	});
 module.exports = Parser;
-)

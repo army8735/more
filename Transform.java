@@ -68,7 +68,7 @@ public class Transform {
 				}
 				br.close();
 				s = sb.toString();
-				s = s.substring(0, s.length() - 3);
+				s = s.substring(0, s.length() - 4);
 				bw = new BufferedWriter(new FileWriter(new File(targetRoot, src.getName())));
 				bw.write(s);
 				bw.close();

@@ -33,4 +33,3 @@ var Match = require('./Match'),
 		}
 	});
 module.exports = RegMatch;
-)

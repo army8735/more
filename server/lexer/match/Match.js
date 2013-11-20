@@ -43,4 +43,3 @@ module.exports = Class(function(type, setPReg, special, parenthese) {
 		return false;
 	}
 });
-)

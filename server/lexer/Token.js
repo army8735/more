@@ -68,4 +68,3 @@ var Class = require('../util/Class'),
 		}
 	});
 module.exports = Token;
-)

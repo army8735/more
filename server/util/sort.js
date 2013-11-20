@@ -89,4 +89,3 @@ module.exports =  function(arr, compare) {
 	quickSort(arr, 0, arr.length - 1, compare);
 	return arr;
 };
-)

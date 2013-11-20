@@ -1072,4 +1072,3 @@ function compress(src) {
 }
 
 exports.compress = compress;
-)

@@ -209,4 +209,3 @@ var Lexer = require('./Lexer'),
 		}
 	});
 module.exports = CssLexer;
-)

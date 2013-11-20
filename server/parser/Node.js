@@ -62,4 +62,3 @@ var Class = require('../util/Class'),
 		FORMAT: 'format'
 	});
 module.exports = Node;
-)
