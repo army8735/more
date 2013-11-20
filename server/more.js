@@ -207,6 +207,8 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			block(true, node);
 		}
 		else if(node.name() == Node.EXTEND) {
+			//防止纯@extend造成空样式被清洁逻辑移除，加个空格
+			res += ' ';
 			isExtend = true;
 			record(node);
 		}
@@ -247,7 +249,7 @@ function styleset(startOrEnd, node, prev, next) {
 		}
 		stack.push(['']);
 		if(levels.length) {
-			exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
+			exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}'));
 		}
 	}
 	else {
@@ -278,7 +280,7 @@ function block(startOrEnd, node) {
 		levels.push(s);
 	}
 	else {
-		exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
+		exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}'));
 		levels.pop();
 	}
 }

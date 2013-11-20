@@ -208,6 +208,8 @@ define(function(require, exports) {
 				block(true, node);
 			}
 			else if(node.name() == Node.EXTEND) {
+				//防止纯@extend造成空样式被清洁逻辑移除，加个空格
+				res += ' ';
 				isExtend = true;
 				record(node);
 			}
@@ -248,7 +250,7 @@ define(function(require, exports) {
 			}
 			stack.push(['']);
 			if(levels.length) {
-				exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
+				exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}'));
 			}
 		}
 		else {
@@ -279,7 +281,7 @@ define(function(require, exports) {
 			levels.push(s);
 		}
 		else {
-			exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}') - 1);
+			exHash[levels[levels.length - 1]].end.push(res.lastIndexOf('}'));
 			levels.pop();
 		}
 	}
