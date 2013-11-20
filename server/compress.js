@@ -146,6 +146,12 @@ function noImpact(node, first, other, child) {
 	if(typeof child == 'number') {
 		mode = true;
 	}
+	//类似::-ms-clear需排除
+	for(var i = first; i <= other; i++) {
+		if(/::-ms-/.test(node[i].s2s)) {
+			return false;
+		}
+	}
 	//紧邻选择器无优先级影响
 	if(first == other - 1) {
 		return true;
