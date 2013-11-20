@@ -40,3 +40,4 @@ exports.lexer = function(syntax) {
 			return new LanguageLexer(new UnknowRule());*/
 	}
 };
+)

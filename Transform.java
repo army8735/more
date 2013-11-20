@@ -63,7 +63,7 @@ public class Transform {
 						else {
 							sb.append(s);
 						}
-						sb.append("\n");
+						sb.append("\r\n");
 					}
 				}
 				br.close();

@@ -32,3 +32,4 @@ function klass(cons) {
 }
 klass.extend = inheritPrototype;
 module.exports = klass;
+)

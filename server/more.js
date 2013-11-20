@@ -539,3 +539,4 @@ exports.build = function(file, noImport) {
 	}
 	return res.join('');
 }
+)

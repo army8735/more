@@ -212,3 +212,4 @@ var Class = require('../util/Class'),
 	}),
 	cmode = Lexer.LOOSE;
 module.exports = Lexer;
+)

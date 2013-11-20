@@ -5,6 +5,7 @@ var Lexer = require('./Lexer'),
 		Lexer.call(this, rule);
 		this.isValue = false;
 		this.parenthese = false;
+		this.inBlock = false;
 		this.isUrl = false;
 	}).methods({
 		//@override
@@ -103,7 +104,18 @@ var Lexer = require('./Lexer'),
 								this.parenthese = true;
 							}
 							else if([';', '{', '}', '(', '='].indexOf(token.content()) > -1) {
-								this.isValue = false;
+								if(token.content() == '{') {
+									this.inBlock = true;
+								}
+								else if(token.content() == '}') {
+									this.inBlock = false;
+								}
+								if(token.content() == '(') {
+									this.isValue = this.inBlock;
+								}
+								else {
+									this.isValue = false;
+								}
 							}
 						}
 						//非值状态的属性被当作id
@@ -197,3 +209,4 @@ var Lexer = require('./Lexer'),
 		}
 	});
 module.exports = CssLexer;
+)

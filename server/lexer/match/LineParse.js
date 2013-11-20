@@ -50,3 +50,4 @@ var Match = require('./Match'),
 		}
 	});
 module.exports = LineParse;
+)

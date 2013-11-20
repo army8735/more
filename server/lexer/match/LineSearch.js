@@ -35,3 +35,4 @@ var Match = require('./Match'),
 		}
 	});
 module.exports = LineSearch;
+)

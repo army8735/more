@@ -36,3 +36,4 @@ var Rule = require('./Rule'),
 		KEYWORDS: 'if else for break case continue function true false switch default do while int float double long throws transient abstract assert boolean byte class const enum instanceof try volatilechar extends final finally goto implements import protected return void char interface native new package private protected throw short public return strictfp super synchronized this static null String'.split(' ')
 	});
 module.exports = JavaRule;
+)

@@ -54,3 +54,4 @@ exports.escapeHTML = function(str) {
 		return xmlchar[$1];
 	});
 };
+)
