@@ -340,9 +340,26 @@ define(function(require, exports) {
 		for(var i = exArr.length - 1; i >= 0; i--) {
 			var o = exArr[i];
 			var s = '';
-			o.fathers.forEach(function(father) {
+			var after = '';
+			var temp = [];
+			o.fathers.forEach(function(father, l) {
 				s += styleMap[father] || '';
+				//将father的子选择器们进行深度继承
+				Object.keys(styleMap).forEach(function(k, m) {
+					if(k.indexOf(father) == 0 && k != father) {
+						o.selectors.forEach(function(se, n) {
+							var ke = se + k.slice(father.length);
+							var v = styleMap[k];
+							temp.push(ke + '{' + v + '}');
+							after += ke + '{' + v + '}';
+						});
+					}
+				});
 			});
+			if(after) {
+				var end = res.indexOf('}', o.index) + 1;
+				res = res.slice(0, end) + after + res.slice(end);
+			}
 			res = res.slice(0, o.index) + s + res.slice(o.index);
 		}
 	}
