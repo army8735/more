@@ -355,19 +355,30 @@ var Parser = Class(function(lexer) {
 			node.add(this.match('{'));
 			while(this.look) {
 				if(this.look.type() == Token.ID) {
+					outer:
 					for(var i = this.index; i < this.length; i++) {
 						var token = this.tokens[i];
 						if(!S[token.type()]) {
 							if(token.content() == ':') {
 								node.add(this.style(true));
+								break;
 							}
-							else if(token.content() == ';' || token.content() == '}') {
-								node.add(this.extend(true));
+							for(var j = i; j < this.length; j++) {
+								token = this.tokens[j];
+								if(!S[token.type()]) {
+									if(token.type() == Token.ID) {
+										continue;
+									}
+									else if(token.content() == ';' || token.content() == '}') {
+										node.add(this.extend(true));
+										break outer;
+									}
+									else {
+										node.add(this.styleset());
+										break outer;
+									}
+								}
 							}
-							else {
-								node.add(this.styleset());
-							}
-							break;
 						}
 					}
 				}

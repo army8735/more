@@ -148,7 +148,7 @@ function noImpact(node, first, other, child) {
 	}
 	//ÀàËÆ::-ms-clearĞèÅÅ³ı
 	for(var i = first; i <= other; i++) {
-		if(/::-ms-/.test(node[i].s2s)) {
+		if(node[i].s2s.indexOf(':-ms-') > -1) {
 			return false;
 		}
 	}
