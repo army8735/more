@@ -268,7 +268,7 @@ define(function(require, exports) {
 			}
 		}
 		//去除层级造成的空样式
-		res = res.replace(/[\w-.\s\n\r]+{}([\s\n\r]*)$/, '$1');
+		res = res.replace(/([\s\r\n]*)[^}]+{}([\s\r\n]*)$/, '$1$2');
 	}
 	function block(startOrEnd, node) {
 		if(startOrEnd) {
