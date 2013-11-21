@@ -267,7 +267,7 @@ function styleset(startOrEnd, node, prev, next) {
 		}
 	}
 	//去除层级造成的空样式
-	res = res.replace(/(}\s*).+{}(\s*)$/, '$1$2');
+	res = res.replace(/[\w-.\s\n\r]+{}([\s\n\r]*)$/, '$1');
 }
 function block(startOrEnd, node) {
 	if(startOrEnd) {
@@ -307,7 +307,7 @@ function record(node) {
 		selectors: getSimpleSelector(levels[levels.length - 1])
 	});
 }
-function delExtend(selector, father, hash, list) {
+function dealExtend(selector, father, hash, list) {
 	hash = hash || {};
 	list = list || [selector];
 	if(hash[selector]) {
@@ -332,7 +332,7 @@ function extend() {
 	exArr.forEach(function(o) {
 		o.selectors.forEach(function(selector) {
 			o.fathers.forEach(function(father) {
-				delExtend(selector, father);
+				dealExtend(selector, father);
 			});
 		});
 	});
