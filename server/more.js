@@ -207,8 +207,8 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			block(true, node);
 		}
 		else if(node.name() == Node.EXTEND) {
-			//防止纯@extend造成空样式被清洁逻辑移除，加个空格
-			res += ' ';
+			//占位符
+			res += '@extend';
 			isExtend = true;
 			record(node);
 		}
@@ -367,7 +367,8 @@ function extend() {
 			}
 			res = res.slice(0, end) + after + res.slice(end);
 		}
-		res = res.slice(0, o.index) + s + res.slice(o.index);
+		//去掉@extend占位符
+		res = res.slice(0, o.index - 7) + s + res.slice(o.index);
 	}
 }
 
