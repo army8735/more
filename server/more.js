@@ -266,6 +266,15 @@ function styleset(startOrEnd, node, prev, next) {
 			exHash[levels[levels.length - 1]].start.push(res.length);
 		}
 	}
+	//去除层级造成的空样式
+	if(/{}([\s\r\n]*)$/.test(res)) {
+		var i = res.lastIndexOf('{');
+		i = res.lastIndexOf('}', i);
+		if(i == -1) {
+			i = 0;
+		}
+		res = res.slice(0, i) + res.slice(i).replace(/([\s\r\n]*)[^}]+{}([\s\r\n]*)$/, '$1$2');
+	}
 }
 function block(startOrEnd, node) {
 	if(startOrEnd) {
