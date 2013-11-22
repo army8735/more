@@ -341,7 +341,6 @@ define(function(require, exports) {
 			var o = exArr[i];
 			var s = '';
 			var after = '';
-			var temp = [];
 			o.fathers.forEach(function(father, l) {
 				s += styleMap[father] || '';
 				//将father的子选择器们进行深度继承
@@ -350,7 +349,6 @@ define(function(require, exports) {
 						o.selectors.forEach(function(se, n) {
 							var ke = se + k.slice(father.length);
 							var v = styleMap[k];
-							temp.push(ke + '{' + v + '}');
 							after += ke + '{' + v + '}';
 						});
 					}
@@ -358,6 +356,9 @@ define(function(require, exports) {
 			});
 			if(after) {
 				var end = res.indexOf('}', o.index) + 1;
+				if(end == -1) {
+					end = res.length;
+				}
 				res = res.slice(0, end) + after + res.slice(end);
 			}
 			res = res.slice(0, o.index) + s + res.slice(o.index);
