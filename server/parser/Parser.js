@@ -366,7 +366,7 @@ var Parser = Class(function(lexer) {
 							for(var j = i; j < this.length; j++) {
 								token = this.tokens[j];
 								if(!S[token.type()]) {
-									if(token.type() == Token.ID) {
+									if(token.type() == Token.ID || token.content() == ',') {
 										continue;
 									}
 									else if(token.content() == ';' || token.content() == '}') {
