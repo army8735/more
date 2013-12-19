@@ -45,78 +45,13 @@ body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-heigh
 </head>
 <body>
 <pre>
-<code class="brush: css; max-height: 400; cache: 0">/**
- * @Author army8735
- *//**//**/
-@scale:0.9;
-@deg:90deg;
-body{
-	-webkit-transform: rotateY(-@deg) scale(@scale);
+<code class="brush: css; max-height: 400; cache: 0">@function f(a) {
 }
-@-webkit-keyframes flipouttoleft {
-    from { -webkit-transform: rotateY(0); }
-    to { -webkit-transform: rotateY(-@deg) scale(@scale); }
+func(n, m) {
+	margin: n n 0;
+	color: m
 }
-$test: background: url("/v3/dist/img/home/v.png");
-@media all and (width:1024px) {
-	body{color:#f00;${test};}
-}
-@font-face {
-	font-family: "HLUC";
-	src: url("@{fontPath}/Helvetica_LT_Ultra_Compressed.eot"); /* IE9 */
-	src: url("@{fontPath}/Helvetica_LT_Ultra_Compressed.eot#iefix") format("embedded-opentype"), /* IE6-IE8 */
-	url("@{fontPath}/Helvetica_LT_Ultra_Compressed.woff") format("woff"), /* chrome 6+、firefox 3.6+、Safari5.1+、Opera 11+ */
-	url("@{fontPath}/Helvetica_LT_Ultra_Compressed.ttf")  format("truetype"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+ */
-	url("@{fontPath}/helvetica_lt_ultra_compressed.svg") format("svg"); /* iOS 4.1- */
-	font-style: normal;
-	font-weight: normal;
-	cursor: default;
-	-webkit-font-smoothing: antialiased;
-}
-@charset "gbk";
-@import url("1.css") screen and (min-width:800px) and (max-device-width:11/9);
-@font-face{font-family:YH;src:url(http://domain/fonts/MSYH.TTF);}
-@keyframes test{
-	from{opacity:1;}
-	30%{transform:translate(20,20);}
-	to{opacity:0;}
-}
-@page thin:first { size: 3in 8in }
-$a:1;
-@b: 'Verdana';
-$inner: 'ico.png';
-$img = '../../img/rss/$inner';
-$cssimg:  url("/v3/dist/img/home/${inner}");
-.gbtn::after {
-  background: url($img);
-  font-family:@b,"\5b8b\4f53 $b";
-  font-family: tahoma,arial,\5b8b\4f53,sans-serif;
-  position: fixed\9;
-  -position: absolute;;;
-  *position: absolute;
-  _position: absolute !important;
-  height: 10px\0;
-  font-family: ~"test,test2";
-  background: $cssimg;
-}
-input:-moz-placeholder{color:#808080;}
-input:-webkit-placeholder{color:#808080;}
-input:placeholder{color:#808080;}
-input::-ms-clear{display:none;}
-.sd_user .sd_user_mask{_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://i3.tdimg.com/b/20130909/co11.png')}
-.ex .a{color:#000;.in{margin:0;}}
-#fff:hover, .test {
-	@extend .gbtn::after;
-	text-align: center;
-	>#fff {
-		color: #fff;
-		&:hover{color:#000}
-		* .pic span {padding:$a;}
-	}
-	div { margin:0; @extend .test>#fff,#none}
-	line-height: 2;
-	.ex .a;
-}</code>
+div{func(2px, 3 3 3);}</code>
 </pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
