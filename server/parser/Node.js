@@ -12,7 +12,10 @@ var Class = require('../util/Class'),
 		}
 		return this;
 	}).methods({
-		name: function() {
+		name: function(t) {
+			if(t) {
+				this.type = t;
+			}
 			return this.type;
 		},
 		leaves: function() {
@@ -59,6 +62,11 @@ var Class = require('../util/Class'),
 		COLOR: 'color',
 		VARS: 'vars',
 		EXTEND: 'extend',
-		FORMAT: 'format'
+		FORMAT: 'format',
+		FN: 'function',
+		PARAMS: 'params',
+		FNC: 'fncall',
+		CPARAMS: 'cparams',
+		CPARAM: 'cparam'
 	});
 module.exports = Node;

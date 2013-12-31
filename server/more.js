@@ -3,6 +3,7 @@ var CssLexer = require('./lexer/CssLexer'),
 	Token = require('./lexer/Token'),
 	Parser = require('./parser/Parser'),
 	Node = require('./parser/Node'),
+	Func = require('./parser/Func'),
 	character = require('./util/character'),
 	compress = require('./compress'),
 	cleanCSS = require('clean-css'),
@@ -13,12 +14,14 @@ var CssLexer = require('./lexer/CssLexer'),
 	token,
 	index,
 	preIndex,
+	preIndex2,
 	stack,
 	varHash,
 	imports,
 	autoSplit,
 	exHash,
 	styleMap,
+	funcMap,
 	levels,
 	exArr,
 	global;
@@ -35,13 +38,14 @@ function init(ignore) {
 		}
 		index++;
 	}
-	preIndex = index;
+	preIndex2 = preIndex = index;
 	stack = [];
 	varHash = {};
 	imports = [];
 	autoSplit = false;
 	exHash = {};
 	styleMap = {};
+	funcMap = {};
 	levels = [];
 	exArr = [];
 	global = global || {};
@@ -108,7 +112,84 @@ function replaceVar(s, type) {
 	}
 	return s;
 }
-function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, prev, next) {
+function preFn(node, ignore) {console.warn(preIndex2);
+	var isToken = node.name() == Node.TOKEN;
+	var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+	if(!isToken) {
+		if(node.name() == Node.FN) {console.log(node, preIndex2);
+			var leaves = node.leaves();
+			if(leaves[0].leaves().type() != Token.VIRTUAL) {
+				while(ignore[++preIndex2]) {}
+			}console.warn(preIndex2);
+			var id = leaves[1].leaves().content();console.log(id);
+			while(ignore[++preIndex2]) {}
+			var params = leaves[3].leaves();
+			while(ignore[++preIndex2]) {}
+			var p = [];
+			var phash = {};
+			params.forEach(function(o, i) {
+				if(i % 2 == 0) {
+					var v = o.leaves().content();
+					p.push(v);
+					phash[v] = Math.floor(i / 2);
+				}
+				while(ignore[++preIndex2]) {}
+			});
+			while(ignore[++preIndex2]) {}
+			var block = leaves[5];
+			var b = block.leaves().slice(0);
+			b.shift();
+			while(ignore[++preIndex2]) {}
+			b.pop();
+			var s = '';
+			var fhash = {};
+			b.forEach(function(style) {
+				style = style.leaves();
+				var key = style[0].leaves()[0].leaves();
+				s += key.content();
+				while(ignore[++preIndex2]) {
+					var ig = ignore[preIndex2];
+					s += ig.content().replace(/[\r\n]/g, '');
+				}
+				s += style[1].leaves().content();
+				while(ignore[++preIndex2]) {
+					var ig = ignore[preIndex2];
+					s += ig.content().replace(/[\r\n]/g, '');
+				}
+				var values = style[2].leaves();
+				values.forEach(function(value) {
+					var v = value.leaves().content();
+					if(phash.hasOwnProperty(v)) {
+						fhash[s.length] = phash[v];
+					}
+					s += v;
+					while(ignore[++preIndex2]) {
+						var ig = ignore[preIndex2];
+						s += ig.content().replace(/[\r\n]/g, '');
+					}
+				});
+				var end = style[3].leaves();
+				if(end.type() != Node.VIRTUAL) {
+					s += end.content();
+					while(ignore[++preIndex2]) {
+						var ig = ignore[preIndex2];
+						s += ig.content().replace(/[\r\n]/g, '');
+					}
+				}
+			});
+			while(ignore[++preIndex2]) {}console.log(fhash, s);
+		}
+		else {
+			node.leaves().forEach(function(leaf) {
+				preFn(leaf, ignore);
+			});
+		}
+	}
+	else if(!isVirtual) {
+		while(ignore[++preIndex2]) {}
+	}
+}
+function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFunc, prev, next) {
 	var isToken = node.name() == Node.TOKEN,
 		isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 	if(isToken) {
@@ -151,7 +232,8 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 					temp[temp.length - 1] += token.content();
 				}
 			}
-			else if(!isExtend) {
+			//继承和方法直接忽略
+			else if(!isExtend && !isFunc) {
 				//兼容less的~String拆分语法
 				if(autoSplit && token.type() == Token.STRING) {
 					var s = token.content();
@@ -212,10 +294,14 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			isExtend = true;
 			record(node);
 		}
+		else if(node.name() == Node.FN) {
+			isFunc = true;
+			compileFunc(node, ignore);
+		}
 		var leaves = node.leaves();
 		//递归子节点
 		leaves.forEach(function(leaf, i) {
-			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, leaves[i - 1], leaves[i + 1]);
+			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFunc, leaves[i - 1], leaves[i + 1]);
 		});
 		if(node.name() == Node.STYLESET & !inHead) {
 			styleset(false, node, prev, next);
@@ -371,10 +457,72 @@ function extend() {
 		res = res.slice(0, o.index - 7) + s + res.slice(o.index);
 	}
 }
+function compileFunc(node, ignore) {
+	var idx = index;
+	var leaves = node.leaves();
+	var id = leaves[1].leaves().content();console.log(id);
+	while(ignore[++idx]) {}
+	var params = leaves[3].leaves();
+	while(ignore[++idx]) {}
+	var p = [];
+	var phash = {};
+	params.forEach(function(o, i) {
+		if(i % 2 == 0) {
+			var v = o.leaves().content();
+			p.push(v);
+			phash[v] = Math.floor(i / 2);
+		}
+		while(ignore[++idx]) {}
+	});
+	while(ignore[++idx]) {}
+	var block = leaves[5];
+	var b = block.leaves().slice(0);
+	b.shift();
+	while(ignore[++idx]) {}
+	b.pop();
+	var s = '';
+	var fhash = {};
+	b.forEach(function(style) {
+		style = style.leaves();
+		var key = style[0].leaves()[0].leaves();
+		s += key.content();
+		while(ignore[++idx]) {
+			var ig = ignore[idx];
+			s += ig.content().replace(/[\r\n]/g, '');
+		}
+		s += style[1].leaves().content();
+		while(ignore[++idx]) {
+			var ig = ignore[idx];
+			s += ig.content().replace(/[\r\n]/g, '');
+		}
+		var values = style[2].leaves();
+		values.forEach(function(value) {
+			var v = value.leaves().content();
+			if(phash.hasOwnProperty(v)) {
+				fhash[s.length] = phash[v];
+			}
+			s += v;
+			while(ignore[++idx]) {
+				var ig = ignore[idx];
+				s += ig.content().replace(/[\r\n]/g, '');
+			}
+		});
+		var end = style[3].leaves();
+		if(end.type() != Node.VIRTUAL) {
+			s += end.content();
+			while(ignore[++idx]) {
+				var ig = ignore[idx];
+				s += ig.content().replace(/[\r\n]/g, '');
+			}
+		}
+	});console.log(fhash, s);
+	funcMap[id] = new Func(id, p, s, fhash);
+}
 
-exports.parse = function(code, vars, style) {
+exports.parse = function(code, vars, style, func) {
 	vars = vars || {};
 	style = style || {};
+	func = func || {};
 	var lexer = new CssLexer(new CssRule()),
 		parser = new Parser(lexer),
 		ignore = {};
@@ -397,7 +545,12 @@ exports.parse = function(code, vars, style) {
 	Object.keys(style).forEach(function(k) {
 		styleMap[k] = style[k];
 	});
+	//传入初始化函数
+	Object.keys(func).forEach(function(k) {
+		funcMap[k] = style[k];
+	});
 	preVar(node, ignore);
+	preFn(node, ignore);
 	join(node, ignore);
 	extend();
 	return character.escapeHTML(res);
@@ -425,6 +578,9 @@ exports.imports = function() {
 };
 exports.styles = function() {
 	return styleMap;
+};
+exports.fns = function() {
+	return funcMap;
 };
 exports.compress = function(src, agressive) {
 	src = src || '';

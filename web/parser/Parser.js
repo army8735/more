@@ -321,7 +321,18 @@ define(function(require, exports, module) {
 				var node = new Node(Node.PARAMS);
 				var hash = {};
 				while(this.look) {
-					if(this.look.type() == Token.ID) {
+					if(this.look.type() == Token.VARS) {
+						var v = this.look.content().replace(/^$/, '');
+						if(hash.hasOwnProperty(v)) {
+							this.error('duplicate params');
+						}
+						hash[v] = true;
+						node.add(this.match());
+						if(this.look && this.look.content() == ',') {
+							node.add(this.match());
+						}
+					}
+					else if(this.look.type() == Token.ID) {
 						var v = this.look.content();
 						if(hash.hasOwnProperty(v)) {
 							this.error('duplicate params');

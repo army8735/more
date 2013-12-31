@@ -15,6 +15,7 @@ define(function(require, exports) {
 		token,
 		index,
 		preIndex,
+		preIndex2,
 		stack,
 		varHash,
 		imports,
@@ -38,7 +39,7 @@ define(function(require, exports) {
 			}
 			index++;
 		}
-		preIndex = index;
+		preIndex2 = preIndex = index;
 		stack = [];
 		varHash = {};
 		imports = [];
@@ -112,7 +113,82 @@ define(function(require, exports) {
 		}
 		return s;
 	}
-	function preFn(node, ignore) {
+	function preFn(node, ignore) {console.warn(preIndex2);
+		var isToken = node.name() == Node.TOKEN;
+		var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+		if(!isToken) {
+			if(node.name() == Node.FN) {console.log(node, preIndex2);
+				var leaves = node.leaves();
+				if(leaves[0].leaves().type() != Token.VIRTUAL) {
+					while(ignore[++preIndex2]) {}
+				}console.warn(preIndex2);
+				var id = leaves[1].leaves().content();console.log(id);
+				while(ignore[++preIndex2]) {}
+				var params = leaves[3].leaves();
+				while(ignore[++preIndex2]) {}
+				var p = [];
+				var phash = {};
+				params.forEach(function(o, i) {
+					if(i % 2 == 0) {
+						var v = o.leaves().content();
+						p.push(v);
+						phash[v] = Math.floor(i / 2);
+					}
+					while(ignore[++preIndex2]) {}
+				});
+				while(ignore[++preIndex2]) {}
+				var block = leaves[5];
+				var b = block.leaves().slice(0);
+				b.shift();
+				while(ignore[++preIndex2]) {}
+				b.pop();
+				var s = '';
+				var fhash = {};
+				b.forEach(function(style) {
+					style = style.leaves();
+					var key = style[0].leaves()[0].leaves();
+					s += key.content();
+					while(ignore[++preIndex2]) {
+						var ig = ignore[preIndex2];
+						s += ig.content().replace(/[\r\n]/g, '');
+					}
+					s += style[1].leaves().content();
+					while(ignore[++preIndex2]) {
+						var ig = ignore[preIndex2];
+						s += ig.content().replace(/[\r\n]/g, '');
+					}
+					var values = style[2].leaves();
+					values.forEach(function(value) {
+						var v = value.leaves().content();
+						if(phash.hasOwnProperty(v)) {
+							fhash[s.length] = phash[v];
+						}
+						s += v;
+						while(ignore[++preIndex2]) {
+							var ig = ignore[preIndex2];
+							s += ig.content().replace(/[\r\n]/g, '');
+						}
+					});
+					var end = style[3].leaves();
+					if(end.type() != Node.VIRTUAL) {
+						s += end.content();
+						while(ignore[++preIndex2]) {
+							var ig = ignore[preIndex2];
+							s += ig.content().replace(/[\r\n]/g, '');
+						}
+					}
+				});
+				while(ignore[++preIndex2]) {}console.log(fhash, s);
+			}
+			else {
+				node.leaves().forEach(function(leaf) {
+					preFn(leaf, ignore);
+				});
+			}
+		}
+		else if(!isVirtual) {
+			while(ignore[++preIndex2]) {}
+		}
 	}
 	function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFunc, prev, next) {
 		var isToken = node.name() == Node.TOKEN,
@@ -157,6 +233,7 @@ define(function(require, exports) {
 						temp[temp.length - 1] += token.content();
 					}
 				}
+				//继承和方法直接忽略
 				else if(!isExtend && !isFunc) {
 					//兼容less的~String拆分语法
 					if(autoSplit && token.type() == Token.STRING) {
