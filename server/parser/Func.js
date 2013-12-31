@@ -1,9 +1,10 @@
 var Class = require('../util/Class'),
-	Node = Class(function(id, params, body, hash) {
+	Node = Class(function(id, params, phash, body, fhash) {
 		this.id = id;
 		this.params = params;
+		this.phash = phash;
 		this.body = body;
-		this.hash = hash;
+		this.fhash = fhash;
 	}).methods({
 		compile: function() {
 		}

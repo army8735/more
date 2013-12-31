@@ -112,16 +112,16 @@ function replaceVar(s, type) {
 	}
 	return s;
 }
-function preFn(node, ignore) {console.warn(preIndex2);
+function preFn(node, ignore) {
 	var isToken = node.name() == Node.TOKEN;
 	var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 	if(!isToken) {
-		if(node.name() == Node.FN) {console.log(node, preIndex2);
+		if(node.name() == Node.FN) {
 			var leaves = node.leaves();
 			if(leaves[0].leaves().type() != Token.VIRTUAL) {
 				while(ignore[++preIndex2]) {}
-			}console.warn(preIndex2);
-			var id = leaves[1].leaves().content();console.log(id);
+			}
+			var id = leaves[1].leaves().content();
 			while(ignore[++preIndex2]) {}
 			var params = leaves[3].leaves();
 			while(ignore[++preIndex2]) {}
@@ -159,8 +159,17 @@ function preFn(node, ignore) {console.warn(preIndex2);
 				var values = style[2].leaves();
 				values.forEach(function(value) {
 					var v = value.leaves().content();
-					if(phash.hasOwnProperty(v)) {
-						fhash[s.length] = phash[v];
+					var noDollar = v.replace(/^$/, '');
+					if(phash.hasOwnProperty(noDollar) || phash.hasOwnProperty('$' + noDollar)) {
+						fhash[s.length] = {
+							v: v
+						};
+						if(phash.hasOwnProperty(noDollar)) {
+							fhash[s.length].index = phash[noDollar];
+						}
+						else {
+							fhash[s.length].index = phash['$' + noDollar];
+						}
 					}
 					s += v;
 					while(ignore[++preIndex2]) {
@@ -177,7 +186,8 @@ function preFn(node, ignore) {console.warn(preIndex2);
 					}
 				}
 			});
-			while(ignore[++preIndex2]) {}console.log(fhash, s);
+			while(ignore[++preIndex2]) {}
+			funcMap[id] = new Func(id, p, phash, s, fhash);
 		}
 		else {
 			node.leaves().forEach(function(leaf) {
@@ -296,7 +306,6 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 		}
 		else if(node.name() == Node.FN) {
 			isFunc = true;
-			compileFunc(node, ignore);
 		}
 		var leaves = node.leaves();
 		//递归子节点
@@ -456,67 +465,6 @@ function extend() {
 		//去掉@extend占位符
 		res = res.slice(0, o.index - 7) + s + res.slice(o.index);
 	}
-}
-function compileFunc(node, ignore) {
-	var idx = index;
-	var leaves = node.leaves();
-	var id = leaves[1].leaves().content();console.log(id);
-	while(ignore[++idx]) {}
-	var params = leaves[3].leaves();
-	while(ignore[++idx]) {}
-	var p = [];
-	var phash = {};
-	params.forEach(function(o, i) {
-		if(i % 2 == 0) {
-			var v = o.leaves().content();
-			p.push(v);
-			phash[v] = Math.floor(i / 2);
-		}
-		while(ignore[++idx]) {}
-	});
-	while(ignore[++idx]) {}
-	var block = leaves[5];
-	var b = block.leaves().slice(0);
-	b.shift();
-	while(ignore[++idx]) {}
-	b.pop();
-	var s = '';
-	var fhash = {};
-	b.forEach(function(style) {
-		style = style.leaves();
-		var key = style[0].leaves()[0].leaves();
-		s += key.content();
-		while(ignore[++idx]) {
-			var ig = ignore[idx];
-			s += ig.content().replace(/[\r\n]/g, '');
-		}
-		s += style[1].leaves().content();
-		while(ignore[++idx]) {
-			var ig = ignore[idx];
-			s += ig.content().replace(/[\r\n]/g, '');
-		}
-		var values = style[2].leaves();
-		values.forEach(function(value) {
-			var v = value.leaves().content();
-			if(phash.hasOwnProperty(v)) {
-				fhash[s.length] = phash[v];
-			}
-			s += v;
-			while(ignore[++idx]) {
-				var ig = ignore[idx];
-				s += ig.content().replace(/[\r\n]/g, '');
-			}
-		});
-		var end = style[3].leaves();
-		if(end.type() != Node.VIRTUAL) {
-			s += end.content();
-			while(ignore[++idx]) {
-				var ig = ignore[idx];
-				s += ig.content().replace(/[\r\n]/g, '');
-			}
-		}
-	});console.log(fhash, s);
-	funcMap[id] = new Func(id, p, s, fhash);
 }
 
 exports.parse = function(code, vars, style, func) {
