@@ -98,6 +98,9 @@ function replaceVar(s, type) {
 						if(vara) {
 							s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(j + 1);
 						}
+						else {
+							console.error('no variable declared: ' + vara);
+						}
 					}
 				}
 				else if(/[\w-]/.test(c)) {
@@ -105,6 +108,9 @@ function replaceVar(s, type) {
 					var vara = varHash[c] || global[c];
 					if(vara) {
 						s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(i + c.length + 1);
+					}
+					else {
+						console.error('no variable declared: ' + vara);
 					}
 				}
 			}
@@ -199,7 +205,18 @@ function preFn(node, ignore) {
 		while(ignore[++preIndex2]) {}
 	}
 }
-function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFunc, prev, next) {
+function compilerFn(node) {console.log(node);
+	var id = node.leaves()[0].leaves().content();
+	if(funcMap.hasOwnProperty(id)) {console.log(id);
+		var fn = funcMap[id];
+		var s = fn.compile(varHash);console.log(s);
+	}
+	else {
+		console.error('no function declared: ' + id);
+	}
+}
+
+function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFn, prev, next) {
 	var isToken = node.name() == Node.TOKEN,
 		isVirtual = isToken && node.token().type() == Token.VIRTUAL;
 	if(isToken) {
@@ -243,7 +260,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 				}
 			}
 			//继承和方法直接忽略
-			else if(!isExtend && !isFunc) {
+			else if(!isExtend && !isFn) {
 				//兼容less的~String拆分语法
 				if(autoSplit && token.type() == Token.STRING) {
 					var s = token.content();
@@ -304,13 +321,16 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			isExtend = true;
 			record(node);
 		}
-		else if(node.name() == Node.FN) {
-			isFunc = true;
+		else if(node.name() == Node.FN || node.name() == Node.FNC) {
+			isFn = true;
+			if(node.name() == Node.FNC) {
+				compilerFn(node);
+			}
 		}
 		var leaves = node.leaves();
 		//递归子节点
 		leaves.forEach(function(leaf, i) {
-			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFunc, leaves[i - 1], leaves[i + 1]);
+			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFn, leaves[i - 1], leaves[i + 1]);
 		});
 		if(node.name() == Node.STYLESET & !inHead) {
 			styleset(false, node, prev, next);
