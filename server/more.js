@@ -98,9 +98,6 @@ function replaceVar(s, type) {
 						if(vara) {
 							s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(j + 1);
 						}
-						else {
-							console.error('no variable declared: ' + vara);
-						}
 					}
 				}
 				else if(/[\w-]/.test(c)) {
@@ -108,9 +105,6 @@ function replaceVar(s, type) {
 					var vara = varHash[c] || global[c];
 					if(vara) {
 						s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(i + c.length + 1);
-					}
-					else {
-						console.error('no variable declared: ' + vara);
 					}
 				}
 			}
@@ -165,7 +159,7 @@ function preFn(node, ignore) {
 				var values = style[2].leaves();
 				values.forEach(function(value) {
 					var v = value.leaves().content();
-					var noDollar = v.replace(/^$/, '');
+					var noDollar = v.replace(/^\$/, '');
 					if(phash.hasOwnProperty(noDollar) || phash.hasOwnProperty('$' + noDollar)) {
 						fhash[s.length] = {
 							v: v
@@ -176,6 +170,12 @@ function preFn(node, ignore) {
 						else {
 							fhash[s.length].index = phash['$' + noDollar];
 						}
+					}
+					else if(v.charAt(0) == '$') {
+						fhash[s.length] = {
+							v: v,
+							index: -1
+						};
 					}
 					s += v;
 					while(ignore[++preIndex2]) {
@@ -193,7 +193,7 @@ function preFn(node, ignore) {
 				}
 			});
 			while(ignore[++preIndex2]) {}
-			funcMap[id] = new Func(id, p, phash, s, fhash);
+			funcMap[id] = new Func(id, p, s, fhash);
 		}
 		else {
 			node.leaves().forEach(function(leaf) {

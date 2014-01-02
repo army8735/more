@@ -99,9 +99,6 @@ define(function(require, exports) {
 							if(vara) {
 								s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(j + 1);
 							}
-							else {
-								console.error('no variable declared: ' + vara);
-							}
 						}
 					}
 					else if(/[\w-]/.test(c)) {
@@ -109,9 +106,6 @@ define(function(require, exports) {
 						var vara = varHash[c] || global[c];
 						if(vara) {
 							s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(i + c.length + 1);
-						}
-						else {
-							console.error('no variable declared: ' + vara);
 						}
 					}
 				}
@@ -178,6 +172,12 @@ define(function(require, exports) {
 								fhash[s.length].index = phash['$' + noDollar];
 							}
 						}
+						else if(v.charAt(0) == '$') {
+							fhash[s.length] = {
+								v: v,
+								index: -1
+							};
+						}
 						s += v;
 						while(ignore[++preIndex2]) {
 							var ig = ignore[preIndex2];
@@ -194,7 +194,7 @@ define(function(require, exports) {
 					}
 				});
 				while(ignore[++preIndex2]) {}
-				funcMap[id] = new Func(id, p, phash, s, fhash);
+				funcMap[id] = new Func(id, p, s, fhash);
 			}
 			else {
 				node.leaves().forEach(function(leaf) {
@@ -232,7 +232,7 @@ define(function(require, exports) {
 					while(ignore[++idx]) {}
 				}
 			});
-			var s = fn.compile(p, varHash);console.log(s)
+			var s = fn.compile(p, varHash);
 			res += s;
 		}
 		else {
