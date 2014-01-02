@@ -206,11 +206,34 @@ define(function(require, exports) {
 			while(ignore[++preIndex2]) {}
 		}
 	}
-	function compilerFn(node) {console.log(node);
-		var id = node.leaves()[0].leaves().content();
-		if(funcMap.hasOwnProperty(id)) {console.log(id);
+	function compilerFn(node, ignore, idx) {
+		var leaves = node.leaves(),
+			id = leaves[0].leaves().content();
+		if(funcMap.hasOwnProperty(id)) {
+			//fncall的头两个节点是id和(，空白计数
+			while(ignore[++idx]) {}
+			while(ignore[++idx]) {}
 			var fn = funcMap[id];
-			var s = fn.compile(varHash);console.log(s);
+			var p = [];
+			leaves[2].leaves().forEach(function(o, i) {
+				if(i % 2 == 0) {
+					var vs = o.leaves();
+					var s = '';
+					vs.forEach(function(v, j) {
+						s += v.leaves().content();
+						while(ignore[++idx]) {
+							var ig = ignore[idx];
+							s += ig.content().replace(/[\r\n]/g, '');
+						}
+					});
+					p.push(s);
+				}
+				else{
+					while(ignore[++idx]) {}
+				}
+			});
+			var s = fn.compile(p, varHash);
+			res += s;
 		}
 		else {
 			console.error('no function declared: ' + id);
@@ -325,7 +348,7 @@ define(function(require, exports) {
 			else if(node.name() == Node.FN || node.name() == Node.FNC) {
 				isFn = true;
 				if(node.name() == Node.FNC) {
-					compilerFn(node);
+					compilerFn(node, ignore, index);
 				}
 			}
 			var leaves = node.leaves();

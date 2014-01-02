@@ -8,8 +8,15 @@ var character = require('../util/character'),
 		this.fhash = fhash;
 		this.gvs = {};
 	}).methods({
-		compile: function(global) {
+		compile: function(aparams, gvs) {
+			this.global(gvs);
 			return this.body;
+		},
+		global: function(gvs) {
+			if(!character.isUndefined(gvs)) {
+				this.gvs = gvs;
+			}
+			return this.gvs;
 		}
 	});
 module.exports = Node;
