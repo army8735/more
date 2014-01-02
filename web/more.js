@@ -166,7 +166,7 @@ define(function(require, exports) {
 					var values = style[2].leaves();
 					values.forEach(function(value) {
 						var v = value.leaves().content();
-						var noDollar = v.replace(/^$/, '');
+						var noDollar = v.replace(/^\$/, '');
 						if(phash.hasOwnProperty(noDollar) || phash.hasOwnProperty('$' + noDollar)) {
 							fhash[s.length] = {
 								v: v
@@ -232,7 +232,7 @@ define(function(require, exports) {
 					while(ignore[++idx]) {}
 				}
 			});
-			var s = fn.compile(p, varHash);
+			var s = fn.compile(p, varHash);console.log(s)
 			res += s;
 		}
 		else {
