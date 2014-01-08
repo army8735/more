@@ -538,7 +538,7 @@ exports.parse = function(code, vars, style, func) {
 	});
 	//传入初始化函数
 	Object.keys(func).forEach(function(k) {
-		funcMap[k] = style[k];
+		funcMap[k] = func[k];
 	});
 	preVar(node, ignore);
 	preFn(node, ignore);
@@ -556,12 +556,16 @@ exports.vars = function() {
 	return varHash;
 };
 exports.global = function(g) {
-	global = g;
+	if(!character.isUndefined(g)) {
+		global = g;
+	}
 	return global;
 };
 var less;
 exports.less = function(l) {
-	less = l;
+	if(!character.isUndefined(l)) {
+		less = l;
+	}
 	return less;
 };
 exports.imports = function() {

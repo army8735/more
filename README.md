@@ -18,10 +18,11 @@ npm install more-css
 
 ##API
 
-more.parse(code:String, preVars:Object):String
+more.parse(code:String, preVars:Object, preStyles:Object, preFns:Object):String
 
 方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
 preVars为解析前预变量，功用在于实现层级变量作用域——即被import的文件可以访问父级变量。此接口可以自定义实现仅文件内作用域或全局作用域。
+preStyles和preFns同理，为预被继承的样式集和方法集。
 推荐使用层级作用域，demo文件夹中的import.html和node.js演示了这一特性。
 
 more.tree():Node
@@ -38,7 +39,7 @@ more.vars():Object<String, String>
 
 more.global(global:Object<String, String/Number/Boolean>):Object<String, String/Number/Boolean>
 
-设置全局变量，可在所有文件中被访问。局部变量拥有更高优先级。
+设置/获取全局变量，可在所有文件中被访问。局部变量拥有更高优先级。
 
 more.styles():Object<String, String>
 
@@ -47,6 +48,10 @@ more.styles():Object<String, String>
 more.imports():Array
 
 获取解析后的导入文件列表。
+
+more.fns():Object<String, Object>
+
+获取解析后的方法集。
 
 more.compress(src:String, agressive:Boolean):String
 
