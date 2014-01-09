@@ -25,6 +25,7 @@ define(function(require, exports, module) {
 			self.addMatch(new CompleteEqual(Token.ENTER, character.ENTER));
 			self.addMatch(new CompleteEqual(Token.LINE, character.LINE));
 
+			self.addMatch(new LineSearch(Token.COMMENT, '//', '\n'));
 			self.addMatch(new LineSearch(Token.COMMENT, '/*', '*/', true));
 			self.addMatch(new LineParse(Token.STRING, '"', '"', false));
 			self.addMatch(new LineParse(Token.STRING, "'", "'", false));
