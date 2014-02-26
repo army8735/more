@@ -210,7 +210,7 @@ define(function(require, exports) {
 		var leaves = node.leaves(),
 			id = leaves[0].leaves().content();
 		if(funcMap.hasOwnProperty(id)) {
-			//fncallµÄÍ·Á½¸ö½ÚµãÊÇidºÍ(£¬¿Õ°×¼ÆÊı
+			//fncallçš„å¤´ä¸¤ä¸ªèŠ‚ç‚¹æ˜¯idå’Œ(ï¼Œç©ºç™½è®¡æ•°
 			while(ignore[++idx]) {}
 			while(ignore[++idx]) {}
 			var fn = funcMap[id];
@@ -256,7 +256,7 @@ define(function(require, exports) {
 						else {
 							imports.push(token.val());
 						}
-						//¼æÈİless£¬Ïà¶ÔÂ·¾¶Îª¸ùÂ·¾¶
+						//å…¼å®¹lessï¼Œç›¸å¯¹è·¯å¾„ä¸ºæ ¹è·¯å¾„
 						if(less) {
 							if(/^(['"]?)\//.test(s)) {
 								s = s.replace(/^(['"]?)\//, '$1' + root);
@@ -272,7 +272,7 @@ define(function(require, exports) {
 					res += s;
 				}
 				else if(isVar) {
-					//ºöÂÔ±äÁ¿ÉùÃ÷
+					//å¿½ç•¥å˜é‡å£°æ˜
 				}
 				else if(isSelectors || isSelector && !isExtend) {
 					var temp = stack[stack.length - 1];
@@ -283,9 +283,9 @@ define(function(require, exports) {
 						temp[temp.length - 1] += token.content();
 					}
 				}
-				//¼Ì³ĞºÍ·½·¨Ö±½ÓºöÂÔ
+				//ç»§æ‰¿å’Œæ–¹æ³•ç›´æ¥å¿½ç•¥
 				else if(!isExtend && !isFn) {
-					//¼æÈİlessµÄ~String²ğ·ÖÓï·¨
+					//å…¼å®¹lessçš„~Stringæ‹†åˆ†è¯­æ³•
 					if(autoSplit && token.type() == Token.STRING) {
 						var s = token.content();
 						var c = s.charAt(0);
@@ -332,7 +332,7 @@ define(function(require, exports) {
 			else if(node.name() == Node.VARS) {
 				isVar = true;
 			}
-			//½«²ã¼¶²ğ¿ª
+			//å°†å±‚çº§æ‹†å¼€
 			else if(node.name() == Node.STYLESET && !inHead) {
 				styleset(true, node, prev, next);
 			}
@@ -340,7 +340,7 @@ define(function(require, exports) {
 				block(true, node);
 			}
 			else if(node.name() == Node.EXTEND) {
-				//Õ¼Î»·û
+				//å ä½ç¬¦
 				res += '@extend';
 				isExtend = true;
 				record(node);
@@ -352,7 +352,7 @@ define(function(require, exports) {
 				}
 			}
 			var leaves = node.leaves();
-			//µİ¹é×Ó½Úµã
+			//é€’å½’å­èŠ‚ç‚¹
 			leaves.forEach(function(leaf, i) {
 				join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFn, leaves[i - 1], leaves[i + 1]);
 			});
@@ -378,7 +378,7 @@ define(function(require, exports) {
 	}
 	function styleset(startOrEnd, node, prev, next) {
 		if(startOrEnd) {
-			//¶ş¼¶µÈÒÔÉÏÑ¡ÔñÆ÷ÏÈ½áÊøÉÏ¼¶block
+			//äºŒçº§ç­‰ä»¥ä¸Šé€‰æ‹©å™¨å…ˆç»“æŸä¸Šçº§block
 			if(stack.length) {
 				if(prev && prev.name() == Node.STYLESET) {
 				}
@@ -394,7 +394,7 @@ define(function(require, exports) {
 		else {
 			stack.pop();
 			if(stack.length) {
-				//µ±¶à¼¶styleset½áÊøÊ±ÏÂ¸ö»¹ÊÇstyleset»ò}£¬»áÔì³É¿Õ°×ÑùÊ½±í
+				//å½“å¤šçº§stylesetç»“æŸæ—¶ä¸‹ä¸ªè¿˜æ˜¯stylesetæˆ–}ï¼Œä¼šé€ æˆç©ºç™½æ ·å¼è¡¨
 				if(next && next.name() == Node.STYLESET) {
 				}
 				else {
@@ -405,7 +405,7 @@ define(function(require, exports) {
 				exHash[levels[levels.length - 1]].start.push(res.length);
 			}
 		}
-		//È¥³ı²ã¼¶Ôì³ÉµÄ¿ÕÑùÊ½
+		//å»é™¤å±‚çº§é€ æˆçš„ç©ºæ ·å¼
 		if(/{}([\s\r\n]*)$/.test(res)) {
 			var i = res.lastIndexOf('{');
 			i = res.lastIndexOf('}', i);
@@ -488,7 +488,7 @@ define(function(require, exports) {
 			var after = '';
 			o.fathers.forEach(function(father, l) {
 				s += styleMap[father] || '';
-				//½«fatherµÄ×ÓÑ¡ÔñÆ÷ÃÇ½øĞĞÉî¶È¼Ì³Ğ
+				//å°†fatherçš„å­é€‰æ‹©å™¨ä»¬è¿›è¡Œæ·±åº¦ç»§æ‰¿
 				Object.keys(styleMap).forEach(function(k, m) {
 					if(k.indexOf(father) == 0 && k != father) {
 						o.selectors.forEach(function(se, n) {
@@ -506,7 +506,7 @@ define(function(require, exports) {
 				}
 				res = res.slice(0, end) + after + res.slice(end);
 			}
-			//È¥µô@extendÕ¼Î»·û
+			//å»æ‰@extendå ä½ç¬¦
 			res = res.slice(0, o.index - 7) + s + res.slice(o.index);
 		}
 	}
@@ -529,15 +529,15 @@ define(function(require, exports) {
 			return e.toString();
 		}
 		init(ignore);
-		//´«Èë³õÊ¼»¯±äÁ¿
+		//ä¼ å…¥åˆå§‹åŒ–å˜é‡
 		Object.keys(vars).forEach(function(k) {
 			varHash[k] = vars[k];
 		});
-		//´«Èë³õÊ¼»¯¼Ì³Ğ
+		//ä¼ å…¥åˆå§‹åŒ–ç»§æ‰¿
 		Object.keys(style).forEach(function(k) {
 			styleMap[k] = style[k];
 		});
-		//´«Èë³õÊ¼»¯º¯Êı
+		//ä¼ å…¥åˆå§‹åŒ–å‡½æ•°
 		Object.keys(func).forEach(function(k) {
 			funcMap[k] = func[k];
 		});
@@ -613,7 +613,7 @@ define(function(require, exports) {
 		return suffix;
 	};
 	function removeImport(s) {
-		//0³õÊ¼£¬1×Ö·û´®
+		//0åˆå§‹ï¼Œ1å­—ç¬¦ä¸²
 		var state = 0;
 		for(var i = 0; i < s.length; i++) {
 			var c = s.charAt(i);
@@ -675,7 +675,7 @@ define(function(require, exports) {
 					}
 					else {
 						if(!localRoot) {
-							throw new Error('¹¹½¨@importµÄÏà¶Ô¸ùÂ·¾¶ÎÄ¼şĞèÒªÊ×ÏÈÉèÖÃroot:\n' + file + ' -> ' + impt);
+							throw new Error('æ„å»º@importçš„ç›¸å¯¹æ ¹è·¯å¾„æ–‡ä»¶éœ€è¦é¦–å…ˆè®¾ç½®root:\n' + file + ' -> ' + impt);
 						}
 						impt = localRoot.replace(/[/\\]$/, '') + '/' + impt.replace(/^[/\\]/, '');
 					}
@@ -683,7 +683,7 @@ define(function(require, exports) {
 				else {
 					if(impt.charAt(0) == '/') {
 						if(!localRoot) {
-							throw new Error('¹¹½¨@importµÄÏà¶Ô¸ùÂ·¾¶ÎÄ¼şĞèÒªÊ×ÏÈÉèÖÃroot:\n' + file + ' -> ' + impt);
+							throw new Error('æ„å»º@importçš„ç›¸å¯¹æ ¹è·¯å¾„æ–‡ä»¶éœ€è¦é¦–å…ˆè®¾ç½®root:\n' + file + ' -> ' + impt);
 						}
 						impt = localRoot.replace(/[/\\]$/, '') + impt;
 					}

@@ -2,7 +2,7 @@ function inheritPrototype(subType, superType) {
 	var prototype = Object.create(superType.prototype);
 	prototype.constructor = subType;
 	subType.prototype = prototype;
-	//¼Ì³Ğstatic±äÁ¿
+	//ç»§æ‰¿staticå˜é‡
 	Object.keys(superType).forEach(function(k) {
 		subType[k] = superType[k];
 	});

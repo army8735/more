@@ -37,7 +37,7 @@ define(function(require, exports, module) {
 			return this.result;
 		},
 		match: function(c, code, index) {
-			//�豻ʵ��
+			//需被实现
 			return false;
 		},
 		error: function() {

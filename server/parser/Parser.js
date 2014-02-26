@@ -93,7 +93,7 @@ var Parser = Class(function(lexer) {
 				case '@function':
 					return this.fn();
 				default:
-					//兼容less
+					//鍏煎less
 					this.look.type(Token.VARS);
 					return this.vars();
 			}
@@ -588,7 +588,7 @@ var Parser = Class(function(lexer) {
 			return node;
 		},
 		match: function(type, msg) {
-			//未定义为所有
+			//鏈畾涔変负鎵?湁
 			if(character.isUndefined(type)) {
 				if(this.look) {
 					var l = this.look;
@@ -599,7 +599,7 @@ var Parser = Class(function(lexer) {
 					this.error('syntax error' + (msg || ''));
 				}
 			}
-			//数组为其中一个即可
+			//鏁扮粍涓哄叾涓竴涓嵆鍙?
 			else if(Array.isArray(type)) {
 				if(this.look) {
 					for(var i = 0, len = type.length; i < len; i++) {
@@ -618,7 +618,7 @@ var Parser = Class(function(lexer) {
 				}
 				this.error('missing ' + type.join('|') + (msg || ''));
 			}
-			//或者根据token的type或者content匹配
+			//鎴栬?鏍规嵁token鐨則ype鎴栬?content鍖归厤
 			else if(typeof type == 'string') {
 				if(this.look && this.look.content() == type) {
 					var l = this.look;
@@ -656,7 +656,7 @@ var Parser = Class(function(lexer) {
 				if(!this.look) {
 					return;
 				}
-				//存下忽略的token
+				//瀛樹笅蹇界暐鐨則oken
 				if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT, Token.IGNORE].indexOf(this.look.type()) != -1) {
 					this.ignores[this.index - 1] = this.look;
 				}

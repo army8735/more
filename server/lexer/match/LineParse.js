@@ -20,7 +20,7 @@ var Match = require('./Match'),
 					res = false;
 				while(index < len) {
 					var c = code.charAt(index++);
-					//×ªÒå
+					//è½¬ä¹‰
 					if(c == character.BACK_SLASH) {
 						if(code.charAt(index++) == character.ENTER) {
 							index++;

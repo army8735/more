@@ -2,19 +2,19 @@ var character = require('../util/character'),
 	Class = require('../util/Class'),
 	Node = Class(function(id, params, body, fhash) {
 		this.id = id;
-		this.params = params; //形参数组
-		this.body = body; //函数体
-		this.fhash = fhash; //形参在函数体中的位置hash
-		this.gvs = {}; //全局变量
+		this.params = params; //褰㈠弬鏁扮粍
+		this.body = body; //鍑芥暟浣?
+		this.fhash = fhash; //褰㈠弬鍦ㄥ嚱鏁颁綋涓殑浣嶇疆hash
+		this.gvs = {}; //鍏ㄥ眬鍙橀噺
 	}).methods({
 		compile: function(aparams, gvs) {
 			var self = this;
 			self.global(gvs);
 			var res = this.body;
-			//将所有位置变量替换为值
+			//灏嗘墍鏈変綅缃彉閲忔浛鎹负鍊?
 			Object.keys(self.fhash).reverse().forEach(function(pos) {
 				var o = self.fhash[pos];
-				//局部变量优先于全局变量
+				//灞?儴鍙橀噺浼樺厛浜庡叏灞?彉閲?
 				var v = aparams[o.index];
 				if(character.isUndefined(v)) {
 					var va = o.v.replace(/^\$/, '');

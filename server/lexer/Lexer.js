@@ -2,18 +2,18 @@ var Class = require('../util/Class'),
 	character = require('../util/character'),
 	Token = require('./Token'),
 	Lexer = Class(function(rule) {
-		this.rule = rule; //当前语法规则
-		this.code; //要解析的代码
-		this.peek = ''; //向前看字符
-		this.index = 0; //向前看字符字符索引
-		this.isReg = Lexer.IS_REG; //当前/是否是perl风格正则表达式
-		this.lanDepth = 0; //生成最终结果时需要记录的行深度
-		this.tokenList = []; //结果的token列表
-		this.parentheseState = false; //(开始时标记之前终结符是否为if/for/while等关键字
-		this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
-		this.cacheLine = 0; //行缓存值
-		this.totalLine = 1; //总行数
-		this.colNum = 0; //列
+		this.rule = rule; //褰撳墠璇硶瑙勫垯
+		this.code; //瑕佽В鏋愮殑浠ｇ爜
+		this.peek = ''; //鍚戝墠鐪嬪瓧绗?
+		this.index = 0; //鍚戝墠鐪嬪瓧绗﹀瓧绗︾储寮?
+		this.isReg = Lexer.IS_REG; //褰撳墠/鏄惁鏄痯erl椋庢牸姝ｅ垯琛ㄨ揪寮?
+		this.lanDepth = 0; //鐢熸垚鏈?粓缁撴灉鏃堕渶瑕佽褰曠殑琛屾繁搴?
+		this.tokenList = []; //缁撴灉鐨則oken鍒楄〃
+		this.parentheseState = false; //(寮?鏃舵爣璁颁箣鍓嶇粓缁撶鏄惁涓篿f/for/while绛夊叧閿瓧
+		this.parentheseStack = []; //鍦嗘嫭鍙锋繁搴﹁褰曞綋鍓嶆槸鍚︿负if/for/while绛夎鍙ュ唴閮?
+		this.cacheLine = 0; //琛岀紦瀛樺?
+		this.totalLine = 1; //鎬昏鏁?
+		this.colNum = 0; //鍒?
 		this.colMax = 0;
 	}).methods({
 		parse: function(code, start) {
@@ -40,12 +40,12 @@ var Class = require('../util/Class'),
 					break;
 				}
 				this.readch();
-				//perl风格正则
+				//perl椋庢牸姝ｅ垯
 				if(perlReg && this.isReg == Lexer.IS_REG && this.peek == character.SLASH && !{ '/': true, '*': true }[this.code.charAt(this.index)]) {
 					this.dealReg(temp, length);
 					this.isReg = Lexer.NOT_REG;
 				}
-				//依次遍历匹配规则，命中则继续
+				//渚濇閬嶅巻鍖归厤瑙勫垯锛屽懡涓垯缁х画
 				else {
 					for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
 						var match = matches[i];
@@ -75,7 +75,7 @@ var Class = require('../util/Class'),
 							if(error) {
 								this.error(error, this.code.slice(this.index - matchLen, this.index));
 							}
-							//支持perl正则需判断关键字、圆括号对除号语义的影响
+							//鏀寔perl姝ｅ垯闇?垽鏂叧閿瓧銆佸渾鎷彿瀵归櫎鍙疯涔夌殑褰卞搷
 							if(perlReg && match.perlReg() != Lexer.IGNORE) {
 								if(match.perlReg() == Lexer.SPECIAL) {
 									this.isReg = match.special();
@@ -97,7 +97,7 @@ var Class = require('../util/Class'),
 							continue outer;
 						}
 					}
-					//如果有未匹配的，说明规则不完整，加入other类型并抛出警告
+					//濡傛灉鏈夋湭鍖归厤鐨勶紝璇存槑瑙勫垯涓嶅畬鏁达紝鍔犲叆other绫诲瀷骞舵姏鍑鸿鍛?
 					this.error('unknow token');
 				}
 			}

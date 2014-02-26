@@ -3,19 +3,19 @@ define(function(require, exports, module) {
 		Class = require('../util/Class'),
 		Node = Class(function(id, params, body, fhash) {
 			this.id = id;
-			this.params = params; //ĞÎ²ÎÊı×é
-			this.body = body; //º¯ÊıÌå
-			this.fhash = fhash; //ĞÎ²ÎÔÚº¯ÊıÌåÖĞµÄÎ»ÖÃhash
-			this.gvs = {}; //È«¾Ö±äÁ¿
+			this.params = params; //å½¢å‚æ•°ç»„
+			this.body = body; //å‡½æ•°ä½“
+			this.fhash = fhash; //å½¢å‚åœ¨å‡½æ•°ä½“ä¸­çš„ä½ç½®hash
+			this.gvs = {}; //å…¨å±€å˜é‡
 		}).methods({
 			compile: function(aparams, gvs) {
 				var self = this;
 				self.global(gvs);
 				var res = this.body;
-				//½«ËùÓĞÎ»ÖÃ±äÁ¿Ìæ»»ÎªÖµ
+				//å°†æ‰€æœ‰ä½ç½®å˜é‡æ›¿æ¢ä¸ºå€¼
 				Object.keys(self.fhash).reverse().forEach(function(pos) {
 					var o = self.fhash[pos];
-					//¾Ö²¿±äÁ¿ÓÅÏÈÓÚÈ«¾Ö±äÁ¿
+					//å±€éƒ¨å˜é‡ä¼˜å…ˆäºå…¨å±€å˜é‡
 					var v = aparams[o.index];
 					if(character.isUndefined(v)) {
 						var va = o.v.replace(/^\$/, '');

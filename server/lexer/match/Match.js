@@ -36,7 +36,7 @@ module.exports = Class(function(type, setPReg, special, parenthese) {
 		return this.result;
 	},
 	match: function(c, code, index) {
-		//需被实现
+		//闇?瀹炵幇
 		return false;
 	},
 	error: function() {

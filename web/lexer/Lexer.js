@@ -3,18 +3,18 @@ define(function(require, exports, module) {
 		character = require('../util/character'),
 		Token = require('./Token'),
 		Lexer = Class(function(rule) {
-			this.rule = rule; //µ±Ç°Óï·¨¹æÔò
-			this.code; //Òª½âÎöµÄ´úÂë
-			this.peek = ''; //ÏòÇ°¿´×Ö·û
-			this.index = 0; //ÏòÇ°¿´×Ö·û×Ö·ûË÷Òı
-			this.isReg = Lexer.IS_REG; //µ±Ç°/ÊÇ·ñÊÇperl·ç¸ñÕıÔò±í´ïÊ½
-			this.lanDepth = 0; //Éú³É×îÖÕ½á¹ûÊ±ĞèÒª¼ÇÂ¼µÄĞĞÉî¶È
-			this.tokenList = []; //½á¹ûµÄtokenÁĞ±í
-			this.parentheseState = false; //(¿ªÊ¼Ê±±ê¼ÇÖ®Ç°ÖÕ½á·ûÊÇ·ñÎªif/for/whileµÈ¹Ø¼ü×Ö
-			this.parentheseStack = []; //Ô²À¨ºÅÉî¶È¼ÇÂ¼µ±Ç°ÊÇ·ñÎªif/for/whileµÈÓï¾äÄÚ²¿
-			this.cacheLine = 0; //ĞĞ»º´æÖµ
-			this.totalLine = 1; //×ÜĞĞÊı
-			this.colNum = 0; //ÁĞ
+			this.rule = rule; //å½“å‰è¯­æ³•è§„åˆ™
+			this.code; //è¦è§£æçš„ä»£ç 
+			this.peek = ''; //å‘å‰çœ‹å­—ç¬¦
+			this.index = 0; //å‘å‰çœ‹å­—ç¬¦å­—ç¬¦ç´¢å¼•
+			this.isReg = Lexer.IS_REG; //å½“å‰/æ˜¯å¦æ˜¯perlé£æ ¼æ­£åˆ™è¡¨è¾¾å¼
+			this.lanDepth = 0; //ç”Ÿæˆæœ€ç»ˆç»“æœæ—¶éœ€è¦è®°å½•çš„è¡Œæ·±åº¦
+			this.tokenList = []; //ç»“æœçš„tokenåˆ—è¡¨
+			this.parentheseState = false; //(å¼€å§‹æ—¶æ ‡è®°ä¹‹å‰ç»ˆç»“ç¬¦æ˜¯å¦ä¸ºif/for/whileç­‰å…³é”®å­—
+			this.parentheseStack = []; //åœ†æ‹¬å·æ·±åº¦è®°å½•å½“å‰æ˜¯å¦ä¸ºif/for/whileç­‰è¯­å¥å†…éƒ¨
+			this.cacheLine = 0; //è¡Œç¼“å­˜å€¼
+			this.totalLine = 1; //æ€»è¡Œæ•°
+			this.colNum = 0; //åˆ—
 			this.colMax = 0;
 		}).methods({
 			parse: function(code, start) {
@@ -41,12 +41,12 @@ define(function(require, exports, module) {
 						break;
 					}
 					this.readch();
-					//perl·ç¸ñÕıÔò
+					//perlé£æ ¼æ­£åˆ™
 					if(perlReg && this.isReg == Lexer.IS_REG && this.peek == character.SLASH && !{ '/': true, '*': true }[this.code.charAt(this.index)]) {
 						this.dealReg(temp, length);
 						this.isReg = Lexer.NOT_REG;
 					}
-					//ÒÀ´Î±éÀúÆ¥Åä¹æÔò£¬ÃüÖĞÔò¼ÌĞø
+					//ä¾æ¬¡éå†åŒ¹é…è§„åˆ™ï¼Œå‘½ä¸­åˆ™ç»§ç»­
 					else {
 						for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
 							var match = matches[i];
@@ -76,7 +76,7 @@ define(function(require, exports, module) {
 								if(error) {
 									this.error(error, this.code.slice(this.index - matchLen, this.index));
 								}
-								//Ö§³ÖperlÕıÔòĞèÅĞ¶Ï¹Ø¼ü×Ö¡¢Ô²À¨ºÅ¶Ô³ıºÅÓïÒåµÄÓ°Ïì
+								//æ”¯æŒperlæ­£åˆ™éœ€åˆ¤æ–­å…³é”®å­—ã€åœ†æ‹¬å·å¯¹é™¤å·è¯­ä¹‰çš„å½±å“
 								if(perlReg && match.perlReg() != Lexer.IGNORE) {
 									if(match.perlReg() == Lexer.SPECIAL) {
 										this.isReg = match.special();
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
 								continue outer;
 							}
 						}
-						//Èç¹ûÓĞÎ´Æ¥ÅäµÄ£¬ËµÃ÷¹æÔò²»ÍêÕû£¬¼ÓÈëotherÀàĞÍ²¢Å×³ö¾¯¸æ
+						//å¦‚æœæœ‰æœªåŒ¹é…çš„ï¼Œè¯´æ˜è§„åˆ™ä¸å®Œæ•´ï¼ŒåŠ å…¥otherç±»å‹å¹¶æŠ›å‡ºè­¦å‘Š
 						this.error('unknow token');
 					}
 				}

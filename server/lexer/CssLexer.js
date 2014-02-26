@@ -23,7 +23,7 @@ var Lexer = require('./Lexer'),
 					if(match.match(this.peek, this.code, this.index)) {
 						var token = new Token(match.tokenType(), match.content(), match.val()),
 							matchLen = match.content().length;
-						//(之后的字符串可省略"号
+						//(涔嬪悗鐨勫瓧绗︿覆鍙渷鐣?鍙?
 						if(this.parenthese) {
 							if([Token.BLANK, Token.TAB, Token.LINE, Token.ENTER].indexOf(token.type()) != -1) {
 								//
@@ -39,7 +39,7 @@ var Lexer = require('./Lexer'),
 								continue outer;
 							}
 						}
-						//将id区分出属性名和属性值
+						//灏唅d鍖哄垎鍑哄睘鎬у悕鍜屽睘鎬у?
 						if(token.type() == Token.ID) {
 							//-webkit-
 							if(token.content().indexOf('-webkit-') == 0) {
@@ -65,14 +65,14 @@ var Lexer = require('./Lexer'),
 									token.type(Token.KEYWORD);
 								}
 							}
-							//ie hack也算关键字
+							//ie hack涔熺畻鍏抽敭瀛?
 							else if(/^[*\-_]/.test(token.content().charAt(0))) {
 								if(this.rule.keyWords().hasOwnProperty(token.content().slice(1))) {
 									token.type(Token.KEYWORD);
 								}
 							}
 							else {
-								//分属性和值
+								//鍒嗗睘鎬у拰鍊?
 								if(this.rule.keyWords().hasOwnProperty(token.content())) {
 									if(this.isValue) {
 										token.type(Token.PROPERTY);
@@ -92,7 +92,7 @@ var Lexer = require('./Lexer'),
 								}
 							}
 						}
-						//@import和@media之后进入值状态
+						//@import鍜孈media涔嬪悗杩涘叆鍊肩姸鎬?
 						if(token.type() == Token.HEAD && ['@import', '@media'].indexOf(token.content()) != -1) {
 							this.isValue = true;
 						}
@@ -118,11 +118,11 @@ var Lexer = require('./Lexer'),
 								}
 							}
 						}
-						//非值状态的属性被当作id
+						//闈炲?鐘舵?鐨勫睘鎬ц褰撲綔id
 						if(token.type() == Token.PROPERTY && !this.isValue) {
 							token.type(Token.ID);
 						}
-						//非值状态的数字被当作id
+						//闈炲?鐘舵?鐨勬暟瀛楄褰撲綔id
 						if(token.type() == Token.NUMBER && !this.isValue && token.content().charAt(0) == '#') {
 							token.type(Token.ID);
 						}
@@ -150,7 +150,7 @@ var Lexer = require('./Lexer'),
 					this.dealPt(temp);
 					continue outer;
 				}
-				//如果有未匹配的，css默认忽略，查找下一个;
+				//濡傛灉鏈夋湭鍖归厤鐨勶紝css榛樿蹇界暐锛屾煡鎵句笅涓?釜;
 				var j = this.code.indexOf(';', this.index);
 				if(j == -1) {
 					j = this.code.length;
@@ -165,7 +165,7 @@ var Lexer = require('./Lexer'),
 		},
 		dealPt: function(temp) {
 			var k = this.code.indexOf(')', this.index);
-			//()未结束直接跳出
+			//()鏈粨鏉熺洿鎺ヨ烦鍑?
 			if(k == -1) {
 				var token = new Token(Token.IGNORE, this.code.slice(this.index - 1, this.code.length));
 				temp.push(token);
@@ -186,7 +186,7 @@ var Lexer = require('./Lexer'),
 			}
 			var s = this.code.slice(this.index - 1, k),
 				reg = /[\s\r\n]+\)$/.exec(s);
-			//)之前的空白要判断
+			//)涔嬪墠鐨勭┖鐧借鍒ゆ柇
 			if(reg) {
 				s = s.slice(0, s.length - reg[0].length);
 			}

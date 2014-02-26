@@ -48,7 +48,7 @@ function rebuild(node, ignore, arr) {
 			rb(leaf, ignore, arr);
 		}
 	});
-	//将每一组选择器顺序排列，比较时即可直接==比较
+	//灏嗘瘡涓?粍閫夋嫨鍣ㄩ『搴忔帓鍒楋紝姣旇緝鏃跺嵆鍙洿鎺?=姣旇緝
 	arr.forEach(function(o) {
 		sort(o.selectors);
 		o.s2s = o.selectors.join(',');
@@ -146,20 +146,20 @@ function noImpact(node, first, other, child) {
 	if(typeof child == 'number') {
 		mode = true;
 	}
-	//类似::-ms-clear需排除
+	//绫讳技::-ms-clear闇?帓闄?
 	for(var i = first; i <= other; i++) {
 		if(node[i].s2s.indexOf(':-ms-') > -1) {
 			return false;
 		}
 	}
-	//紧邻选择器无优先级影响
+	//绱ч偦閫夋嫨鍣ㄦ棤浼樺厛绾у奖鍝?
 	if(first == other - 1) {
 		return true;
 	}
 	else if(!mode && typeof imCache[first + ',' + other] == 'boolean') {
 		return imCache[first + ',' + other];
 	}
-	//非紧邻则若无相同样式或后声明有important更高优先级或后声明与中间夹杂的值相同亦无影响
+	//闈炵揣閭诲垯鑻ユ棤鐩稿悓鏍峰紡鎴栧悗澹版槑鏈塱mportant鏇撮珮浼樺厛绾ф垨鍚庡０鏄庝笌涓棿澶规潅鐨勫?鐩稿悓浜︽棤褰卞搷
 	else {
 		var hash = {};
 		var keys = {
@@ -216,7 +216,7 @@ function noImpact(node, first, other, child) {
 			'border-bottom-right-radius': true
 		};
 		for(var i = first + 1; i < other; i++) {
-			//缓存
+			//缂撳瓨
 			if(imCache[i + ',' + (i + 1)]) {
 				continue;
 			}
@@ -224,7 +224,7 @@ function noImpact(node, first, other, child) {
 				var k = getK(o.key);
 				if(hash[k]) {
 					hash[k].p = Math.max(hash[k].p, o.impt ? 2 : 1);
-					//多次出现不同值无需记录，因为后声明的不可能同时等于两个值，将其置true说明冲突
+					//澶氭鍑虹幇涓嶅悓鍊兼棤闇?褰曪紝鍥犱负鍚庡０鏄庣殑涓嶅彲鑳藉悓鏃剁瓑浜庝袱涓?锛屽皢鍏剁疆true璇存槑鍐茬獊
 					hash[k].v = hash[k].v == o.value ? o.value : true;
 				}
 				else {
@@ -237,7 +237,7 @@ function noImpact(node, first, other, child) {
 		}
 		var res = true;
 		var block = node[other].block;
-		//有child索引时仅检查other样式的索引冲突，否则为other全部
+		//鏈塩hild绱㈠紩鏃朵粎妫?煡other鏍峰紡鐨勭储寮曞啿绐侊紝鍚﹀垯涓簅ther鍏ㄩ儴
 		if(mode) {
 			block = block.slice(child, child + 1);
 		}
@@ -250,7 +250,7 @@ function noImpact(node, first, other, child) {
 						res = false;
 					}
 				}
-				//总样式和分样式有冲突
+				//鎬绘牱寮忓拰鍒嗘牱寮忔湁鍐茬獊
 				else if(keys[key]) {
 					switch(key) {
 						case 'background':
@@ -523,10 +523,10 @@ function noImpact(node, first, other, child) {
 				}
 			}
 		});
-		//缓存留以后用
+		//缂撳瓨鐣欎互鍚庣敤
 		if(!mode) {
 			imCache[first + ',' + other] = res;
-			//如果first到other之间无优先级冲突，将first和other之间也做标记
+			//濡傛灉first鍒皁ther涔嬮棿鏃犱紭鍏堢骇鍐茬獊锛屽皢first鍜宱ther涔嬮棿涔熷仛鏍囪
 			if(res) {
 				for(var i = first + 1; i < other; i++) {
 					imCache[i + ',' + other] = res;
@@ -537,7 +537,7 @@ function noImpact(node, first, other, child) {
 	}
 }
 function clean(node) {
-	//清空null
+	//娓呯┖null
 	for(var i = node.length - 1; i >= 0; i--) {
 		var o = node[i];
 		for(var j = o.block.length - 1; j >= 0; j--) {
@@ -549,12 +549,12 @@ function clean(node) {
 			node.splice(i, 1);
 		}
 	}
-	//节点变化必须清空imcache
+	//鑺傜偣鍙樺寲蹇呴』娓呯┖imcache
 	imCache = {};
 }
 
 function merge(node) {
-	//冒泡处理，因为可能处理后留有多个相同选择器，但后面的选择器可继续递归过程
+	//鍐掓场澶勭悊锛屽洜涓哄彲鑳藉鐞嗗悗鐣欐湁澶氫釜鐩稿悓閫夋嫨鍣紝浣嗗悗闈㈢殑閫夋嫨鍣ㄥ彲缁х画閫掑綊杩囩▼
 	for(var i = 0; i < node.length - 1; i++) {
 		var hash = {};
 		var index = {};
@@ -562,7 +562,7 @@ function merge(node) {
 			var o = node[j];
 			var s = o.s2s;
 			if(hash[s]) {
-				//当无优先级冲突时可合并分开的相同选择器
+				//褰撴棤浼樺厛绾у啿绐佹椂鍙悎骞跺垎寮?殑鐩稿悓閫夋嫨鍣?
 				if(noImpact(node, index[s], j)) {
 					hash[s].block = hash[s].block.concat(o.block);
 					node.splice(j, 1);
@@ -583,16 +583,16 @@ function duplicate(node) {
 		hash[o.s2s] = hash[o.s2s] || {};
 		for(var i = 0; i < o.block.length; i++) {
 			var style = o.block[i];
-			//以样式名+hack为键，去除hack的影响
+			//浠ユ牱寮忓悕+hack涓洪敭锛屽幓闄ack鐨勫奖鍝?
 			var key = style.key;
 			if(style.hack) {
 				key += style.hack;
 			}
-			//优先级普通声明为1，!important为2，删除低优先级和先出现的
+			//浼樺厛绾ф櫘閫氬０鏄庝负1锛?important涓?锛屽垹闄や綆浼樺厛绾у拰鍏堝嚭鐜扮殑
 			var priority = style.impt ? 2 : 1;
 			if(hash[o.s2s][key]) {
 				if(priority >= hash[o.s2s][key].priority) {
-					//置空后统一删除，防止干扰index
+					//缃┖鍚庣粺涓?垹闄わ紝闃叉骞叉壈index
 					hash[o.s2s][key].parent.block[hash[o.s2s][key].index] = null;
 					hash[o.s2s][key] = {
 						index: i,
@@ -614,9 +614,9 @@ function duplicate(node) {
 			}
 		}
 	});
-	//清空null
+	//娓呯┖null
 	clean(node);
-	//后出现的普通样式会覆盖掉前面的hack
+	//鍚庡嚭鐜扮殑鏅?鏍峰紡浼氳鐩栨帀鍓嶉潰鐨刪ack
 	hash = {};
 	for(var i = node.length - 1; i >=0; i--) {
 		var o = node[i];
@@ -653,14 +653,14 @@ function override(node) {
 	for(var j = node.length - 1; j >= 0; j--) {
 		var o = node[j];
 		hash[o.s2s] = hash[o.s2s] || {};
-		//从后往前遍历，后面出现的总样式会覆盖掉前面的分样式
+		//浠庡悗寰?墠閬嶅巻锛屽悗闈㈠嚭鐜扮殑鎬绘牱寮忎細瑕嗙洊鎺夊墠闈㈢殑鍒嗘牱寮?
 		for(var i = o.block.length - 1; i >= 0; i--) {
 			var style = o.block[i];
-			//hack的分样式也会被覆盖，但hahc的总样式没有覆盖权利
+			//hack鐨勫垎鏍峰紡涔熶細琚鐩栵紝浣唄ahc鐨勬?鏍峰紡娌℃湁瑕嗙洊鏉冨埄
 			var k = getK(style.key);
 			if(k == style.key && keys[k] && !style.hack) {
 				hash[o.s2s][k] = style.impt ? 2 : 1;
-				//以下4个即可作为总样式也可作为分样式
+				//浠ヤ笅4涓嵆鍙綔涓烘?鏍峰紡涔熷彲浣滀负鍒嗘牱寮?
 				if(!{
 					'border-left': true,
 					'border-top': true,
@@ -831,7 +831,7 @@ function union(node) {
 	Object.keys(hash).forEach(function(o) {
 		if(hash[o].length > 1) {
 			var queue = hash[o];
-			//后面的选择器冒泡合并到第一个上，并置空
+			//鍚庨潰鐨勯?鎷╁櫒鍐掓场鍚堝苟鍒扮涓?釜涓婏紝骞剁疆绌?
 			for(var i = 0; i < queue.length - 1; i++) {
 				for(var j = i + 1; j < queue.length; j++) {
 					if(queue[i].n.block.length && queue[j].n.block.length && noImpact(node, queue[i].i, queue[j].i)) {
@@ -866,7 +866,7 @@ function extract(node) {
 			});
 		});
 	});
-	//将只有1次出现的删除，多次出现的保留，将留下的组成一个二维数组
+	//灏嗗彧鏈?娆″嚭鐜扮殑鍒犻櫎锛屽娆″嚭鐜扮殑淇濈暀锛屽皢鐣欎笅鐨勭粍鎴愪竴涓簩缁存暟缁?
 	var index = [];
 	var max = 0;
 	var keys = [];
@@ -885,7 +885,7 @@ function extract(node) {
 			index.push(temp);
 		}
 	});
-	//排列好map的位置，索引和位置对应，空的地方填null
+	//鎺掑垪濂絤ap鐨勪綅缃紝绱㈠紩鍜屼綅缃搴旓紝绌虹殑鍦版柟濉玭ull
 	var map = [];
 	index.forEach(function(temp, idx) {
 		var arr = new Array(max);
@@ -897,29 +897,29 @@ function extract(node) {
 		});
 		map.push(arr);
 	});
-	//同列相同部分视为一块矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器。优先取最大面积者合并。当然至少要2列，因为1列为只出现在一个选择器中没必要提
-	//to do 面积择优算法。目前想到的复杂度过高，无法用于实际场景
-	//舍弃之采用单行合并，即拥有某一个样式的所有选择器尝试合并，当然因为优先级冲突不一定能够整行合并，应该递归其所有组合尝试，代价太大暂时忽略
+	//鍚屽垪鐩稿悓閮ㄥ垎瑙嗕负涓?潡鐭╁舰闈㈢Н锛屼笉鍚屽垪鎷ユ湁鐩稿悓浣嶇疆鍜岄珮搴﹀彲鍚堝苟璁＄畻闈㈢Н鈥斺?鍗虫嫢鏈夌浉鍚屾牱寮忕殑涓嶅悓閫夋嫨鍣ㄣ?浼樺厛鍙栨渶澶ч潰绉?鍚堝苟銆傚綋鐒惰嚦灏戣2鍒楋紝鍥犱负1鍒椾负鍙嚭鐜板湪涓?釜閫夋嫨鍣ㄤ腑娌″繀瑕佹彁
+	//to do 闈㈢Н鎷╀紭绠楁硶銆傜洰鍓嶆兂鍒扮殑澶嶆潅搴﹁繃楂橈紝鏃犳硶鐢ㄤ簬瀹為檯鍦烘櫙
+	//鑸嶅純涔嬮噰鐢ㄥ崟琛屽悎骞讹紝鍗虫嫢鏈夋煇涓?釜鏍峰紡鐨勬墍鏈夐?鎷╁櫒灏濊瘯鍚堝苟锛屽綋鐒跺洜涓轰紭鍏堢骇鍐茬獊涓嶄竴瀹氳兘澶熸暣琛屽悎骞讹紝搴旇閫掑綊鍏舵墍鏈夌粍鍚堝皾璇曪紝浠ｄ环澶ぇ鏆傛椂蹇界暐
 	var record = [];
 	var insert = [];
 	map.forEach(function(row, i) {
 		var start = row.indexOf(1);
 		var end = row.lastIndexOf(1);
-		//列操作可能将后面的某行清空，判断之
+		//鍒楁搷浣滃彲鑳藉皢鍚庨潰鐨勬煇琛屾竻绌猴紝鍒ゆ柇涔?
 		if(start == end) {
 			return;
 		}
 		var style = keys[i];
 		var same = hash[style];
-		//优先本行合并，若冲突，进行相邻列合并。因为相邻出现一定无冲突
+		//浼樺厛鏈鍚堝苟锛岃嫢鍐茬獊锛岃繘琛岀浉閭诲垪鍚堝苟銆傚洜涓虹浉閭诲嚭鐜颁竴瀹氭棤鍐茬獊
 		if(noImpact(node, start, end, same[same.length - 1].j)) {
-			//没有冲突还要看合并后是否缩小体积，即减少的样式字数要比选择器拼接大
+			//娌℃湁鍐茬獊杩樿鐪嬪悎骞跺悗鏄惁缂╁皬浣撶Н锛屽嵆鍑忓皯鐨勬牱寮忓瓧鏁拌姣旈?鎷╁櫒鎷兼帴澶?
 			var reduce = style.length * (same.length - 1);
 			var add = 0;
 			same.forEach(function(o, i) {
 				add += o.parent.s2s.length;
 			});
-			//提取合并每2个选择器之间会多1个,且样式表会多2个字符{}，抵消后为增加same.length
+			//鎻愬彇鍚堝苟姣?涓?鎷╁櫒涔嬮棿浼氬1涓?涓旀牱寮忚〃浼氬2涓瓧绗}锛屾姷娑堝悗涓哄鍔爏ame.length
 			if(reduce > add + same.length) {
 				var ss = [];
 				same.forEach(function(o) {
@@ -927,7 +927,7 @@ function extract(node) {
 					record.push(o);
 				});
 				sort(ss);
-				//插入提取合并结果的位置在第一个之后
+				//鎻掑叆鎻愬彇鍚堝苟缁撴灉鐨勪綅缃湪绗竴涓箣鍚?
 				insert.push({
 					i: same[0].i + 1,
 					selectors: ss,
@@ -935,21 +935,21 @@ function extract(node) {
 					s2s: ss.join(',')
 				});
 			}
-			//本行清空
+			//鏈娓呯┖
 			for(var j = 0; j < row.length; j++) {
 				row[j] = 0;
 			}
 		}
 		else {
 			for(var m = 0; m < row.length - 1; m++) {
-				//相邻必须有2个以上才合并
+				//鐩搁偦蹇呴』鏈?涓互涓婃墠鍚堝苟
 				if(row[m] && row[m + 1]) {
 					for(var n = m + 2; n < row.length; n++) {
 						if(!row[n]) {
 							break;
 						}
 					}
-					//同时进行纵向相同可合并行搜索，即这些选择器拥有的相同样式合并
+					//鍚屾椂杩涜绾靛悜鐩稿悓鍙悎骞惰鎼滅储锛屽嵆杩欎簺閫夋嫨鍣ㄦ嫢鏈夌殑鐩稿悓鏍峰紡鍚堝苟
 					var ri = [i];
 					var reduce = style.length * (n - m - 1);
 					for(var l = 0, compare = row.slice(m, n).join(''); l < map.length; l++) {
@@ -997,7 +997,7 @@ function extract(node) {
 			}
 		}
 	});
-	//清空记录的提取项，插入提取结果
+	//娓呯┖璁板綍鐨勬彁鍙栭」锛屾彃鍏ユ彁鍙栫粨鏋?
 	record.forEach(function(o) {
 		o.parent.block[o.j] = null;
 	});
@@ -1008,7 +1008,7 @@ function extract(node) {
 		node.splice(o.i, 0, o);
 	});
 	clean(node);
-	//再次合并因提取公因子产生的具有相同样式的选择器
+	//鍐嶆鍚堝苟鍥犳彁鍙栧叕鍥犲瓙浜х敓鐨勫叿鏈夌浉鍚屾牱寮忕殑閫夋嫨鍣?
 	if(insert.length) {
 		union(node);
 	}
@@ -1054,19 +1054,19 @@ function compress(src) {
 	head = '';
 	body = '';
 	getHead(node, ignore);
-	//将ast重构成更直接的形式并添加附加信息
+	//灏哸st閲嶆瀯鎴愭洿鐩存帴鐨勫舰寮忓苟娣诲姞闄勫姞淇℃伅
 	node = rebuild(node, ignore, []);
-	//合并相同选择器
+	//鍚堝苟鐩稿悓閫夋嫨鍣?
 	merge(node);
-	//去除同一选择器中重复样式声明
+	//鍘婚櫎鍚屼竴閫夋嫨鍣ㄤ腑閲嶅鏍峰紡澹版槑
 	duplicate(node);
-	//去除同一选择器中被覆盖的样式声明
+	//鍘婚櫎鍚屼竴閫夋嫨鍣ㄤ腑琚鐩栫殑鏍峰紡澹版槑
 	override(node);
-	//聚合相同样式的选择器
+	//鑱氬悎鐩稿悓鏍峰紡鐨勯?鎷╁櫒
 	union(node);
-	//提取公因子
+	//鎻愬彇鍏洜瀛?
 	extract(node);
-	//结果
+	//缁撴灉
 	join(node);
 	return head + body;
 }

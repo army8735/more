@@ -24,7 +24,7 @@ define(function(require, exports, module) {
 						if(match.match(this.peek, this.code, this.index)) {
 							var token = new Token(match.tokenType(), match.content(), match.val()),
 								matchLen = match.content().length;
-							//(Ö®ºóµÄ×Ö·û´®¿ÉÊ¡ÂÔ"ºÅ
+							//(ä¹‹åçš„å­—ç¬¦ä¸²å¯çœç•¥"å·
 							if(this.parenthese) {
 								if([Token.BLANK, Token.TAB, Token.LINE, Token.ENTER].indexOf(token.type()) != -1) {
 									//
@@ -40,7 +40,7 @@ define(function(require, exports, module) {
 									continue outer;
 								}
 							}
-							//½«idÇø·Ö³öÊôĞÔÃûºÍÊôĞÔÖµ
+							//å°†idåŒºåˆ†å‡ºå±æ€§åå’Œå±æ€§å€¼
 							if(token.type() == Token.ID) {
 								//-webkit-
 								if(token.content().indexOf('-webkit-') == 0) {
@@ -66,14 +66,14 @@ define(function(require, exports, module) {
 										token.type(Token.KEYWORD);
 									}
 								}
-								//ie hackÒ²Ëã¹Ø¼ü×Ö
+								//ie hackä¹Ÿç®—å…³é”®å­—
 								else if(/^[*\-_]/.test(token.content().charAt(0))) {
 									if(this.rule.keyWords().hasOwnProperty(token.content().slice(1))) {
 										token.type(Token.KEYWORD);
 									}
 								}
 								else {
-									//·ÖÊôĞÔºÍÖµ
+									//åˆ†å±æ€§å’Œå€¼
 									if(this.rule.keyWords().hasOwnProperty(token.content())) {
 										if(this.isValue) {
 											token.type(Token.PROPERTY);
@@ -93,7 +93,7 @@ define(function(require, exports, module) {
 									}
 								}
 							}
-							//@importºÍ@mediaÖ®ºó½øÈëÖµ×´Ì¬
+							//@importå’Œ@mediaä¹‹åè¿›å…¥å€¼çŠ¶æ€
 							if(token.type() == Token.HEAD && ['@import', '@media'].indexOf(token.content()) != -1) {
 								this.isValue = true;
 							}
@@ -119,11 +119,11 @@ define(function(require, exports, module) {
 									}
 								}
 							}
-							//·ÇÖµ×´Ì¬µÄÊôĞÔ±»µ±×÷id
+							//éå€¼çŠ¶æ€çš„å±æ€§è¢«å½“ä½œid
 							if(token.type() == Token.PROPERTY && !this.isValue) {
 								token.type(Token.ID);
 							}
-							//·ÇÖµ×´Ì¬µÄÊı×Ö±»µ±×÷id
+							//éå€¼çŠ¶æ€çš„æ•°å­—è¢«å½“ä½œid
 							if(token.type() == Token.NUMBER && !this.isValue && token.content().charAt(0) == '#') {
 								token.type(Token.ID);
 							}
@@ -151,7 +151,7 @@ define(function(require, exports, module) {
 						this.dealPt(temp);
 						continue outer;
 					}
-					//Èç¹ûÓĞÎ´Æ¥ÅäµÄ£¬cssÄ¬ÈÏºöÂÔ£¬²éÕÒÏÂÒ»¸ö;
+					//å¦‚æœæœ‰æœªåŒ¹é…çš„ï¼Œcssé»˜è®¤å¿½ç•¥ï¼ŒæŸ¥æ‰¾ä¸‹ä¸€ä¸ª;
 					var j = this.code.indexOf(';', this.index);
 					if(j == -1) {
 						j = this.code.length;
@@ -166,7 +166,7 @@ define(function(require, exports, module) {
 			},
 			dealPt: function(temp) {
 				var k = this.code.indexOf(')', this.index);
-				//()Î´½áÊøÖ±½ÓÌø³ö
+				//()æœªç»“æŸç›´æ¥è·³å‡º
 				if(k == -1) {
 					var token = new Token(Token.IGNORE, this.code.slice(this.index - 1, this.code.length));
 					temp.push(token);
@@ -187,7 +187,7 @@ define(function(require, exports, module) {
 				}
 				var s = this.code.slice(this.index - 1, k),
 					reg = /[\s\r\n]+\)$/.exec(s);
-				//)Ö®Ç°µÄ¿Õ°×ÒªÅĞ¶Ï
+				//)ä¹‹å‰çš„ç©ºç™½è¦åˆ¤æ–­
 				if(reg) {
 					s = s.slice(0, s.length - reg[0].length);
 				}

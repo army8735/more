@@ -209,7 +209,7 @@ function compilerFn(node, ignore, idx) {
 	var leaves = node.leaves(),
 		id = leaves[0].leaves().content();
 	if(funcMap.hasOwnProperty(id)) {
-		//fncall的头两个节点是id和(，空白计数
+		//fncall鐨勫ご涓や釜鑺傜偣鏄痠d鍜?锛岀┖鐧借鏁?
 		while(ignore[++idx]) {}
 		while(ignore[++idx]) {}
 		var fn = funcMap[id];
@@ -255,7 +255,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 					else {
 						imports.push(token.val());
 					}
-					//兼容less，相对路径为根路径
+					//鍏煎less锛岀浉瀵硅矾寰勪负鏍硅矾寰?
 					if(less) {
 						if(/^(['"]?)\//.test(s)) {
 							s = s.replace(/^(['"]?)\//, '$1' + root);
@@ -271,7 +271,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 				res += s;
 			}
 			else if(isVar) {
-				//忽略变量声明
+				//蹇界暐鍙橀噺澹版槑
 			}
 			else if(isSelectors || isSelector && !isExtend) {
 				var temp = stack[stack.length - 1];
@@ -282,9 +282,9 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 					temp[temp.length - 1] += token.content();
 				}
 			}
-			//继承和方法直接忽略
+			//缁ф壙鍜屾柟娉曠洿鎺ュ拷鐣?
 			else if(!isExtend && !isFn) {
-				//兼容less的~String拆分语法
+				//鍏煎less鐨剘String鎷嗗垎璇硶
 				if(autoSplit && token.type() == Token.STRING) {
 					var s = token.content();
 					var c = s.charAt(0);
@@ -331,7 +331,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 		else if(node.name() == Node.VARS) {
 			isVar = true;
 		}
-		//将层级拆开
+		//灏嗗眰绾ф媶寮?
 		else if(node.name() == Node.STYLESET && !inHead) {
 			styleset(true, node, prev, next);
 		}
@@ -339,7 +339,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			block(true, node);
 		}
 		else if(node.name() == Node.EXTEND) {
-			//占位符
+			//鍗犱綅绗?
 			res += '@extend';
 			isExtend = true;
 			record(node);
@@ -351,7 +351,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			}
 		}
 		var leaves = node.leaves();
-		//递归子节点
+		//閫掑綊瀛愯妭鐐?
 		leaves.forEach(function(leaf, i) {
 			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFn, leaves[i - 1], leaves[i + 1]);
 		});
@@ -377,7 +377,7 @@ function concatSt(i, s, arr, needTrim) {
 }
 function styleset(startOrEnd, node, prev, next) {
 	if(startOrEnd) {
-		//二级等以上选择器先结束上级block
+		//浜岀骇绛変互涓婇?鎷╁櫒鍏堢粨鏉熶笂绾lock
 		if(stack.length) {
 			if(prev && prev.name() == Node.STYLESET) {
 			}
@@ -393,7 +393,7 @@ function styleset(startOrEnd, node, prev, next) {
 	else {
 		stack.pop();
 		if(stack.length) {
-			//当多级styleset结束时下个还是styleset或}，会造成空白样式表
+			//褰撳绾tyleset缁撴潫鏃朵笅涓繕鏄痵tyleset鎴杴锛屼細閫犳垚绌虹櫧鏍峰紡琛?
 			if(next && next.name() == Node.STYLESET) {
 			}
 			else {
@@ -404,7 +404,7 @@ function styleset(startOrEnd, node, prev, next) {
 			exHash[levels[levels.length - 1]].start.push(res.length);
 		}
 	}
-	//去除层级造成的空样式
+	//鍘婚櫎灞傜骇閫犳垚鐨勭┖鏍峰紡
 	if(/{}([\s\r\n]*)$/.test(res)) {
 		var i = res.lastIndexOf('{');
 		i = res.lastIndexOf('}', i);
@@ -487,7 +487,7 @@ function extend() {
 		var after = '';
 		o.fathers.forEach(function(father, l) {
 			s += styleMap[father] || '';
-			//将father的子选择器们进行深度继承
+			//灏唂ather鐨勫瓙閫夋嫨鍣ㄤ滑杩涜娣卞害缁ф壙
 			Object.keys(styleMap).forEach(function(k, m) {
 				if(k.indexOf(father) == 0 && k != father) {
 					o.selectors.forEach(function(se, n) {
@@ -505,7 +505,7 @@ function extend() {
 			}
 			res = res.slice(0, end) + after + res.slice(end);
 		}
-		//去掉@extend占位符
+		//鍘绘帀@extend鍗犱綅绗?
 		res = res.slice(0, o.index - 7) + s + res.slice(o.index);
 	}
 }
@@ -528,15 +528,15 @@ exports.parse = function(code, vars, style, func) {
 		return e.toString();
 	}
 	init(ignore);
-	//传入初始化变量
+	//浼犲叆鍒濆鍖栧彉閲?
 	Object.keys(vars).forEach(function(k) {
 		varHash[k] = vars[k];
 	});
-	//传入初始化继承
+	//浼犲叆鍒濆鍖栫户鎵?
 	Object.keys(style).forEach(function(k) {
 		styleMap[k] = style[k];
 	});
-	//传入初始化函数
+	//浼犲叆鍒濆鍖栧嚱鏁?
 	Object.keys(func).forEach(function(k) {
 		funcMap[k] = func[k];
 	});
@@ -612,7 +612,7 @@ exports.suffix = function(s) {
 	return suffix;
 };
 function removeImport(s) {
-	//0初始，1字符串
+	//0鍒濆锛?瀛楃涓?
 	var state = 0;
 	for(var i = 0; i < s.length; i++) {
 		var c = s.charAt(i);
@@ -674,7 +674,7 @@ function build(file, res, noImport, depth) {
 				}
 				else {
 					if(!localRoot) {
-						throw new Error('构建@import的相对根路径文件需要首先设置root:\n' + file + ' -> ' + impt);
+						throw new Error('鏋勫缓@import鐨勭浉瀵规牴璺緞鏂囦欢闇?棣栧厛璁剧疆root:\n' + file + ' -> ' + impt);
 					}
 					impt = localRoot.replace(/[/\\]$/, '') + '/' + impt.replace(/^[/\\]/, '');
 				}
@@ -682,7 +682,7 @@ function build(file, res, noImport, depth) {
 			else {
 				if(impt.charAt(0) == '/') {
 					if(!localRoot) {
-						throw new Error('构建@import的相对根路径文件需要首先设置root:\n' + file + ' -> ' + impt);
+						throw new Error('鏋勫缓@import鐨勭浉瀵规牴璺緞鏂囦欢闇?棣栧厛璁剧疆root:\n' + file + ' -> ' + impt);
 					}
 					impt = localRoot.replace(/[/\\]$/, '') + impt;
 				}

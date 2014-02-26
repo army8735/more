@@ -94,7 +94,7 @@ define(function(require, exports, module) {
 					case '@function':
 						return this.fn();
 					default:
-						//¼æÈİless
+						//å…¼å®¹less
 						this.look.type(Token.VARS);
 						return this.vars();
 				}
@@ -589,7 +589,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			match: function(type, msg) {
-				//Î´¶¨ÒåÎªËùÓĞ
+				//æœªå®šä¹‰ä¸ºæ‰€æœ‰
 				if(character.isUndefined(type)) {
 					if(this.look) {
 						var l = this.look;
@@ -600,7 +600,7 @@ define(function(require, exports, module) {
 						this.error('syntax error' + (msg || ''));
 					}
 				}
-				//Êı×éÎªÆäÖĞÒ»¸ö¼´¿É
+				//æ•°ç»„ä¸ºå…¶ä¸­ä¸€ä¸ªå³å¯
 				else if(Array.isArray(type)) {
 					if(this.look) {
 						for(var i = 0, len = type.length; i < len; i++) {
@@ -619,7 +619,7 @@ define(function(require, exports, module) {
 					}
 					this.error('missing ' + type.join('|') + (msg || ''));
 				}
-				//»òÕß¸ù¾İtokenµÄtype»òÕßcontentÆ¥Åä
+				//æˆ–è€…æ ¹æ®tokençš„typeæˆ–è€…contentåŒ¹é…
 				else if(typeof type == 'string') {
 					if(this.look && this.look.content() == type) {
 						var l = this.look;
@@ -657,7 +657,7 @@ define(function(require, exports, module) {
 					if(!this.look) {
 						return;
 					}
-					//´æÏÂºöÂÔµÄtoken
+					//å­˜ä¸‹å¿½ç•¥çš„token
 					if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT, Token.IGNORE].indexOf(this.look.type()) != -1) {
 						this.ignores[this.index - 1] = this.look;
 					}
