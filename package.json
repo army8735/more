@@ -9,7 +9,7 @@
     } 
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -27,8 +27,22 @@
       "url": "https://github.com/addyosmani/es6-module-loader/blob/master/LICENSE-MIT"
     }
   ],
-  "dependencies": {},
-  "main": "./server/more",
+  "dependencies": {
+    "homunculus": "^0.3.8"
+  },
+  "devDependencies": {
+    "blanket": "^1.1.6",
+    "coveralls": "^2.10.0",
+    "expect.js": "^0.3.1",
+    "gulp": "^3.8.1",
+    "gulp-clean": "^0.2.4",
+    "gulp-jsdc": "^0.2.1",
+    "gulp-util": "^2.2.14",
+    "mocha": "^1.18.2",
+    "mocha-lcov-reporter": "0.0.1",
+    "through2": "^0.4.2"
+  },
+  "main": "./index",
   "engines": {
     "node": ">= 0.10.0"
   },
