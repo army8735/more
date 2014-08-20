@@ -1,7 +1,8 @@
-gulp:
+build:
 	@gulp
 
-test: gulp test-jsdc
+test: build
+	@mocha tests/test.js -R spec
 
 test-jsdc:
 	@mocha tests/test.js -R spec

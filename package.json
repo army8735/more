@@ -5,8 +5,8 @@
   "maintainers": [
     {
       "name": "army8735",
-      "email": "army8735@qq.com" 
-    } 
+      "email": "army8735@qq.com"
+    }
   ],
   "scripts": {
     "test": "make test"
@@ -28,7 +28,8 @@
     }
   ],
   "dependencies": {
-    "homunculus": "^0.3.8"
+    "clean-css": "^2.2.13",
+    "homunculus": "^0.4.0"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
@@ -36,7 +37,7 @@
     "expect.js": "^0.3.1",
     "gulp": "^3.8.1",
     "gulp-clean": "^0.2.4",
-    "gulp-jsdc": "^0.2.1",
+    "gulp-jsdc": "^0.2.2",
     "gulp-util": "^2.2.14",
     "mocha": "^1.18.2",
     "mocha-lcov-reporter": "0.0.1",
