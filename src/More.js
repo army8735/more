@@ -4,7 +4,9 @@ module homunculus from 'homunculus';
 var Token = homunculus.getClass('token');
 
 var global = {
-
+  var: {},
+  fn: {},
+  st: {}
 };
 
 class More {
@@ -16,8 +18,8 @@ class More {
       this.data = data;
     }
     if(Object.prototype.toString.call(data) == '[object String]') {
-      data = {
-        code: data
+      this.data = {
+        code: this.data
       };
     }
     var parser = homunculus.getParser('css');
@@ -34,6 +36,29 @@ class More {
       return e.toString();
     }
     this.init(ignore);
+    //初始化变量
+    if(this.data.var) {
+      Object.keys(this.data.var).forEach(function(k) {
+        this.varHash[k] = this.data.var[k];
+      });
+    }
+    //初始化函数
+    if(this.data.fn) {
+      Object.keys(this.data.fn).forEach(function(k) {
+        this.fnHash[k] = this.data.fn[k];
+      });
+    }
+    //初始化继承
+    if(this.data.st) {
+      Object.keys(this.data.st).forEach(function(k) {
+        this.stHash[k] = this.data.st[k];
+      });
+    }
+    preVar(node, ignore);
+    preFn(node, ignore);
+    join(node, ignore);
+    extend();
+    return res;
   }
   init(ignore) {
     this.res = '';
@@ -48,15 +73,29 @@ class More {
       this.index++;
     }
     this.preIndex2 = this.preIndex = this.index;
-    this.stack = [];
-    this.varHash = {};
-    this.imports = [];
     this.autoSplit = false;
     this.exHash = {};
-    this.styleMap = {};
-    this.funcMap = {};
+    this.stack = [];
+    this.imports = [];
+
+    this.varHash = {};
+    this.stHash = {};
+    this.fnHash = {};
+
     this.levels = [];
     this.exArr = [];
+  }
+  preVar(node, ignore) {
+
+  }
+  preFn(node, ignore) {
+
+  }
+  join(node, ignore) {
+
+  }
+  extend() {
+
   }
 
   static less(data = {}) {
