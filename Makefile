@@ -12,3 +12,5 @@ coveralls:
 
 test-cov:
 	@mocha tests/test.js --require blanket -R html-cov > tests/covrage.html
+
+.PHONY: build

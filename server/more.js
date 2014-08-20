@@ -209,7 +209,7 @@ function compilerFn(node, ignore, idx) {
 	var leaves = node.leaves(),
 		id = leaves[0].leaves().content();
 	if(funcMap.hasOwnProperty(id)) {
-		//fncall的头两个节点是id�?，空白计�?
+		//fncall的头两个节点是id�?，空白计�?
 		while(ignore[++idx]) {}
 		while(ignore[++idx]) {}
 		var fn = funcMap[id];
@@ -255,7 +255,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 					else {
 						imports.push(token.val());
 					}
-					//兼容less，相对路径为根路�?
+					//兼容less，相对路径为根路�?
 					if(less) {
 						if(/^(['"]?)\//.test(s)) {
 							s = s.replace(/^(['"]?)\//, '$1' + root);
@@ -282,7 +282,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 					temp[temp.length - 1] += token.content();
 				}
 			}
-			//继承和方法直接忽�?
+			//继承和方法直接忽�?
 			else if(!isExtend && !isFn) {
 				//兼容less的~String拆分语法
 				if(autoSplit && token.type() == Token.STRING) {
@@ -331,7 +331,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 		else if(node.name() == Node.VARS) {
 			isVar = true;
 		}
-		//将层级拆�?
+		//将层级拆�?
 		else if(node.name() == Node.STYLESET && !inHead) {
 			styleset(true, node, prev, next);
 		}
@@ -339,7 +339,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			block(true, node);
 		}
 		else if(node.name() == Node.EXTEND) {
-			//占位�?
+			//占位�?
 			res += '@extend';
 			isExtend = true;
 			record(node);
@@ -351,7 +351,7 @@ function join(node, ignore, inHead, isSelectors, isSelector, isVar, isImport, is
 			}
 		}
 		var leaves = node.leaves();
-		//递归子节�?
+		//递归子节�?
 		leaves.forEach(function(leaf, i) {
 			join(leaf, ignore, inHead, isSelectors, isSelector, isVar, isImport, isExtend, isFn, leaves[i - 1], leaves[i + 1]);
 		});
@@ -377,7 +377,7 @@ function concatSt(i, s, arr, needTrim) {
 }
 function styleset(startOrEnd, node, prev, next) {
 	if(startOrEnd) {
-		//二级等以上�?择器先结束上级block
+		//二级等以上�?择器先结束上级block
 		if(stack.length) {
 			if(prev && prev.name() == Node.STYLESET) {
 			}
@@ -393,7 +393,7 @@ function styleset(startOrEnd, node, prev, next) {
 	else {
 		stack.pop();
 		if(stack.length) {
-			//当多级styleset结束时下个还是styleset或}，会造成空白样式�?
+			//当多级styleset结束时下个还是styleset或}，会造成空白样式�?
 			if(next && next.name() == Node.STYLESET) {
 			}
 			else {
@@ -505,7 +505,7 @@ function extend() {
 			}
 			res = res.slice(0, end) + after + res.slice(end);
 		}
-		//去掉@extend占位�?
+		//去掉@extend占位�?
 		res = res.slice(0, o.index - 7) + s + res.slice(o.index);
 	}
 }
@@ -528,15 +528,15 @@ exports.parse = function(code, vars, style, func) {
 		return e.toString();
 	}
 	init(ignore);
-	//传入初始化变�?
+	//传入初始化变�?
 	Object.keys(vars).forEach(function(k) {
 		varHash[k] = vars[k];
 	});
-	//传入初始化继�?
+	//传入初始化继�?
 	Object.keys(style).forEach(function(k) {
 		styleMap[k] = style[k];
 	});
-	//传入初始化函�?
+	//传入初始化函�?
 	Object.keys(func).forEach(function(k) {
 		funcMap[k] = func[k];
 	});
@@ -612,7 +612,7 @@ exports.suffix = function(s) {
 	return suffix;
 };
 function removeImport(s) {
-	//0初始�?字符�?
+	//0初始�?字符�?
 	var state = 0;
 	for(var i = 0; i < s.length; i++) {
 		var c = s.charAt(i);
@@ -674,7 +674,7 @@ function build(file, res, noImport, depth) {
 				}
 				else {
 					if(!localRoot) {
-						throw new Error('构建@import的相对根路径文件�?��首先设置root:\n' + file + ' -> ' + impt);
+						throw new Error('构建@import的相对根路径文件�?��首先设置root:\n' + file + ' -> ' + impt);
 					}
 					impt = localRoot.replace(/[/\\]$/, '') + '/' + impt.replace(/^[/\\]/, '');
 				}
@@ -682,7 +682,7 @@ function build(file, res, noImport, depth) {
 			else {
 				if(impt.charAt(0) == '/') {
 					if(!localRoot) {
-						throw new Error('构建@import的相对根路径文件�?��首先设置root:\n' + file + ' -> ' + impt);
+						throw new Error('构建@import的相对根路径文件�?��首先设置root:\n' + file + ' -> ' + impt);
 					}
 					impt = localRoot.replace(/[/\\]$/, '') + impt;
 				}
