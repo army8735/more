@@ -12,7 +12,7 @@ describe('api', function() {
 });
 describe('simple test', function() {
   it('var :', function() {
-    var s = '$a: 0;body{margin: $a}';
+    var s = '$a: 0;body{ margin: $a}';
     var res = More.parse(s);
     expect(res).to.eql('body{margin: 0}');
   });

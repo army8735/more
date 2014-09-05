@@ -11,23 +11,23 @@ var global = {
 };
 
 class More {
-  constructor(data = {}) {
+  constructor(data = { code: '' }) {
     this.data = data;
   }
   parse(data) {
-    if(data) {
-      this.data = data;
-    }
     if(Object.prototype.toString.call(data) == '[object String]') {
       this.data = {
         code: this.data
       };
     }
+    else if(data) {
+      this.data = data;
+    }
     var parser = homunculus.getParser('css');
     var node;
     var ignore;
     try {
-      node = parser.parse(data.code);
+      node = parser.parse(this.data.code);
       ignore = parser.ignore();
     }
     catch(e) {
@@ -59,7 +59,7 @@ class More {
     this.preFn(node, ignore);
     this.join(node, ignore);
     this.extend();
-    return res;
+    return this.res;
   }
   init(ignore) {
     this.res = '';
@@ -154,8 +154,131 @@ class More {
   preFn(node, ignore) {
 
   }
-  join(node, ignore) {
-
+  join(node, ignore, config = {}) {
+    var self = this;
+    var isToken = node.name() == Node.TOKEN;
+    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+    if(isToken) {
+      if(!isVirtual) {
+        var token = node.token();
+        if(config.inHead) {
+          var s = self.getVar(token.content(), token.type());
+          if(config.isImport && token.type() == Token.STRING) {
+            if(!/\.css['"]?$/.test(s)) {
+              s = s.replace(/(['"]?)$/, '.css$1');
+              self.imports.push(token.val() + '.css');
+            }
+            else {
+              self.imports.push(token.val());
+            }
+            //兼容less，相对路径为根路径
+            if(self.less) {
+              if(/^(['"]?)\//.test(s)) {
+                s = s.replace(/^(['"]?)\//, '$1' + root);
+              }
+              else {
+                s = s.replace(/^(['"]?)([\w-])/, '$1' + root + '$2');
+              }
+            }
+            else {
+              s = s.replace(/^(['"]?)\//, '$1' + root);
+            }
+          }
+          self.res += s;
+        }
+        else if(config.isVar) {
+          //忽略变量声明
+        }
+        else if(config.isSelectors || config.isSelector && !config.isExtend) {
+          var temp = self.stack[self.stack.length - 1];
+          if(config.isSelectors) {
+            temp.push('');
+          }
+          else {
+            temp[temp.length - 1] += token.content();
+          }
+        }
+        //继承和方法直接忽略
+        else if(!config.isExtend && !config.isFn) {
+          //兼容less的~String拆分语法
+          if(self.autoSplit && token.type() == Token.STRING) {
+            var s = token.content();
+            var c = s.charAt(0);
+            if(c != "'" && c != '"') {
+              c = '"';
+              s = c + s + c;
+            }
+            s = s.replace(/,/g, c + ',' + c);
+            self.res = self.res.replace(/~\s*$/, '');
+            self.res += self.getVar(s, token.type());
+          }
+          else {
+            self.res += self.getVar(token.content(), token.type());
+          }
+          if(token.content() == '~') {
+            self.autoSplit = true;
+          }
+          else {
+            self.autoSplit = false;
+          }
+        }
+        while(ignore[++index]) {
+          var ig = ignore[index];
+          var s = ig.type() == Token.IGNORE ? ig.content().replace(/\S/g, ' ') : ig.content();
+          if(!config.inHead && (config.isSelectors || config.isSelector)) {
+            var temp = self.stack[self.stack.length - 1];
+            temp[temp.length - 1] += s;
+          }
+          else {
+            self.res += s;
+          }
+        }
+      }
+    }
+    else {
+      config.isSelectors = node.name() == Node.SELECTORS;
+      config.isSelector = node.name() == Node.SELECTOR;
+      if(!config.inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
+        config.inHead = true;
+        if(node.name() == Node.IMPORT) {
+          config.isImport = true;
+        }
+      }
+      else if(node.name() == Node.VARS) {
+        config.isVar = true;
+      }
+      //将层级拆开
+      else if(node.name() == Node.STYLESET && !config.inHead) {
+        styleset(true, node, prev, next);
+      }
+      else if(node.name() == Node.BLOCK && !config.inHead) {
+        block(true, node);
+      }
+      else if(node.name() == Node.EXTEND) {
+        //占位符
+        self.res += '@extend';
+        config.isExtend = true;
+        record(node);
+      }
+      else if(node.name() == Node.FN || node.name() == Node.FNC) {
+        config.isFn = true;
+        if(node.name() == Node.FNC) {
+          compilerFn(node, ignore, index);
+        }
+      }
+      var leaves = node.leaves();
+      //递归子节点
+      leaves.forEach(function(leaf, i) {
+        self.join(leaf, ignore, {
+        });
+      });
+      if(node.name() == Node.STYLESET & !config.inHead) {
+        self.styleset(false, node, config.prev, config.next);
+      }
+      else if(node.name() == Node.BLOCK && !config.inHead) {
+        self.block(false, node);
+      }
+    }
   }
   extend() {
 
