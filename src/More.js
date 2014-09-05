@@ -2,11 +2,12 @@ module fs from 'fs';
 module homunculus from 'homunculus';
 
 var Token = homunculus.getClass('token');
+var Node = homunculus.getClass('node', 'css');
 
 var global = {
   var: {},
   fn: {},
-  st: {}
+  style: {}
 };
 
 class More {
@@ -30,7 +31,7 @@ class More {
       ignore = parser.ignore();
     }
     catch(e) {
-      if(console) {
+      if(typeof console != 'undefined') {
         console.error(e);
       }
       return e.toString();
@@ -50,14 +51,14 @@ class More {
     }
     //初始化继承
     if(this.data.st) {
-      Object.keys(this.data.st).forEach(function(k) {
-        this.stHash[k] = this.data.st[k];
+      Object.keys(this.data.style).forEach(function(k) {
+        this.styleHash[k] = this.data.style[k];
       });
     }
-    preVar(node, ignore);
-    preFn(node, ignore);
-    join(node, ignore);
-    extend();
+    this.preVar(node, ignore);
+    this.preFn(node, ignore);
+    this.join(node, ignore);
+    this.extend();
     return res;
   }
   init(ignore) {
@@ -79,14 +80,76 @@ class More {
     this.imports = [];
 
     this.varHash = {};
-    this.stHash = {};
+    this.styleHash = {};
     this.fnHash = {};
 
     this.levels = [];
     this.exArr = [];
   }
+  //预处理变量，遍历ast找到所有变量声明，将其存储至hash
   preVar(node, ignore) {
-
+    var self = this;
+    var isToken = node.name() == Node.TOKEN;
+    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+    if(!isToken) {
+      if(node.name() == Node.VARS) {
+        var leaves = node.leaves();
+        var k = leaves[0].leaves().content().slice(1);
+        var v = '';
+        while(ignore[++self.preIndex]) {}
+        while(ignore[++self.preIndex]) {}
+        //变量值可能不是元类型而是个样式，有多个token
+        leaves[2].leaves().forEach(function(leaf) {
+          var token = leaf.leaves();
+          v += self.getVar(token.content(), token.type());
+          while(ignore[++self.preIndex]) {
+            v += ignore[self.preIndex].content();
+          }
+        });
+        while(ignore[++self.preIndex]) {}
+        varHash[k] = v;
+      }
+      else {
+        node.leaves().forEach(function(leaf) {
+          self.preVar(leaf, ignore);
+        });
+      }
+    }
+    else if(!isVirtual) {
+      while(ignore[++self.preIndex]) {}
+    }
+  }
+  getVar(s, type) {
+    if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
+      for(var i = 0; i < s.length; i++) {
+        if(s.charAt(i) == '\\') {
+          i++;
+          continue;
+        }
+        if(s.charAt(i) == '$' || s.charAt(i) == '@') {
+          var c = s.charAt(i + 1),
+            lit;
+          if(c == '{') {
+            var j = s.indexOf('}', i + 3);
+            if(j > -1) {
+              c = s.slice(i + 2, j);
+              var vara = this.varHash[c] || global.var[c];
+              if(vara) {
+                s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(j + 1);
+              }
+            }
+          }
+          else if(/[\w-]/.test(c)) {
+            c = /^[\w-]+/.exec(s.slice(i + 1))[0];
+            var vara = this.varHash[c] || global.var[c];
+            if(vara) {
+              s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(i + c.length + 1);
+            }
+          }
+        }
+      }
+    }
+    return s;
   }
   preFn(node, ignore) {
 
@@ -99,6 +162,9 @@ class More {
   }
 
   static less(data = {}) {
+
+  }
+  static stylus(data = {}) {
 
   }
   static global(data = {}) {
