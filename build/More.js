@@ -18,9 +18,7 @@ var global = {
   }
   More.prototype.parse = function(data) {
     if(Object.prototype.toString.call(data) == '[object String]') {
-      this.data = {
-        code: this.data
-      };
+      this.data.code = data;
     }
     else if(data) {
       this.data = data;
@@ -51,12 +49,12 @@ var global = {
       });
     }
     //初始化继承
-    if(this.data.st) {
+    if(this.data.style) {
       Object.keys(this.data.style).forEach(function(k) {
         this.styleHash[k] = this.data.style[k];
       });
     }
-    this.preVar(this.node);console.log(this.varHash)
+    this.preVar(this.node);
     this.preFn(this.node);
     this.join(this.node);
     this.extend();
@@ -223,8 +221,8 @@ var global = {
             self.autoSplit = false;
           }
         }
-        while(this.ignore[++index]) {
-          var ig = this.ignore[index];
+        while(self.ignore[++self.index]) {
+          var ig = self.ignore[self.index];
           var s = ig.type() == Token.IGNORE ? ig.content().replace(/\S/g, ' ') : ig.content();
           if(!config.inHead && (config.isSelectors || config.isSelector)) {
             var temp = self.stack[self.stack.length - 1];
@@ -250,27 +248,27 @@ var global = {
       }
       //将层级拆开
       else if(node.name() == Node.STYLESET && !config.inHead) {
-        styleset(true, node, prev, next);
+        self.styleset(true, node, config.prev, config.next);
       }
       else if(node.name() == Node.BLOCK && !config.inHead) {
-        block(true, node);
+        self.block(true, node);
       }
       else if(node.name() == Node.EXTEND) {
         //占位符
         self.res += '@extend';
         config.isExtend = true;
-        record(node);
+        self.record(node);
       }
       else if(node.name() == Node.FN || node.name() == Node.FNC) {
         config.isFn = true;
         if(node.name() == Node.FNC) {
-          compilerFn(node, this.ignore, index);
+          self.compilerFn(node, this.ignore, self.index);
         }
       }
       var leaves = node.leaves();
       //递归子节点
       leaves.forEach(function(leaf, i) {
-        self.join(leaf, this.ignore, {
+        self.join(leaf, {
         });
       });
       if(node.name() == Node.STYLESET & !config.inHead) {
@@ -280,6 +278,12 @@ var global = {
         self.block(false, node);
       }
     }
+  }
+  More.prototype.styleset = function() {
+
+  }
+  More.prototype.block = function() {
+
   }
   More.prototype.extend = function(node) {
 
