@@ -1,219 +1,186 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="gbk"/>
 <title>more</title>
 <style>
-body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-height:1.25;overflow-y:scroll;}
+  body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-height:1.25;overflow-y:scroll;}
 
-.jssc .col{margin-left:12px;color:#CCC;cursor:default;line-height:1.5;}
-.jssc .col em{position:relative;font-style:normal;}
-.jssc .col em small{position:absolute;left:0;top:-7px;color:#A0A080;}
-.jssc .col,.jssc ol{font-family:Consolas,momospace,"宋体","Courier New";font-size:12px;}
-.jssc li:hover{background:#FF9;}
-.jssc .number{color:#088;}
-.jssc .keyword{color:#33f;}
-.jssc .comment{color:#393;}
-.jssc .string{color:#a33;}
-.jssc .template{color:#993;}
-.jssc .reg, .jssc .annot, .jssc .head, .jssc .declare{color:#999;}
-.jssc .annot{font-style:italic;}
-.jssc .attr{color:#909;}
-.jssc .tags, .jssc .cdata{color:#c96;}
-.jssc .namespace{color:#f00;}
-.jssc .depth{color:#fc0;}
-.jssc .java .keyword{color:#909;}
-.jssc .property{color:#f33;}
-.jssc .hack{color:#9CF;}
-.jssc .important{color:#F9C;}
+  .jssc .col{margin-left:12px;color:#CCC;cursor:default;line-height:1.5;}
+  .jssc .col em{position:relative;font-style:normal;}
+  .jssc .col em small{position:absolute;left:0;top:-7px;color:#A0A080;}
+  .jssc .col,.jssc ol{font-family:Consolas,momospace,"宋体","Courier New";font-size:12px;}
+  .jssc li:hover{background:#FF9;}
+  .jssc .number{color:#088;}
+  .jssc .keyword{color:#33f;}
+  .jssc .comment{color:#393;}
+  .jssc .string{color:#a33;}
+  .jssc .template{color:#993;}
+  .jssc .reg, .jssc .annot, .jssc .head, .jssc .declare{color:#999;}
+  .jssc .annot{font-style:italic;}
+  .jssc .attr{color:#909;}
+  .jssc .tags, .jssc .cdata{color:#c96;}
+  .jssc .namespace{color:#f00;}
+  .jssc .depth{color:#fc0;}
+  .jssc .java .keyword{color:#909;}
 
-.jssc{position:relative;}
-.jssc p{margin:10px 0;color:#79a;text-indent:2em;font-weight:700;font-family:"Verdana";}
-.jssc .error{color:#f33;}
-.jssc .copy{display:block;position:absolute;top:0;right:0;cursor:pointer;color:#39f;}
-.jssc ol{margin:0;padding:0;overflow:auto;border:1px solid #ccc;background-color:#eee;clear:both;}
-.jssc ol li{margin:0;padding-left:10px;border-left:1px solid #abc;background-color:#fff;color:#333;word-wrap:break-word;word-break:break-all;}
-.jssc ol li:hover{background-color:#ff9;}
-.jssc ol li.even{background-color:#eee;}
-.jssc ol li .error{background-color:#f33;}
-.jssc ol .fold{background:#eee;font-style:italic;}
-.jssc ol .fold:after{content:"...";}
-.jssc ol .hide{position:absolute;visibility:hidden;}
+  .jssc{position:relative;}
+  .jssc p{margin:10px 0;color:#79a;text-indent:2em;font-weight:700;font-family:"Verdana";}
+  .jssc .error{color:#f33;}
+  .jssc .copy{display:block;position:absolute;top:0;right:0;cursor:pointer;color:#39f;}
+  .jssc ol{margin:0;padding:0;overflow:auto;border:1px solid #ccc;background-color:#eee;clear:both;}
+  .jssc ol li{margin:0;padding-left:10px;border-left:1px solid #abc;background-color:#fff;color:#333;word-wrap:break-word;word-break:break-all;}
+  .jssc ol li:hover{background-color:#ff9;}
+  .jssc ol li.even{background-color:#eee;}
+  .jssc ol li .error{background-color:#f33;}
+  .jssc ol .fold{background:#eee;font-style:italic;}
+  .jssc ol .fold:after{content:"...";}
+  .jssc ol .hide{position:absolute;visibility:hidden;}
 
-.kineticjs-content{margin:10px 0;}
+  .kineticjs-content{margin:10px 0;}
+  textarea{position:absolute;top:24px;right:0;padding:5px;width:50%;height:300px;z-index:99;background:#252;border:1px solid #333;opacity:0.1;color:#FFF;font-size:13px;font-family:"宋体";border-radius:5px;}
+  textarea:hover{opacity:0.8;}
+  #btn{position:absolute;top:0;right:0;width:50px;z-index:99;}
 </style>
 </head>
 <body>
-<pre>
-<code class="brush: css; max-height: 400; cache: 0">/**
- * @Author army8735
- *//**//**/
-@scale:0.9;
-@deg:90deg;
-body{
-	-webkit-transform: rotateY(-@deg) scale(@scale);
-}
-@-webkit-keyframes flipouttoleft {
-    from { -webkit-transform: rotateY(0); }
-    to { -webkit-transform: rotateY(-@deg) scale(@scale); }
-}
-$test: background: url("/v3/dist/img/home/v.png");
-@media all and (width:1024px) {
-	body{color:#f00;${test};}
-}
-@font-face {
-	font-family: "HLUC";
-	src: url("@{fontPath}/Helvetica_LT_Ultra_Compressed.eot"); /* IE9 */
-	src: url("@{fontPath}/Helvetica_LT_Ultra_Compressed.eot#iefix") format("embedded-opentype"), /* IE6-IE8 */
-	url("@{fontPath}/Helvetica_LT_Ultra_Compressed.woff") format("woff"), /* chrome 6+、firefox 3.6+、Safari5.1+、Opera 11+ */
-	url("@{fontPath}/Helvetica_LT_Ultra_Compressed.ttf")  format("truetype"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+ */
-	url("@{fontPath}/helvetica_lt_ultra_compressed.svg") format("svg"); /* iOS 4.1- */
-	font-style: normal;
-	font-weight: normal;
-	cursor: default;
-	-webkit-font-smoothing: antialiased;
-}
-@charset "gbk";
-@import url("1.css") screen and (min-width:800px) and (max-device-width:11/9);
-@font-face{font-family:YH;src:url(http://domain/fonts/MSYH.TTF);}
-@keyframes test{
-	from{opacity:1;}
-	30%{transform:translate(20,20);}
-	to{opacity:0;}
-}
-@page thin:first { size: 3in 8in }
-$a:1;
-@b: 'Verdana';
-$inner: 'ico.png';
-$img = '../../img/rss/$inner';
-$cssimg:  url("/v3/dist/img/home/${inner}");
-.gbtn::after {
-  background: url($img);
-  font-family:@b,"\5b8b\4f53 $b";
-  font-family: tahoma,arial,\5b8b\4f53,sans-serif;
-  position: fixed\9;
-  -position: absolute;;;
-  *position: absolute;
-  _position: absolute !important;
-  height: 10px\0;
-  font-family: ~"test,test2";
-  background: $cssimg;
-}
-input:-moz-placeholder{color:#808080;}
-input:-webkit-placeholder{color:#808080;}
-input:placeholder{color:#808080;}
-input::-ms-clear{display:none;}
-.sd_user .sd_user_mask{_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://i3.tdimg.com/b/20130909/co11.png')}
-.ex .a{color:#000;.in{margin:0;}}
-#fff:hover, .test {
-	@extend .gbtn::after;
-	text-align: center;
-	>#fff {
-		color: #fff;
-		&:hover{color:#000}
-		* .pic span {padding:$a;}
-	}
-	div { margin:0; @extend .test>#fff,#none}
-	line-height: 2;
-	.ex .a;
-}
-@function fn($c, d) {
-	margin: $c d;
-}
-//test
-div{fn(5%, 3px);}</code>
-</pre>
-<script src="Ai.js"></script>
+<textarea id="ta" autocomplete="true"></textarea>
+<input id="btn" type="button" value="ok"/><pre><code class="brush:js"></code></pre>
+<script src="sea.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script>
-require(['../web/more', 'jssc'], function(more, jssc) {
-	var w = 0, h = 0;
-	function draw(i, res, node) {
-		w = h = 0;
-		if(typeof res == 'string') {
-			return;
-		}
-		var div = document.createElement('div');
-		div.id = 'container' + i;
-		node.parentNode.insertBefore(div, node);
-		var stage = new Kinetic.Stage({
-				container: div.id,
-				width: 0,
-				height: 0
-			}),
-			layer = new Kinetic.Layer();
-		drawNode(layer, res, 0, 0, 0, 0);
-		stage.add(layer);
-		stage.setWidth(w);
-		stage.setHeight(h + 30);
-	}
-	function drawNode(layer, node, x, index, parent, sibling) {
-		if(index > 0) {
-			h += 24;
-		}
-		var isToken = node.name() == 'token',
-			isVirtual = isToken && node.leaves().type() == -1,
-			text = new Kinetic.Text({
-				x: x + 5,
-				y: h + 6,
-				text: isToken ? node.token().content() : node.name(),
-				width: 68,
-				height: 16,
-				align: 'center',
-				fill: isToken ? (isVirtual ? '#F33' : '#6CF') : '#F60',
-				fontSize: 12,
-				fontFamily: 'Tahoma'
-			}),
-			rect = new Kinetic.Rect({
-				x: x + 2,
-				y: h + 2,
-				width: 74,
-				height: 20,
-				fill: isToken ? (isVirtual ? '#FCC' : '#FFF') : '#F6F6F6',
-				stroke: isToken ? '#CCC' : '#F93',
-				cornerRadius: 10
-			});
-		layer.add(rect);
-		layer.add(text);
-		var x2 = x + 88;
-		if(parent) {
-			var line = new Kinetic.Line({
-				points: [x - 10, parent.getY() + 10, x + 2, rect.getY() + 10],
-				stroke: '#6F9',
-				strokeWidth: 1,
-				lineJion: 'round',
-				dashArray: [1, 1]
-			});
-			layer.add(line);
-		}
-		if(!isToken) {
-			var sib = null;
-			node.leaves().forEach(function(leaf, index) {
-				drawNode(layer, leaf, x2, index, rect, sib);
-				sib = leaf;
-			});
-		}
-		w = Math.max(w, x2);
-	}
-	var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
-	nodes.forEach(function(node, i) {
-		var res = more.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
-			tree = more.tree(),
-			pre = node.parentNode,
-			ncode = document.createElement('code'),
-			npre = document.createElement('pre');
-		ncode.innerHTML = res;
-		ncode.className = node.className;
-		npre.appendChild(ncode);
-		pre.parentNode.insertBefore(npre, pre.nextSibling);
-		if(tree) {
-			draw(i, tree, npre.nextSibling);
-		}
-	});
-	jssc.exec();
-
-});
+  var w = 0, h = 0;
+  function draw(i, res, node) {
+    w = h = 0;
+    if(typeof res == 'string') {
+      return;
+    }
+    var div = document.createElement('div');
+    div.id = 'container' + i;
+    node.parentNode.insertBefore(div, node);
+    var stage = new Kinetic.Stage({
+        container: div.id,
+        width: 0,
+        height: 0
+      }),
+      layer = new Kinetic.Layer();
+    drawNode(layer, res, 0, 0, 0, 0);
+    stage.add(layer);
+    stage.setWidth(w);
+    stage.setHeight(h + 30);
+  }
+  function drawNode(layer, node, x, index, parent, sibling) {
+    if(index > 0) {
+      h += 24;
+    }
+    if(!node.name) {
+      return;
+    }
+    var isToken = node.name() == 'token',
+      isVirtual = isToken && node.leaves().type() == -1,
+      text = new Kinetic.Text({
+        x: x + 5,
+        y: h + 6,
+        text: isToken ? node.token().content() : node.name(),
+        width: 68,
+        height: 16,
+        align: 'center',
+        fill: isToken ? (isVirtual ? '#F33' : '#6CF') : '#F60',
+        fontSize: 12,
+        fontFamily: 'Tahoma'
+      }),
+      rect = new Kinetic.Rect({
+        x: x + 2,
+        y: h + 2,
+        width: 74,
+        height: 20,
+        fill: isToken ? (isVirtual ? '#FCC' : '#FFF') : '#F6F6F6',
+        stroke: isToken ? '#CCC' : '#F93',
+        cornerRadius: 10
+      });
+    layer.add(rect);
+    layer.add(text);
+    var x2 = x + 88;
+    if(parent) {
+      var line = new Kinetic.Line({
+        points: [x - 10, parent.getY() + 10, x + 2, rect.getY() + 10],
+        stroke: '#6F9',
+        strokeWidth: 1,
+        lineJion: 'round',
+        dashArray: [1, 1]
+      });
+      layer.add(line);
+    }
+    if(!isToken) {
+      var sib = null;
+      node.leaves().forEach(function(leaf, index) {
+        drawNode(layer, leaf, x2, index, rect, sib);
+        sib = leaf;
+      });
+    }
+    w = Math.max(w, x2);
+  }
+  seajs.config({
+    alias: {
+      'homunculus': seajs.resolve('../node_modules/homunculus/index.js', seajs.data.cwd)
+    },
+    map: [function(url) {
+      return url.replace('demo/lexer/', 'node_modules/homunculus/web/lexer/');
+    }]
+  });
+  define('fs', {});
+  seajs.use(['../index', './jssc'], function(More, jssc) {
+    function init() {
+      console.clear();
+      var more = new More();
+      var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
+      nodes.forEach(function(node, i) {
+        var res = more.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
+        var ast = more.ast();
+        var tokens = more.tokens();
+        var pre = node.parentNode;
+        var ncode = document.createElement('code');
+        var npre = document.createElement('pre');
+        ncode.innerHTML = res;
+        ncode.className = node.className;
+        npre.appendChild(ncode);
+        pre.parentNode.insertBefore(npre, pre.nextSibling);
+        if(ast) {
+          draw(i, ast, npre.nextSibling);
+        }
+        if(tokens) {
+          console.table(tokens, ['t', 'c', 'v', 'id', 'si']);
+        }
+      });
+      jssc.exec();
+    }
+    var ta = document.getElementById('ta');
+    var input = document.getElementById('btn');
+    input.onclick = function() {
+      var s = ta.value;
+      Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {
+        o.parentNode.removeChild(o);
+      });
+      var pre = document.getElementsByTagName('pre');
+      pre[1] && pre[1].parentNode.removeChild(pre[1]);
+      document.getElementsByTagName('code')[0].innerHTML = s;
+      pre[0].style.display = 'block';
+      init();
+      location.hash = encodeURIComponent(s);
+    }
+    function hashChange() {
+      var s = location.hash.replace(/^#/, '');
+      if(s) {
+        s = decodeURIComponent(s);
+        if(s != ta.value) {
+          ta.value = s;
+          input.onclick();
+        }
+      }
+    }
+    hashChange();
+    window.onhashchange = hashChange;
+  });
 </script>
 </body>
 </html>

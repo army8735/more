@@ -28,6 +28,10 @@ function cb(file, enc, cb) {
   content = content.toString('utf-8');
   content = jsdc.parse(content);
   fs.writeFileSync(target, content, { encoding: 'utf-8' });
+  target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
+  util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
+  content = 'define(function(require, exports, module){' + content + '});';
+  fs.writeFileSync(target, content, { encoding: 'utf-8' });
   cb(null, file);
 }
 

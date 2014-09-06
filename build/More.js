@@ -13,6 +13,8 @@ var global = {
 
   function More(data) {
     if(data===void 0)data={code:''};this.data = data;
+    this.node = null;
+    this.parser = null;
   }
   More.prototype.parse = function(data) {
     if(Object.prototype.toString.call(data) == '[object String]') {
@@ -23,12 +25,10 @@ var global = {
     else if(data) {
       this.data = data;
     }
-    var parser = homunculus.getParser('css');
-    var node;
-    var ignore;
+    this.parser = homunculus.getParser('css');
     try {
-      node = parser.parse(this.data.code);
-      ignore = parser.ignore();
+      this.node = this.parser.parse(this.data.code);
+      this.ignore = this.parser.ignore();
     }
     catch(e) {
       if(typeof console != 'undefined') {
@@ -36,7 +36,8 @@ var global = {
       }
       return e.toString();
     }
-    this.init(ignore);
+    this.init();
+
     //初始化变量
     if(this.data.var) {
       Object.keys(this.data.var).forEach(function(k) {
@@ -55,21 +56,21 @@ var global = {
         this.styleHash[k] = this.data.style[k];
       });
     }
-    this.preVar(node, ignore);
-    this.preFn(node, ignore);
-    this.join(node, ignore);
+    this.preVar(this.node);console.log(this.varHash)
+    this.preFn(this.node);
+    this.join(this.node);
     this.extend();
     return this.res;
   }
-  More.prototype.init = function(ignore) {
+  More.prototype.init = function() {
     this.res = '';
     this.index = 0;
-    while(ignore[this.index]) {
-      if(ignore[this.index].type() == Token.IGNORE) {
-        this.res += ignore[this.index].content().replace(/\S/g, ' ');
+    while(this.ignore[this.index]) {
+      if(this.ignore[this.index].type() == Token.IGNORE) {
+        this.res += this.ignore[this.index].content().replace(/\S/g, ' ');
       }
       else {
-        this.res += ignore[this.index].content();
+        this.res += this.ignore[this.index].content();
       }
       this.index++;
     }
@@ -87,7 +88,7 @@ var global = {
     this.exArr = [];
   }
   //预处理变量，遍历ast找到所有变量声明，将其存储至hash
-  More.prototype.preVar = function(node, ignore) {
+  More.prototype.preVar = function(node) {
     var self = this;
     var isToken = node.name() == Node.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
@@ -96,27 +97,27 @@ var global = {
         var leaves = node.leaves();
         var k = leaves[0].leaves().content().slice(1);
         var v = '';
-        while(ignore[++self.preIndex]) {}
-        while(ignore[++self.preIndex]) {}
+        while(self.ignore[++self.preIndex]) {}
+        while(self.ignore[++self.preIndex]) {}
         //变量值可能不是元类型而是个样式，有多个token
         leaves[2].leaves().forEach(function(leaf) {
           var token = leaf.leaves();
           v += self.getVar(token.content(), token.type());
-          while(ignore[++self.preIndex]) {
-            v += ignore[self.preIndex].content();
+          while(self.ignore[++self.preIndex]) {
+            v += self.ignore[self.preIndex].content();
           }
         });
-        while(ignore[++self.preIndex]) {}
+        while(self.ignore[++self.preIndex]) {}
         varHash[k] = v;
       }
       else {
         node.leaves().forEach(function(leaf) {
-          self.preVar(leaf, ignore);
+          self.preVar(leaf);
         });
       }
     }
     else if(!isVirtual) {
-      while(ignore[++self.preIndex]) {}
+      while(self.ignore[++self.preIndex]) {}
     }
   }
   More.prototype.getVar = function(s, type) {
@@ -151,10 +152,10 @@ var global = {
     }
     return s;
   }
-  More.prototype.preFn = function(node, ignore) {
+  More.prototype.preFn = function(node) {
 
   }
-  More.prototype.join = function(node, ignore, config) {
+  More.prototype.join = function(node, config) {
     if(config===void 0)config={};var self = this;
     var isToken = node.name() == Node.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
@@ -222,8 +223,8 @@ var global = {
             self.autoSplit = false;
           }
         }
-        while(ignore[++index]) {
-          var ig = ignore[index];
+        while(this.ignore[++index]) {
+          var ig = this.ignore[index];
           var s = ig.type() == Token.IGNORE ? ig.content().replace(/\S/g, ' ') : ig.content();
           if(!config.inHead && (config.isSelectors || config.isSelector)) {
             var temp = self.stack[self.stack.length - 1];
@@ -263,13 +264,13 @@ var global = {
       else if(node.name() == Node.FN || node.name() == Node.FNC) {
         config.isFn = true;
         if(node.name() == Node.FNC) {
-          compilerFn(node, ignore, index);
+          compilerFn(node, this.ignore, index);
         }
       }
       var leaves = node.leaves();
       //递归子节点
       leaves.forEach(function(leaf, i) {
-        self.join(leaf, ignore, {
+        self.join(leaf, this.ignore, {
         });
       });
       if(node.name() == Node.STYLESET & !config.inHead) {
@@ -280,8 +281,14 @@ var global = {
       }
     }
   }
-  More.prototype.extend = function() {
+  More.prototype.extend = function(node) {
 
+  }
+  More.prototype.ast = function() {
+    return this.node;
+  }
+  More.prototype.tokens = function() {
+    return this.parser.lexer.tokens();
   }
 
   More.less=function(data) {
@@ -292,10 +299,6 @@ var global = {
   if(data===void 0)data={};}
   More.global=function(data) {
     if(data===void 0)data={};global = data;
-  }
-  More.parse=function(args) {
-    args=[].slice.call(arguments, 0);var more = new More();
-    return more.parse.apply(more, [].concat(function(){var _0=[],_1;while(!(_1=args.next()).done)_0.push(_1.value);return _0}()));
   }
 
 
