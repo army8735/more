@@ -1,5 +1,6 @@
 define(function(require, exports, module){var fs=require('fs');
 var homunculus=require('homunculus');
+var preVar=function(){var _9=require('./preVar');return _9.hasOwnProperty("preVar")?_9.preVar:_9.hasOwnProperty("default")?_9.default:_9}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -54,7 +55,8 @@ var global = {
         this.styleHash[k] = this.data.style[k];
       });
     }
-    this.preVar(this.node);
+
+    this.varHash = preVar(this.node, this.ignores, this.preIndex);
     this.preFn(this.node);
     this.join(this.node);
     this.extend();
@@ -72,7 +74,7 @@ var global = {
       }
       this.index++;
     }
-    this.preIndex2 = this.preIndex = this.index;
+    this.preIndex = this.index;
     this.autoSplit = false;
     this.exHash = {};
     this.stack = [];
@@ -84,40 +86,6 @@ var global = {
 
     this.levels = [];
     this.exArr = [];
-  }
-  //预处理变量，遍历ast找到所有变量声明，将其存储至hash
-  More.prototype.preVar = function(node) {
-    var self = this;
-    var isToken = node.name() == Node.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(!isToken) {
-      if(node.name() == Node.VARDECL) {
-        self.ignore(node);
-        var leaves = node.leaves();
-        var k = leaves[0].leaves().content().slice(1);
-        var v = '';
-        while(self.ignores[++self.preIndex]) {}
-        while(self.ignores[++self.preIndex]) {}
-        //变量值可能不是元类型而是个样式，有多个token
-        leaves[2].leaves().forEach(function(leaf) {
-          var token = leaf.leaves();
-          v += self.getVar(token.content(), token.type());
-          while(self.ignores[++self.preIndex]) {
-            v += self.ignores[self.preIndex].content();
-          }
-        });
-        while(self.ignores[++self.preIndex]) {}
-        self.varHash[k] = v;
-      }
-      else {
-        node.leaves().forEach(function(leaf) {
-          self.preVar(leaf);
-        });
-      }
-    }
-    else if(!isVirtual) {
-      while(self.ignores[++self.preIndex]) {}
-    }
   }
   More.prototype.getVar = function(s, type) {
     if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
@@ -293,32 +261,6 @@ var global = {
   }
   More.prototype.tokens = function() {
     return this.parser.lexer.tokens();
-  }
-  More.prototype.ignore = function(node, prev) {
-    var self = this;
-    if(node instanceof Token) {
-      node.ignore = true;
-      //忽略前置空格
-      if(prev) {
-        prev = node;
-        while(prev = prev.prev()) {
-          if(prev.type() == Token.BLANK) {
-            prev.ignore = true;
-          }
-          else {
-            break;
-          }
-        }
-      }
-    }
-    else if(node.name() == Node.TOKEN) {
-      self.ignore(node.token(), prev);
-    }
-    else {
-      node.leaves().forEach(function(leaf) {
-        self.ignore(leaf, prev);
-      });
-    }
   }
 
   More.less=function(data) {
