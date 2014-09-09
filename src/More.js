@@ -1,6 +1,7 @@
 module fs from 'fs';
 module homunculus from 'homunculus';
 import preVar from './preVar';
+import vars from './vars';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -196,7 +197,7 @@ class More {
             var temp = self.stack[self.stack.length - 1];
             temp[temp.length - 1] += s;
           }
-          else {
+          else if(!ig.ignore) {
             self.res += s;
           }
         }
