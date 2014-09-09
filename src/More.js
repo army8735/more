@@ -26,7 +26,7 @@ class More {
     this.parser = homunculus.getParser('css');
     try {
       this.node = this.parser.parse(this.data.code);
-      this.ignore = this.parser.ignore();
+      this.ignores = this.parser.ignore();
     }
     catch(e) {
       if(typeof console != 'undefined') {
@@ -63,12 +63,12 @@ class More {
   init() {
     this.res = '';
     this.index = 0;
-    while(this.ignore[this.index]) {
-      if(this.ignore[this.index].type() == Token.IGNORE) {
-        this.res += this.ignore[this.index].content().replace(/\S/g, ' ');
+    while(this.ignores[this.index]) {
+      if(this.ignores[this.index].type() == Token.ignores) {
+        this.res += this.ignores[this.index].content().replace(/\S/g, ' ');
       }
       else {
-        this.res += this.ignore[this.index].content();
+        this.res += this.ignores[this.index].content();
       }
       this.index++;
     }
@@ -91,22 +91,23 @@ class More {
     var isToken = node.name() == Node.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
     if(!isToken) {
-      if(node.name() == Node.VARS) {
+      if(node.name() == Node.VARDECL) {
+        self.ignore(node);
         var leaves = node.leaves();
         var k = leaves[0].leaves().content().slice(1);
         var v = '';
-        while(self.ignore[++self.preIndex]) {}
-        while(self.ignore[++self.preIndex]) {}
+        while(self.ignores[++self.preIndex]) {}
+        while(self.ignores[++self.preIndex]) {}
         //变量值可能不是元类型而是个样式，有多个token
         leaves[2].leaves().forEach(function(leaf) {
           var token = leaf.leaves();
           v += self.getVar(token.content(), token.type());
-          while(self.ignore[++self.preIndex]) {
-            v += self.ignore[self.preIndex].content();
+          while(self.ignores[++self.preIndex]) {
+            v += self.ignores[self.preIndex].content();
           }
         });
-        while(self.ignore[++self.preIndex]) {}
-        varHash[k] = v;
+        while(self.ignores[++self.preIndex]) {}
+        self.varHash[k] = v;
       }
       else {
         node.leaves().forEach(function(leaf) {
@@ -115,7 +116,7 @@ class More {
       }
     }
     else if(!isVirtual) {
-      while(self.ignore[++self.preIndex]) {}
+      while(self.ignores[++self.preIndex]) {}
     }
   }
   getVar(s, type) {
@@ -160,70 +161,69 @@ class More {
     if(isToken) {
       if(!isVirtual) {
         var token = node.token();
-        if(config.inHead) {
-          var s = self.getVar(token.content(), token.type());
-          if(config.isImport && token.type() == Token.STRING) {
-            if(!/\.css['"]?$/.test(s)) {
-              s = s.replace(/(['"]?)$/, '.css$1');
-              self.imports.push(token.val() + '.css');
-            }
-            else {
-              self.imports.push(token.val());
-            }
-            //兼容less，相对路径为根路径
-            if(self.less) {
-              if(/^(['"]?)\//.test(s)) {
-                s = s.replace(/^(['"]?)\//, '$1' + root);
+        if(!token.ignore) {
+          if(config.inHead) {
+            var s = self.getVar(token.content(), token.type());
+            if(config.isImport && token.type() == Token.STRING) {
+              if(!/\.css['"]?$/.test(s)) {
+                s = s.replace(/(['"]?)$/, '.css$1');
+                self.imports.push(token.val() + '.css');
               }
               else {
-                s = s.replace(/^(['"]?)([\w-])/, '$1' + root + '$2');
+                self.imports.push(token.val());
+              }
+              //兼容less，相对路径为根路径
+              if(self.less) {
+                if(/^(['"]?)\//.test(s)) {
+                  s = s.replace(/^(['"]?)\//, '$1' + root);
+                }
+                else {
+                  s = s.replace(/^(['"]?)([\w-])/, '$1' + root + '$2');
+                }
+              }
+              else {
+                s = s.replace(/^(['"]?)\//, '$1' + root);
               }
             }
+            self.res += s;
+          }
+          else if(config.isSelectors || config.isSelector && !config.isExtend) {
+            var temp = self.stack[self.stack.length - 1];
+            if(config.isSelectors) {
+              temp.push('');
+            }
             else {
-              s = s.replace(/^(['"]?)\//, '$1' + root);
+              temp[temp.length - 1] += token.content();
             }
           }
-          self.res += s;
-        }
-        else if(config.isVar) {
-          //忽略变量声明
-        }
-        else if(config.isSelectors || config.isSelector && !config.isExtend) {
-          var temp = self.stack[self.stack.length - 1];
-          if(config.isSelectors) {
-            temp.push('');
-          }
-          else {
-            temp[temp.length - 1] += token.content();
-          }
-        }
-        //继承和方法直接忽略
-        else if(!config.isExtend && !config.isFn) {
-          //兼容less的~String拆分语法
-          if(self.autoSplit && token.type() == Token.STRING) {
-            var s = token.content();
-            var c = s.charAt(0);
-            if(c != "'" && c != '"') {
-              c = '"';
-              s = c + s + c;
+          //继承和方法直接忽略
+          else if(!config.isExtend && !config.isFn) {
+            //兼容less的~String拆分语法
+            if(self.autoSplit && token.type() == Token.STRING) {
+              var s = token.content();
+              var c = s.charAt(0);
+              if(c != "'" && c != '"') {
+                c = '"';
+                s = c + s + c;
+              }
+              s = s.replace(/,/g, c + ',' + c);
+              self.res = self.res.replace(/~\s*$/, '');
+              self.res += self.getVar(s, token.type());
             }
-            s = s.replace(/,/g, c + ',' + c);
-            self.res = self.res.replace(/~\s*$/, '');
-            self.res += self.getVar(s, token.type());
-          }
-          else {
-            self.res += self.getVar(token.content(), token.type());
-          }
-          if(token.content() == '~') {
-            self.autoSplit = true;
-          }
-          else {
-            self.autoSplit = false;
+            else {
+              self.res += self.getVar(token.content(), token.type());
+            }
+            if(token.content() == '~') {
+              self.autoSplit = true;
+            }
+            else {
+              self.autoSplit = false;
+            }
           }
         }
-        while(self.ignore[++self.index]) {
-          var ig = self.ignore[self.index];
-          var s = ig.type() == Token.IGNORE ? ig.content().replace(/\S/g, ' ') : ig.content();
+        while(self.ignores[++self.index]) {
+          var ig = self.ignores[self.index];
+          var s = ig.type() == Token.ignores ? ig.content().replace(/\S/g, ' ') : ig.content();
           if(!config.inHead && (config.isSelectors || config.isSelector)) {
             var temp = self.stack[self.stack.length - 1];
             temp[temp.length - 1] += s;
@@ -262,7 +262,7 @@ class More {
       else if(node.name() == Node.FN || node.name() == Node.FNC) {
         config.isFn = true;
         if(node.name() == Node.FNC) {
-          self.compilerFn(node, this.ignore, self.index);
+          self.compilerFn(node, this.ignores, self.index);
         }
       }
       var leaves = node.leaves();
@@ -294,11 +294,34 @@ class More {
   tokens() {
     return this.parser.lexer.tokens();
   }
+  ignore(node, prev) {
+    var self = this;
+    if(node instanceof Token) {
+      node.ignore = true;
+      //忽略前置空格
+      if(prev) {
+        prev = node;
+        while(prev = prev.prev()) {
+          if(prev.type() == Token.BLANK) {
+            prev.ignore = true;
+          }
+          else {
+            break;
+          }
+        }
+      }
+    }
+    else if(node.name() == Node.TOKEN) {
+      self.ignore(node.token(), prev);
+    }
+    else {
+      node.leaves().forEach(function(leaf) {
+        self.ignore(leaf, prev);
+      });
+    }
+  }
 
   static less(data = {}) {
-
-  }
-  static stylus(data = {}) {
 
   }
   static global(data = {}) {

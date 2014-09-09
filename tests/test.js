@@ -12,8 +12,9 @@ describe('api', function() {
 });
 describe('simple test', function() {
   it('var :', function() {
+    var more = new More();
     var s = '$a: 0;body{ margin: $a}';
-    var res = More.parse(s);
+    var res = more.parse(s);
     expect(res).to.eql('body{margin: 0}');
   });
 });

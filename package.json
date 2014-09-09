@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "clean-css": "^2.2.13",
-    "homunculus": "^0.4.4"
+    "homunculus": "^0.5.1"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
