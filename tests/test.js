@@ -15,6 +15,6 @@ describe('simple test', function() {
     var more = new More();
     var s = '$a: 0;body{ margin: $a}';
     var res = more.parse(s);
-    expect(res).to.eql('body{margin: 0}');
+    expect(res).to.eql(' body{ margin: 0}');
   });
 });
