@@ -2,6 +2,7 @@ module fs from 'fs';
 module homunculus from 'homunculus';
 import preVar from './preVar';
 import vars from './vars';
+import ignore from './ignore';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -130,6 +131,14 @@ class More {
     if(isToken) {
       if(!isVirtual) {
         var token = node.token();
+        //标识下一个string是否自动拆分
+        if(token.content() == '~') {
+          self.autoSplit = true;
+          ignore(token, self.ignores, self.index);
+        }
+        else if(token.type() != Token.STRING) {
+          self.autoSplit = false;
+        }
         if(!token.ignore) {
           if(config.inHead) {
             var s = self.getVar(token.content(), token.type());
@@ -141,63 +150,29 @@ class More {
               else {
                 self.imports.push(token.val());
               }
-              //兼容less，相对路径为根路径
-              if(self.less) {
-                if(/^(['"]?)\//.test(s)) {
-                  s = s.replace(/^(['"]?)\//, '$1' + root);
-                }
-                else {
-                  s = s.replace(/^(['"]?)([\w-])/, '$1' + root + '$2');
-                }
-              }
-              else {
-                s = s.replace(/^(['"]?)\//, '$1' + root);
-              }
             }
             self.res += s;
           }
-          else if(config.isSelectors || config.isSelector && !config.isExtend) {
-            var temp = self.stack[self.stack.length - 1];
-            if(config.isSelectors) {
-              temp.push('');
+          //兼容less的~String拆分语法
+          if(self.autoSplit && token.type() == Token.STRING) {
+            var s = token.content();
+            var c = s.charAt(0);
+            if(c != "'" && c != '"') {
+              c = '"';
+              s = c + s + c;
             }
-            else {
-              temp[temp.length - 1] += token.content();
-            }
+            s = s.replace(/,/g, c + ',' + c);
+            self.res += self.getVar(s, token.type());
+            self.autoSplit = false;
           }
-          //继承和方法直接忽略
-          else if(!config.isExtend && !config.isFn) {
-            //兼容less的~String拆分语法
-            if(self.autoSplit && token.type() == Token.STRING) {
-              var s = token.content();
-              var c = s.charAt(0);
-              if(c != "'" && c != '"') {
-                c = '"';
-                s = c + s + c;
-              }
-              s = s.replace(/,/g, c + ',' + c);
-              self.res = self.res.replace(/~\s*$/, '');
-              self.res += self.getVar(s, token.type());
-            }
-            else {
-              self.res += self.getVar(token.content(), token.type());
-            }
-            if(token.content() == '~') {
-              self.autoSplit = true;
-            }
-            else {
-              self.autoSplit = false;
-            }
+          else {
+            self.res += self.getVar(token.content(), token.type());
           }
         }
         while(self.ignores[++self.index]) {
           var ig = self.ignores[self.index];
           var s = ig.type() == Token.ignores ? ig.content().replace(/\S/g, ' ') : ig.content();
-          if(!config.inHead && (config.isSelectors || config.isSelector)) {
-            var temp = self.stack[self.stack.length - 1];
-            temp[temp.length - 1] += s;
-          }
-          else if(!ig.ignore) {
+          if(!ig.ignore) {
             self.res += s;
           }
         }
@@ -211,9 +186,6 @@ class More {
         if(node.name() == Node.IMPORT) {
           config.isImport = true;
         }
-      }
-      else if(node.name() == Node.VARS) {
-        config.isVar = true;
       }
       //将层级拆开
       else if(node.name() == Node.STYLESET && !config.inHead) {
@@ -240,7 +212,7 @@ class More {
         self.join(leaf, {
         });
       });
-      if(node.name() == Node.STYLESET & !config.inHead) {
+      if(node.name() == Node.STYLESET && !config.inHead) {
         self.styleset(false, node, config.prev, config.next);
       }
       else if(node.name() == Node.BLOCK && !config.inHead) {
@@ -262,10 +234,6 @@ class More {
   }
   tokens() {
     return this.parser.lexer.tokens();
-  }
-
-  static less(data = {}) {
-
   }
   static global(data = {}) {
     global = data;

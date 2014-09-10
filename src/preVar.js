@@ -12,11 +12,12 @@ function recursion(node, ignores, res) {
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(!isToken) {
     if(node.name() == Node.VARDECL) {
-      while(ignores[++index]) {}
-      while(ignores[++index]) {}
+      var i = index;
+      while(ignores[++i]) {}
+      while(ignores[++i]) {}
       var leaves = node.leaves();
       var k = leaves[0].leaves().content().slice(1);
-      var v = join(leaves[2], ignores, index);
+      var v = join(leaves[2], ignores, i);
       res[k] = v;
       index = ignore(node, ignores, index);
     }

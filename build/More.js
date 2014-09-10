@@ -1,7 +1,8 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _45=require('./preVar');return _45.hasOwnProperty("preVar")?_45.preVar:_45.hasOwnProperty("default")?_45.default:_45}()
-var vars=function(){var _46=require('./vars');return _46.hasOwnProperty("vars")?_46.vars:_46.hasOwnProperty("default")?_46.default:_46}()
+var preVar=function(){var _118=require('./preVar');return _118.hasOwnProperty("preVar")?_118.preVar:_118.hasOwnProperty("default")?_118.default:_118}()
+var vars=function(){var _119=require('./vars');return _119.hasOwnProperty("vars")?_119.vars:_119.hasOwnProperty("default")?_119.default:_119}()
+var ignore=function(){var _120=require('./ignore');return _120.hasOwnProperty("ignore")?_120.ignore:_120.hasOwnProperty("default")?_120.default:_120}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -130,6 +131,14 @@ var global = {
     if(isToken) {
       if(!isVirtual) {
         var token = node.token();
+        //标识下一个string是否自动拆分
+        if(token.content() == '~') {
+          self.autoSplit = true;
+          ignore(token, self.ignores, self.index);
+        }
+        else if(token.type() != Token.STRING) {
+          self.autoSplit = false;
+        }
         if(!token.ignore) {
           if(config.inHead) {
             var s = self.getVar(token.content(), token.type());
@@ -141,63 +150,29 @@ var global = {
               else {
                 self.imports.push(token.val());
               }
-              //兼容less，相对路径为根路径
-              if(self.less) {
-                if(/^(['"]?)\//.test(s)) {
-                  s = s.replace(/^(['"]?)\//, '$1' + root);
-                }
-                else {
-                  s = s.replace(/^(['"]?)([\w-])/, '$1' + root + '$2');
-                }
-              }
-              else {
-                s = s.replace(/^(['"]?)\//, '$1' + root);
-              }
             }
             self.res += s;
           }
-          else if(config.isSelectors || config.isSelector && !config.isExtend) {
-            var temp = self.stack[self.stack.length - 1];
-            if(config.isSelectors) {
-              temp.push('');
+          //兼容less的~String拆分语法
+          if(self.autoSplit && token.type() == Token.STRING) {
+            var s = token.content();
+            var c = s.charAt(0);
+            if(c != "'" && c != '"') {
+              c = '"';
+              s = c + s + c;
             }
-            else {
-              temp[temp.length - 1] += token.content();
-            }
+            s = s.replace(/,/g, c + ',' + c);
+            self.res += self.getVar(s, token.type());
+            self.autoSplit = false;
           }
-          //继承和方法直接忽略
-          else if(!config.isExtend && !config.isFn) {
-            //兼容less的~String拆分语法
-            if(self.autoSplit && token.type() == Token.STRING) {
-              var s = token.content();
-              var c = s.charAt(0);
-              if(c != "'" && c != '"') {
-                c = '"';
-                s = c + s + c;
-              }
-              s = s.replace(/,/g, c + ',' + c);
-              self.res = self.res.replace(/~\s*$/, '');
-              self.res += self.getVar(s, token.type());
-            }
-            else {
-              self.res += self.getVar(token.content(), token.type());
-            }
-            if(token.content() == '~') {
-              self.autoSplit = true;
-            }
-            else {
-              self.autoSplit = false;
-            }
+          else {
+            self.res += self.getVar(token.content(), token.type());
           }
         }
         while(self.ignores[++self.index]) {
           var ig = self.ignores[self.index];
           var s = ig.type() == Token.ignores ? ig.content().replace(/\S/g, ' ') : ig.content();
-          if(!config.inHead && (config.isSelectors || config.isSelector)) {
-            var temp = self.stack[self.stack.length - 1];
-            temp[temp.length - 1] += s;
-          }
-          else if(!ig.ignore) {
+          if(!ig.ignore) {
             self.res += s;
           }
         }
@@ -211,9 +186,6 @@ var global = {
         if(node.name() == Node.IMPORT) {
           config.isImport = true;
         }
-      }
-      else if(node.name() == Node.VARS) {
-        config.isVar = true;
       }
       //将层级拆开
       else if(node.name() == Node.STYLESET && !config.inHead) {
@@ -240,7 +212,7 @@ var global = {
         self.join(leaf, {
         });
       });
-      if(node.name() == Node.STYLESET & !config.inHead) {
+      if(node.name() == Node.STYLESET && !config.inHead) {
         self.styleset(false, node, config.prev, config.next);
       }
       else if(node.name() == Node.BLOCK && !config.inHead) {
@@ -263,10 +235,6 @@ var global = {
   More.prototype.tokens = function() {
     return this.parser.lexer.tokens();
   }
-
-  More.less=function(data) {
-
-  if(data===void 0)data={};}
   More.global=function(data) {
     if(data===void 0)data={};global = data;
   }
