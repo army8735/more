@@ -1,8 +1,8 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _118=require('./preVar');return _118.hasOwnProperty("preVar")?_118.preVar:_118.hasOwnProperty("default")?_118.default:_118}()
-var vars=function(){var _119=require('./vars');return _119.hasOwnProperty("vars")?_119.vars:_119.hasOwnProperty("default")?_119.default:_119}()
-var ignore=function(){var _120=require('./ignore');return _120.hasOwnProperty("ignore")?_120.ignore:_120.hasOwnProperty("default")?_120.default:_120}()
+var preVar=function(){var _0=require('./preVar');return _0.hasOwnProperty("preVar")?_0.preVar:_0.hasOwnProperty("default")?_0.default:_0}()
+var vars=function(){var _1=require('./vars');return _1.hasOwnProperty("vars")?_1.vars:_1.hasOwnProperty("default")?_1.default:_1}()
+var ignore=function(){var _2=require('./ignore');return _2.hasOwnProperty("ignore")?_2.ignore:_2.hasOwnProperty("default")?_2.default:_2}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -161,7 +161,7 @@ var global = {
               c = '"';
               s = c + s + c;
             }
-            s = s.replace(/,/g, c + ',' + c);
+            s = s.replace(/,\s*/g, c + ',' + c);
             self.res += self.getVar(s, token.type());
             self.autoSplit = false;
           }

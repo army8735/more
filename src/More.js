@@ -161,7 +161,7 @@ class More {
               c = '"';
               s = c + s + c;
             }
-            s = s.replace(/,/g, c + ',' + c);
+            s = s.replace(/,\s*/g, c + ',' + c);
             self.res += self.getVar(s, token.type());
             self.autoSplit = false;
           }

@@ -1,6 +1,6 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
-var join=function(){var _65=require('./join');return _65.hasOwnProperty("join")?_65.join:_65.hasOwnProperty("default")?_65.default:_65}()
-var ignore=function(){var _66=require('./ignore');return _66.hasOwnProperty("ignore")?_66.ignore:_66.hasOwnProperty("default")?_66.default:_66}()
+var join=function(){var _3=require('./join');return _3.hasOwnProperty("join")?_3.join:_3.hasOwnProperty("default")?_3.default:_3}()
+var ignore=function(){var _4=require('./ignore');return _4.hasOwnProperty("ignore")?_4.ignore:_4.hasOwnProperty("default")?_4.default:_4}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');

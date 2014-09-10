@@ -11,10 +11,28 @@ describe('api', function() {
   });
 });
 describe('simple test', function() {
-  it('var :', function() {
+  it('$var :', function() {
     var more = new More();
     var s = '$a: 0;body{ margin: $a}';
     var res = more.parse(s);
     expect(res).to.eql('body{ margin: 0}');
+  });
+  it('$var =', function() {
+    var more = new More();
+    var s = '$a: background:url(xxx);\nbody{ margin: $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('\nbody{ margin: background:url(xxx)}');
+  });
+  it('@var', function() {
+    var more = new More();
+    var s = '$a: background: url(xxx);\nbody{ margin: $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('\nbody{ margin: background: url(xxx)}');
+  });
+  it('~ autoSplit', function() {
+    var more = new More();
+    var s = 'body{font-family:~"Arail, verdana"}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{font-family:"Arail","verdana"}');
   });
 });
