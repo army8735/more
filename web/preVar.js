@@ -1,6 +1,6 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
-var join=function(){var _7=require('./join');return _7.hasOwnProperty("join")?_7.join:_7.hasOwnProperty("default")?_7.default:_7}()
-var ignore=function(){var _8=require('./ignore');return _8.hasOwnProperty("ignore")?_8.ignore:_8.hasOwnProperty("default")?_8.default:_8}()
+var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}()
+var ignore=function(){var _12=require('./ignore');return _12.hasOwnProperty("ignore")?_12.ignore:_12.hasOwnProperty("default")?_12.default:_12}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -16,7 +16,7 @@ function recursion(node, ignores, res) {
       while(ignores[++i]) {}
       while(ignores[++i]) {}
       var leaves = node.leaves();
-      var k = leaves[0].leaves().content().slice(1);
+      var k = leaves[0].token().content().slice(1);
       var v = join(leaves[2], ignores, i);
       res[k] = v;
       index = ignore(node, ignores, index);

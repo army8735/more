@@ -1,10 +1,11 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _0=require('./preVar');return _0.hasOwnProperty("preVar")?_0.preVar:_0.hasOwnProperty("default")?_0.default:_0}()
-var getVar=function(){var _1=require('./getVar');return _1.hasOwnProperty("getVar")?_1.getVar:_1.hasOwnProperty("default")?_1.default:_1}()
-var preFn=function(){var _2=require('./preFn');return _2.hasOwnProperty("preFn")?_2.preFn:_2.hasOwnProperty("default")?_2.default:_2}()
-var ignore=function(){var _3=require('./ignore');return _3.hasOwnProperty("ignore")?_3.ignore:_3.hasOwnProperty("default")?_3.default:_3}()
-var clone=function(){var _4=require('./clone');return _4.hasOwnProperty("clone")?_4.clone:_4.hasOwnProperty("default")?_4.default:_4}()
+var preVar=function(){var _100=require('./preVar');return _100.hasOwnProperty("preVar")?_100.preVar:_100.hasOwnProperty("default")?_100.default:_100}()
+var getVar=function(){var _101=require('./getVar');return _101.hasOwnProperty("getVar")?_101.getVar:_101.hasOwnProperty("default")?_101.default:_101}()
+var preFn=function(){var _102=require('./preFn');return _102.hasOwnProperty("preFn")?_102.preFn:_102.hasOwnProperty("default")?_102.default:_102}()
+var getFn=function(){var _103=require('./getFn');return _103.hasOwnProperty("getFn")?_103.getFn:_103.hasOwnProperty("default")?_103.default:_103}()
+var ignore=function(){var _104=require('./ignore');return _104.hasOwnProperty("ignore")?_104.ignore:_104.hasOwnProperty("default")?_104.default:_104}()
+var clone=function(){var _105=require('./clone');return _105.hasOwnProperty("clone")?_105.clone:_105.hasOwnProperty("default")?_105.default:_105}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -143,37 +144,29 @@ var global = {
     }
     else {
       var newConfig = clone(config);
-      newConfig.isSelectors = node.name() == Node.SELECTORS;
-      newConfig.isSelector = node.name() == Node.SELECTOR;
-      if(!newConfig.inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
-        newConfig.inHead = true;
-        if(node.name() == Node.IMPORT) {
-          newConfig.isImport = true;
-        }
-      }
-      //将层级拆开
-      else if(node.name() == Node.STYLESET && !newConfig.inHead) {
-        self.styleset(true, node, newConfig);
-      }
-      else if(node.name() == Node.BLOCK && !newConfig.inHead) {
-        self.block(true, node);
-      }
-      else if(node.name() == Node.EXTEND) {
-        //
-      }
-      else if(node.name() == Node.FN || node.name() == Node.FNC) {
-        //
+      switch(node.name()) {
+        case Node.STYLESET:
+          !newConfig.inHead && self.styleset(true, node, newConfig);
+          break;
+        case Node.BLOCK:
+          !newConfig.inHead && self.block(true, node);
+          break;
+        case Node.FNC:
+          self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
+          break;
       }
       var leaves = node.leaves();
       //递归子节点
       leaves.forEach(function(leaf) {
         self.join(leaf, newConfig);
       });
-      if(node.name() == Node.STYLESET && !newConfig.inHead) {
-        self.styleset(false, node, newConfig);
-      }
-      else if(node.name() == Node.BLOCK && !newConfig.inHead) {
-        self.block(false, node);
+      switch(node.name()) {
+        case Node.STYLESET:
+          !newConfig.inHead && self.styleset(false, node, newConfig);
+          break;
+        case Node.BLOCK:
+          !newConfig.inHead && self.block(false, node);
+          break;
       }
     }
   }

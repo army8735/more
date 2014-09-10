@@ -1,6 +1,7 @@
 module homunculus from 'homunculus';
 import join from './join';
 import ignore from './ignore';
+import Fn from './Fn';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -12,11 +13,9 @@ function recursion(node, ignores, res) {
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(!isToken) {
     if(node.name() == Node.FN) {
-      var i = index;
       var leaves = node.leaves();
-      var k = leaves[0].leaves().content().slice(1);
-      var v = join(leaves[2], ignores, i);
-      res[k] = v;
+      var k = leaves[0].token().content();
+      res[k] = new Fn(node, ignores, index);
       index = ignore(node, ignores, index);
     }
     else {

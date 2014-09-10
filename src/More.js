@@ -3,6 +3,7 @@ module homunculus from 'homunculus';
 import preVar from './preVar';
 import getVar from './getVar';
 import preFn from './preFn';
+import getFn from './getFn';
 import ignore from './ignore';
 import clone from './clone';
 
@@ -143,37 +144,29 @@ class More {
     }
     else {
       var newConfig = clone(config);
-      newConfig.isSelectors = node.name() == Node.SELECTORS;
-      newConfig.isSelector = node.name() == Node.SELECTOR;
-      if(!newConfig.inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
-        newConfig.inHead = true;
-        if(node.name() == Node.IMPORT) {
-          newConfig.isImport = true;
-        }
-      }
-      //将层级拆开
-      else if(node.name() == Node.STYLESET && !newConfig.inHead) {
-        self.styleset(true, node, newConfig);
-      }
-      else if(node.name() == Node.BLOCK && !newConfig.inHead) {
-        self.block(true, node);
-      }
-      else if(node.name() == Node.EXTEND) {
-        //
-      }
-      else if(node.name() == Node.FN || node.name() == Node.FNC) {
-        //
+      switch(node.name()) {
+        case Node.STYLESET:
+          !newConfig.inHead && self.styleset(true, node, newConfig);
+          break;
+        case Node.BLOCK:
+          !newConfig.inHead && self.block(true, node);
+          break;
+        case Node.FNC:
+          self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
+          break;
       }
       var leaves = node.leaves();
       //递归子节点
       leaves.forEach(function(leaf) {
         self.join(leaf, newConfig);
       });
-      if(node.name() == Node.STYLESET && !newConfig.inHead) {
-        self.styleset(false, node, newConfig);
-      }
-      else if(node.name() == Node.BLOCK && !newConfig.inHead) {
-        self.block(false, node);
+      switch(node.name()) {
+        case Node.STYLESET:
+          !newConfig.inHead && self.styleset(false, node, newConfig);
+          break;
+        case Node.BLOCK:
+          !newConfig.inHead && self.block(false, node);
+          break;
       }
     }
   }

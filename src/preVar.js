@@ -16,7 +16,7 @@ function recursion(node, ignores, res) {
       while(ignores[++i]) {}
       while(ignores[++i]) {}
       var leaves = node.leaves();
-      var k = leaves[0].leaves().content().slice(1);
+      var k = leaves[0].token().content().slice(1);
       var v = join(leaves[2], ignores, i);
       res[k] = v;
       index = ignore(node, ignores, index);
