@@ -4,29 +4,30 @@ var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
 var index;
+var str;
 
-function recursion(node, ignore, res) {
+function recursion(node, ignore) {
   var isToken = node.name() == Node.TOKEN;
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(isToken) {
     if(!isVirtual) {
       var token = node.token();
-      res.s += token.content();
+      str += token.content();
       while(ignore[++index]) {
-        res.s += ignore[index].content();
+        str += ignore[index].content();
       }
     }
   }
   else {
     node.leaves().forEach(function(leaf) {
-      recursion(leaf, ignore, res);
+      recursion(leaf, ignore);
     });
   }
 }
 
 exports.default=function(node, ignore, i) {
-  var res = { s: '' };
+  str = '';
   index = i;
-  recursion(node, ignore, res);
-  return res.s;
+  recursion(node, ignore);
+  return str;
 }});

@@ -1,6 +1,6 @@
 var homunculus=require('homunculus');
-var join=function(){var _2=require('./join');return _2.hasOwnProperty("join")?_2.join:_2.hasOwnProperty("default")?_2.default:_2}()
-var ignore=function(){var _3=require('./ignore');return _3.hasOwnProperty("ignore")?_3.ignore:_3.hasOwnProperty("default")?_3.default:_3}()
+var join=function(){var _43=require('./join');return _43.hasOwnProperty("join")?_43.join:_43.hasOwnProperty("default")?_43.default:_43}()
+var ignore=function(){var _44=require('./ignore');return _44.hasOwnProperty("ignore")?_44.ignore:_44.hasOwnProperty("default")?_44.default:_44}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -12,11 +12,13 @@ function recursion(node, ignores, res) {
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(!isToken) {
     if(node.name() == Node.VARDECL) {
-      index = ignore(node, ignores, index);
+      while(ignores[++index]) {}
+      while(ignores[++index]) {}
       var leaves = node.leaves();
       var k = leaves[0].leaves().content().slice(1);
       var v = join(leaves[2], ignores, index);
       res[k] = v;
+      index = ignore(node, ignores, index);
     }
     else {
       node.leaves().forEach(function(leaf) {

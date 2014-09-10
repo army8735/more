@@ -1,7 +1,7 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _31=require('./preVar');return _31.hasOwnProperty("preVar")?_31.preVar:_31.hasOwnProperty("default")?_31.default:_31}()
-var vars=function(){var _32=require('./vars');return _32.hasOwnProperty("vars")?_32.vars:_32.hasOwnProperty("default")?_32.default:_32}()
+var preVar=function(){var _45=require('./preVar');return _45.hasOwnProperty("preVar")?_45.preVar:_45.hasOwnProperty("default")?_45.default:_45}()
+var vars=function(){var _46=require('./vars');return _46.hasOwnProperty("vars")?_46.vars:_46.hasOwnProperty("default")?_46.default:_46}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
