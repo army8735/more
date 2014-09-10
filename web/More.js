@@ -1,8 +1,10 @@
 define(function(require, exports, module){var fs=require('fs');
 var homunculus=require('homunculus');
 var preVar=function(){var _0=require('./preVar');return _0.hasOwnProperty("preVar")?_0.preVar:_0.hasOwnProperty("default")?_0.default:_0}()
-var vars=function(){var _1=require('./vars');return _1.hasOwnProperty("vars")?_1.vars:_1.hasOwnProperty("default")?_1.default:_1}()
-var ignore=function(){var _2=require('./ignore');return _2.hasOwnProperty("ignore")?_2.ignore:_2.hasOwnProperty("default")?_2.default:_2}()
+var getVar=function(){var _1=require('./getVar');return _1.hasOwnProperty("getVar")?_1.getVar:_1.hasOwnProperty("default")?_1.default:_1}()
+var preFn=function(){var _2=require('./preFn');return _2.hasOwnProperty("preFn")?_2.preFn:_2.hasOwnProperty("default")?_2.default:_2}()
+var ignore=function(){var _3=require('./ignore');return _3.hasOwnProperty("ignore")?_3.ignore:_3.hasOwnProperty("default")?_3.default:_3}()
+var clone=function(){var _4=require('./clone');return _4.hasOwnProperty("clone")?_4.clone:_4.hasOwnProperty("default")?_4.default:_4}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -59,7 +61,7 @@ var global = {
     }
 
     this.varHash = preVar(this.node, this.ignores, this.preIndex);
-    this.preFn(this.node);
+    this.fnHash = preFn(this.node, this.ignores, this.preIndex);
     this.join(this.node);
     this.extend();
     return this.res;
@@ -78,51 +80,12 @@ var global = {
     }
     this.preIndex = this.index;
     this.autoSplit = false;
-    this.exHash = {};
     this.stack = [];
     this.imports = [];
 
     this.varHash = {};
     this.styleHash = {};
     this.fnHash = {};
-
-    this.levels = [];
-    this.exArr = [];
-  }
-  More.prototype.getVar = function(s, type) {
-    if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
-      for(var i = 0; i < s.length; i++) {
-        if(s.charAt(i) == '\\') {
-          i++;
-          continue;
-        }
-        if(s.charAt(i) == '$' || s.charAt(i) == '@') {
-          var c = s.charAt(i + 1),
-            lit;
-          if(c == '{') {
-            var j = s.indexOf('}', i + 3);
-            if(j > -1) {
-              c = s.slice(i + 2, j);
-              var vara = this.varHash[c] || global.var[c];
-              if(vara) {
-                s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(j + 1);
-              }
-            }
-          }
-          else if(/[\w-]/.test(c)) {
-            c = /^[\w-]+/.exec(s.slice(i + 1))[0];
-            var vara = this.varHash[c] || global.var[c];
-            if(vara) {
-              s = s.slice(0, i) + (type == Token.STRING && /^['"]/.test(s) ? vara.replace(/^(['"])(.*)\1$/, '$2') : vara) + s.slice(i + c.length + 1);
-            }
-          }
-        }
-      }
-    }
-    return s;
-  }
-  More.prototype.preFn = function(node) {
-
   }
   More.prototype.join = function(node, config) {
     if(config===void 0)config={};var self = this;
@@ -141,7 +104,7 @@ var global = {
         }
         if(!token.ignore) {
           if(config.inHead) {
-            var s = self.getVar(token.content(), token.type());
+            var s = getVar(token, self.varHash, global.var);
             if(config.isImport && token.type() == Token.STRING) {
               if(!/\.css['"]?$/.test(s)) {
                 s = s.replace(/(['"]?)$/, '.css$1');
@@ -153,20 +116,20 @@ var global = {
             }
             self.res += s;
           }
-          //兼容less的~String拆分语法
+          //~String拆分语法
           if(self.autoSplit && token.type() == Token.STRING) {
-            var s = token.content();
+            var s = getVar(token, self.varHash, global.var);
             var c = s.charAt(0);
             if(c != "'" && c != '"') {
               c = '"';
               s = c + s + c;
             }
             s = s.replace(/,\s*/g, c + ',' + c);
-            self.res += self.getVar(s, token.type());
+            self.res += s;
             self.autoSplit = false;
           }
           else {
-            self.res += self.getVar(token.content(), token.type());
+            self.res += getVar(token, self.varHash, global.var);
           }
         }
         while(self.ignores[++self.index]) {
@@ -179,43 +142,37 @@ var global = {
       }
     }
     else {
-      config.isSelectors = node.name() == Node.SELECTORS;
-      config.isSelector = node.name() == Node.SELECTOR;
-      if(!config.inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
-        config.inHead = true;
+      var newConfig = clone(config);
+      newConfig.isSelectors = node.name() == Node.SELECTORS;
+      newConfig.isSelector = node.name() == Node.SELECTOR;
+      if(!newConfig.inHead && [Node.FONTFACE, Node.MEDIA, Node.CHARSET, Node.IMPORT, Node.PAGE, Node.KEYFRAMES].indexOf(node.name()) != -1) {
+        newConfig.inHead = true;
         if(node.name() == Node.IMPORT) {
-          config.isImport = true;
+          newConfig.isImport = true;
         }
       }
       //将层级拆开
-      else if(node.name() == Node.STYLESET && !config.inHead) {
-        self.styleset(true, node, config.prev, config.next);
+      else if(node.name() == Node.STYLESET && !newConfig.inHead) {
+        self.styleset(true, node, newConfig);
       }
-      else if(node.name() == Node.BLOCK && !config.inHead) {
+      else if(node.name() == Node.BLOCK && !newConfig.inHead) {
         self.block(true, node);
       }
       else if(node.name() == Node.EXTEND) {
-        //占位符
-        self.res += '@extend';
-        config.isExtend = true;
-        self.record(node);
+        //
       }
       else if(node.name() == Node.FN || node.name() == Node.FNC) {
-        config.isFn = true;
-        if(node.name() == Node.FNC) {
-          self.compilerFn(node, this.ignores, self.index);
-        }
+        //
       }
       var leaves = node.leaves();
       //递归子节点
-      leaves.forEach(function(leaf, i) {
-        self.join(leaf, {
-        });
+      leaves.forEach(function(leaf) {
+        self.join(leaf, newConfig);
       });
-      if(node.name() == Node.STYLESET && !config.inHead) {
-        self.styleset(false, node, config.prev, config.next);
+      if(node.name() == Node.STYLESET && !newConfig.inHead) {
+        self.styleset(false, node, newConfig);
       }
-      else if(node.name() == Node.BLOCK && !config.inHead) {
+      else if(node.name() == Node.BLOCK && !newConfig.inHead) {
         self.block(false, node);
       }
     }

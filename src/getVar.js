@@ -1,9 +1,9 @@
-define(function(require, exports, module){var homunculus=require('homunculus');
+module homunculus from 'homunculus';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
-exports.default=function(token, varHash, globalVar) {
+export default function(token, varHash, globalVar) {
   var s = token.content();
   var type = token.type();
   if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
@@ -35,4 +35,4 @@ exports.default=function(token, varHash, globalVar) {
     }
   }
   return s;
-}});
+}

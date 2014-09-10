@@ -1,4 +1,4 @@
-define(function(require, exports, module){var homunculus=require('homunculus');
+var homunculus=require('homunculus');
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -35,4 +35,4 @@ exports.default=function(token, varHash, globalVar) {
     }
   }
   return s;
-}});
+}
