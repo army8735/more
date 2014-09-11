@@ -1,8 +1,8 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
-var join=function(){var _345=require('./join');return _345.hasOwnProperty("join")?_345.join:_345.hasOwnProperty("default")?_345.default:_345}()
-var ignore=function(){var _346=require('./ignore');return _346.hasOwnProperty("ignore")?_346.ignore:_346.hasOwnProperty("default")?_346.default:_346}()
-var getVar=function(){var _347=require('./getVar');return _347.hasOwnProperty("getVar")?_347.getVar:_347.hasOwnProperty("default")?_347.default:_347}()
-var clone=function(){var _348=require('./clone');return _348.hasOwnProperty("clone")?_348.clone:_348.hasOwnProperty("default")?_348.default:_348}()
+var join=function(){var _0=require('./join');return _0.hasOwnProperty("join")?_0.join:_0.hasOwnProperty("default")?_0.default:_0}()
+var ignore=function(){var _1=require('./ignore');return _1.hasOwnProperty("ignore")?_1.ignore:_1.hasOwnProperty("default")?_1.default:_1}()
+var getVar=function(){var _2=require('./getVar');return _2.hasOwnProperty("getVar")?_2.getVar:_2.hasOwnProperty("default")?_2.default:_2}()
+var clone=function(){var _3=require('./clone');return _3.hasOwnProperty("clone")?_3.clone:_3.hasOwnProperty("default")?_3.default:_3}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');

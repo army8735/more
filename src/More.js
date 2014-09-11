@@ -6,6 +6,8 @@ import preFn from './preFn';
 import getFn from './getFn';
 import ignore from './ignore';
 import clone from './clone';
+import join from './join';
+import concatSelector from './concatSelector';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -81,8 +83,8 @@ class More {
     }
     this.preIndex = this.index;
     this.autoSplit = false;
-    this.stack = [];
-    this.imports = [];
+    this.selectorStack = [];
+    this.importStack = [];
 
     this.varHash = {};
     this.styleHash = {};
@@ -109,10 +111,10 @@ class More {
             if(config.isImport && token.type() == Token.STRING) {
               if(!/\.css['"]?$/.test(s)) {
                 s = s.replace(/(['"]?)$/, '.css$1');
-                self.imports.push(token.val() + '.css');
+                self.importStack.push(token.val() + '.css');
               }
               else {
-                self.imports.push(token.val());
+                self.importStack.push(token.val());
               }
             }
             self.res += s;
@@ -146,7 +148,7 @@ class More {
       var newConfig = clone(config);
       switch(node.name()) {
         case Node.STYLESET:
-          !newConfig.inHead && self.styleset(true, node, newConfig);
+          !newConfig.inHead && self.styleset(true, node);
           break;
         case Node.BLOCK:
           !newConfig.inHead && self.block(true, node);
@@ -155,14 +157,14 @@ class More {
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
           break;
       }
-      var leaves = node.leaves();
       //递归子节点
+      var leaves = node.leaves();
       leaves.forEach(function(leaf) {
         self.join(leaf, newConfig);
       });
       switch(node.name()) {
         case Node.STYLESET:
-          !newConfig.inHead && self.styleset(false, node, newConfig);
+          !newConfig.inHead && self.styleset(false, node);
           break;
         case Node.BLOCK:
           !newConfig.inHead && self.block(false, node);
@@ -170,11 +172,42 @@ class More {
       }
     }
   }
-  styleset() {
-
+  styleset(start, node) {
+    if(start) {
+      var prev = node.prev();
+      ignore(node.first(), this.ignores, this.index);
+      //二级以上选择器样式集需先结束
+      if(this.selectorStack.length) {
+        if(prev && prev.name() == Node.STYLESET) {
+          //
+        }
+        else {
+          this.res += '}';
+        }
+      }
+      //存储当前层级父选择器集合
+      var s = join(node.first(), this.ignores, this.index, true);
+      this.selectorStack.push(s.split(','));
+    }
+    else {
+      var next = node.next();
+      this.selectorStack.pop();
+      if(this.selectorStack.length) {
+        //当多级styleset结束时下个还是styleset或}，会造成空白样式
+        if(next && next.name() == Node.STYLESET) {
+          //
+        }
+        else {
+          this.res += concatSelector(this.selectorStack) + '{';
+        }
+      }
+    }
   }
-  block() {
-
+  block(start, node) {
+    if(start) {
+      var s = concatSelector(this.selectorStack);
+      this.res += s;
+    }
   }
   extend(node) {
 
@@ -184,6 +217,12 @@ class More {
   }
   tokens() {
     return this.parser.lexer.tokens();
+  }
+  imports() {
+    return this.importStatck;
+  }
+  global(data = {}) {
+    More.global(data);
   }
   static global(data = {}) {
     global = data;

@@ -75,6 +75,18 @@ describe('simple test', function() {
     var more = new More();
     var s = 'fn($a){$a}body{fn(background:url(xxx))}';
     var res = more.parse(s);
-    expect(res).to.eql('body{fn(2)}');
+    expect(res).to.eql('body{background:url(xxx);}');
+  });
+  it('level', function() {
+    var more = new More();
+    var s = 'html,body{margin:0;div,p{padding:0;a{color:#000}span{color:#fff}}}';
+    var res = more.parse(s);
+    expect(res).to.eql('html,body{margin:0;}html div,html p,body div,body p{padding:0;}html div a,html p a,body div a,body p a{color:#000}html div span,html p span,body div span,body p span{color:#fff}html div,html p,body div,body p{}html,body{}');
+  });
+  it('level 2', function() {
+    var more = new More();
+    var s = 'html,body{div,p{padding:0;a{color:#000}span{color:#fff}}margin:0;}';
+    var res = more.parse(s);
+    expect(res).to.eql('html,body{}html div,html p,body div,body p{padding:0;}html div a,html p a,body div a,body p a{color:#000}html div span,html p span,body div span,body p span{color:#fff}html div,html p,body div,body p{}html,body{margin:0;}');
   });
 });
