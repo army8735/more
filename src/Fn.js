@@ -13,6 +13,8 @@ class Fn {
     this.ignores = ignores;
     this.index = index;
     this.params = [];
+    this.flag = false;
+    this.res = '';
     this.preCompiler(node, ignores, index);
   }
   preCompiler(node, ignores, index) {
@@ -31,7 +33,7 @@ class Fn {
     leaves.slice(1, leaves.length - 1).forEach(function(leaf, i) {
       if(i % 2 == 0) {
         var idx = Math.floor(i / 2);
-        var k = leaf.first().token().content();
+        var k = join(leaf, self.ignores);
         if(idx < self.params.length) {
           var v = self.params[idx];
           v = v.replace(/^\${?/, '').replace(/}$/, '');
@@ -39,8 +41,35 @@ class Fn {
         }
       }
     });
-    console.log(varHash, newVarHash)
-    return '';
+    self.recursion(self.node, newVarHash, globalVar);
+    return self.res.replace(/^{/, '').replace(/}$/, '');
+  }
+  recursion(node, newVarHash, globalVar) {
+    var self = this;
+    var isToken = node.name() == Node.TOKEN;
+    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+    if(isToken) {
+      if(!isVirtual) {
+        if(self.flag) {
+          var token = node.token();
+          self.res += getVar(token, newVarHash, globalVar);
+        }
+        while(self.ignores[++self.index]) {
+          var s = self.ignores[self.index].content();
+          if(self.flag && s != '\n') {
+            self.res += s;
+          }
+        }
+      }
+    }
+    else {
+      if(node.name() == Node.BLOCK) {
+        self.flag = true;
+      }
+      node.leaves().forEach(function(leaf) {
+        self.recursion(leaf, newVarHash, globalVar);
+      });
+    }
   }
 }
 
