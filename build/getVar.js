@@ -6,6 +6,9 @@ var Node = homunculus.getClass('node', 'css');
 exports.default=function(token, varHash, globalVar) {
   var s = token.content();
   var type = token.type();
+  if(type == Token.HEAD) {
+    return s;
+  }
   if(s.indexOf('$') > -1 || s.indexOf('@') > -1) {
     for(var i = 0; i < s.length; i++) {
       if(s.charAt(i) == '\\') {

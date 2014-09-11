@@ -86,12 +86,13 @@ class More {
     this.autoSplit = false;
     this.selectorStack = [];
     this.importStack = [];
+    this.extendStack = [];
 
     this.varHash = {};
     this.styleHash = {};
     this.fnHash = {};
   }
-  join(node, config = {}) {
+  join(node) {
     var self = this;
     var isToken = node.name() == Node.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
@@ -108,19 +109,6 @@ class More {
           self.autoSplit = false;
         }
         if(!token.ignore) {
-          if(config.inHead) {
-            var s = getVar(token, self.varHash, global.var);
-            if(config.isImport && token.type() == Token.STRING) {
-              if(!/\.css['"]?$/.test(s)) {
-                s = s.replace(/(['"]?)$/, '.css$1');
-                self.importStack.push(token.val() + '.css');
-              }
-              else {
-                self.importStack.push(token.val());
-              }
-            }
-            self.res += s;
-          }
           //~String拆分语法
           if(self.autoSplit && token.type() == Token.STRING) {
             var s = getVar(token, self.varHash, global.var);
@@ -147,29 +135,28 @@ class More {
       }
     }
     else {
-      var newConfig = clone(config);
       switch(node.name()) {
         case Node.STYLESET:
-          !newConfig.inHead && self.styleset(true, node);
+          self.styleset(true, node);
           break;
         case Node.BLOCK:
-          !newConfig.inHead && self.block(true, node);
+          self.block(node);
           break;
         case Node.FNC:
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
+          break;
+        case Node.EXTEND:
+          self.preExtend(node);
           break;
       }
       //递归子节点
       var leaves = node.leaves();
       leaves.forEach(function(leaf) {
-        self.join(leaf, newConfig);
+        self.join(leaf);
       });
       switch(node.name()) {
         case Node.STYLESET:
-          !newConfig.inHead && self.styleset(false, node);
-          break;
-        case Node.BLOCK:
-          !newConfig.inHead && self.block(false, node);
+          self.styleset(false, node);
           break;
       }
     }
@@ -211,30 +198,31 @@ class More {
       }
     }
   }
-  block(start, node) {
+  block(node) {
     var self = this;
-    if(start) {
-      var last = node.last();
-      var prev = last.prev();
-      //当多级block的最后一个是styleset或}，会造成空白样式
-      if(prev.name() == Node.STYLESET) {
-        eventbus.on(last.nid(), function() {
-          ignore(last, self.ignores, self.index);
-        });
-      }
-      var first = node.leaf(1);
-      if(first.name() == Node.STYLESET) {
-        eventbus.on(first.prev().nid(), function() {
-          ignore(first.prev(), self.ignores, self.index);
-        });
-      }
-      else {
-        var s = concatSelector(this.selectorStack);
-        this.res += s;
-      }
+    var last = node.last();
+    var prev = last.prev();
+    //当多级block的最后一个是styleset或}，会造成空白样式
+    if(prev.name() == Node.STYLESET) {
+      eventbus.on(last.nid(), function() {
+        ignore(last, self.ignores, self.index);
+      });
+    }
+    var first = node.leaf(1);
+    if(first.name() == Node.STYLESET) {
+      eventbus.on(first.prev().nid(), function() {
+        ignore(first.prev(), self.ignores, self.index);
+      });
+    }
+    else {
+      var s = concatSelector(this.selectorStack);
+      this.res += s;
     }
   }
-  extend(node) {
+  preExtend(node) {
+
+  }
+  extend() {
 
   }
   ast() {

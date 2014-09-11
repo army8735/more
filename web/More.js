@@ -1,14 +1,14 @@
 define(function(require, exports, module){var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _4=require('./preVar');return _4.hasOwnProperty("preVar")?_4.preVar:_4.hasOwnProperty("default")?_4.default:_4}()
-var getVar=function(){var _5=require('./getVar');return _5.hasOwnProperty("getVar")?_5.getVar:_5.hasOwnProperty("default")?_5.default:_5}()
-var preFn=function(){var _6=require('./preFn');return _6.hasOwnProperty("preFn")?_6.preFn:_6.hasOwnProperty("default")?_6.default:_6}()
-var getFn=function(){var _7=require('./getFn');return _7.hasOwnProperty("getFn")?_7.getFn:_7.hasOwnProperty("default")?_7.default:_7}()
-var ignore=function(){var _8=require('./ignore');return _8.hasOwnProperty("ignore")?_8.ignore:_8.hasOwnProperty("default")?_8.default:_8}()
-var clone=function(){var _9=require('./clone');return _9.hasOwnProperty("clone")?_9.clone:_9.hasOwnProperty("default")?_9.default:_9}()
-var join=function(){var _10=require('./join');return _10.hasOwnProperty("join")?_10.join:_10.hasOwnProperty("default")?_10.default:_10}()
-var concatSelector=function(){var _11=require('./concatSelector');return _11.hasOwnProperty("concatSelector")?_11.concatSelector:_11.hasOwnProperty("default")?_11.default:_11}()
-var eventbus=function(){var _12=require('./eventbus.js');return _12.hasOwnProperty("eventbus")?_12.eventbus:_12.hasOwnProperty("default")?_12.default:_12}()
+var preVar=function(){var _845=require('./preVar');return _845.hasOwnProperty("preVar")?_845.preVar:_845.hasOwnProperty("default")?_845.default:_845}()
+var getVar=function(){var _846=require('./getVar');return _846.hasOwnProperty("getVar")?_846.getVar:_846.hasOwnProperty("default")?_846.default:_846}()
+var preFn=function(){var _847=require('./preFn');return _847.hasOwnProperty("preFn")?_847.preFn:_847.hasOwnProperty("default")?_847.default:_847}()
+var getFn=function(){var _848=require('./getFn');return _848.hasOwnProperty("getFn")?_848.getFn:_848.hasOwnProperty("default")?_848.default:_848}()
+var ignore=function(){var _849=require('./ignore');return _849.hasOwnProperty("ignore")?_849.ignore:_849.hasOwnProperty("default")?_849.default:_849}()
+var clone=function(){var _850=require('./clone');return _850.hasOwnProperty("clone")?_850.clone:_850.hasOwnProperty("default")?_850.default:_850}()
+var join=function(){var _851=require('./join');return _851.hasOwnProperty("join")?_851.join:_851.hasOwnProperty("default")?_851.default:_851}()
+var concatSelector=function(){var _852=require('./concatSelector');return _852.hasOwnProperty("concatSelector")?_852.concatSelector:_852.hasOwnProperty("default")?_852.default:_852}()
+var eventbus=function(){var _853=require('./eventbus.js');return _853.hasOwnProperty("eventbus")?_853.eventbus:_853.hasOwnProperty("default")?_853.default:_853}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -86,13 +86,14 @@ var global = {
     this.autoSplit = false;
     this.selectorStack = [];
     this.importStack = [];
+    this.extendStack = [];
 
     this.varHash = {};
     this.styleHash = {};
     this.fnHash = {};
   }
-  More.prototype.join = function(node, config) {
-    if(config===void 0)config={};var self = this;
+  More.prototype.join = function(node) {
+    var self = this;
     var isToken = node.name() == Node.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
     if(isToken) {
@@ -108,19 +109,6 @@ var global = {
           self.autoSplit = false;
         }
         if(!token.ignore) {
-          if(config.inHead) {
-            var s = getVar(token, self.varHash, global.var);
-            if(config.isImport && token.type() == Token.STRING) {
-              if(!/\.css['"]?$/.test(s)) {
-                s = s.replace(/(['"]?)$/, '.css$1');
-                self.importStack.push(token.val() + '.css');
-              }
-              else {
-                self.importStack.push(token.val());
-              }
-            }
-            self.res += s;
-          }
           //~String拆分语法
           if(self.autoSplit && token.type() == Token.STRING) {
             var s = getVar(token, self.varHash, global.var);
@@ -147,29 +135,28 @@ var global = {
       }
     }
     else {
-      var newConfig = clone(config);
       switch(node.name()) {
         case Node.STYLESET:
-          !newConfig.inHead && self.styleset(true, node);
+          self.styleset(true, node);
           break;
         case Node.BLOCK:
-          !newConfig.inHead && self.block(true, node);
+          self.block(node);
           break;
         case Node.FNC:
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
+          break;
+        case Node.EXTEND:
+          self.preExtend(node);
           break;
       }
       //递归子节点
       var leaves = node.leaves();
       leaves.forEach(function(leaf) {
-        self.join(leaf, newConfig);
+        self.join(leaf);
       });
       switch(node.name()) {
         case Node.STYLESET:
-          !newConfig.inHead && self.styleset(false, node);
-          break;
-        case Node.BLOCK:
-          !newConfig.inHead && self.block(false, node);
+          self.styleset(false, node);
           break;
       }
     }
@@ -211,30 +198,31 @@ var global = {
       }
     }
   }
-  More.prototype.block = function(start, node) {
+  More.prototype.block = function(node) {
     var self = this;
-    if(start) {
-      var last = node.last();
-      var prev = last.prev();
-      //当多级block的最后一个是styleset或}，会造成空白样式
-      if(prev.name() == Node.STYLESET) {
-        eventbus.on(last.nid(), function() {
-          ignore(last, self.ignores, self.index);
-        });
-      }
-      var first = node.leaf(1);
-      if(first.name() == Node.STYLESET) {
-        eventbus.on(first.prev().nid(), function() {
-          ignore(first.prev(), self.ignores, self.index);
-        });
-      }
-      else {
-        var s = concatSelector(this.selectorStack);
-        this.res += s;
-      }
+    var last = node.last();
+    var prev = last.prev();
+    //当多级block的最后一个是styleset或}，会造成空白样式
+    if(prev.name() == Node.STYLESET) {
+      eventbus.on(last.nid(), function() {
+        ignore(last, self.ignores, self.index);
+      });
+    }
+    var first = node.leaf(1);
+    if(first.name() == Node.STYLESET) {
+      eventbus.on(first.prev().nid(), function() {
+        ignore(first.prev(), self.ignores, self.index);
+      });
+    }
+    else {
+      var s = concatSelector(this.selectorStack);
+      this.res += s;
     }
   }
-  More.prototype.extend = function(node) {
+  More.prototype.preExtend = function(node) {
+
+  }
+  More.prototype.extend = function() {
 
   }
   More.prototype.ast = function() {
