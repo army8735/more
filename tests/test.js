@@ -9,6 +9,21 @@ describe('api', function() {
     var more = new More();
     expect(more.parse).to.be.a(Function);
   });
+  it('#tokens', function() {
+    var more = new More();
+    expect(more.tokens).to.be.a(Function);
+  });
+  it('#ast', function() {
+    var more = new More();
+    expect(more.ast).to.be.a(Function);
+  });
+  it('#global', function() {
+    var more = new More();
+    expect(more.global).to.be.a(Function);
+  });
+  it('More#global', function() {
+    expect(More.global).to.be.a(Function);
+  });
 });
 describe('simple test', function() {
   it('$var :', function() {
