@@ -220,10 +220,18 @@ class More {
     }
   }
   preExtend(node) {
-
+    ignore(node, this.ignores, this.index);
+    var i = this.index;
+    var o = {
+      start: this.res.length
+    };
+    while(this.ignores[++i]) {}
+    var s = join(node.leaf(1), this.ignores, i);
+    o.selectors = s.split(',');
+    this.extendStack.push(o);
   }
   extend() {
-
+    console.log(this.extendStack)
   }
   ast() {
     return this.node;

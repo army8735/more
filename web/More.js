@@ -1,14 +1,14 @@
 define(function(require, exports, module){var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _845=require('./preVar');return _845.hasOwnProperty("preVar")?_845.preVar:_845.hasOwnProperty("default")?_845.default:_845}()
-var getVar=function(){var _846=require('./getVar');return _846.hasOwnProperty("getVar")?_846.getVar:_846.hasOwnProperty("default")?_846.default:_846}()
-var preFn=function(){var _847=require('./preFn');return _847.hasOwnProperty("preFn")?_847.preFn:_847.hasOwnProperty("default")?_847.default:_847}()
-var getFn=function(){var _848=require('./getFn');return _848.hasOwnProperty("getFn")?_848.getFn:_848.hasOwnProperty("default")?_848.default:_848}()
-var ignore=function(){var _849=require('./ignore');return _849.hasOwnProperty("ignore")?_849.ignore:_849.hasOwnProperty("default")?_849.default:_849}()
-var clone=function(){var _850=require('./clone');return _850.hasOwnProperty("clone")?_850.clone:_850.hasOwnProperty("default")?_850.default:_850}()
-var join=function(){var _851=require('./join');return _851.hasOwnProperty("join")?_851.join:_851.hasOwnProperty("default")?_851.default:_851}()
-var concatSelector=function(){var _852=require('./concatSelector');return _852.hasOwnProperty("concatSelector")?_852.concatSelector:_852.hasOwnProperty("default")?_852.default:_852}()
-var eventbus=function(){var _853=require('./eventbus.js');return _853.hasOwnProperty("eventbus")?_853.eventbus:_853.hasOwnProperty("default")?_853.default:_853}()
+var preVar=function(){var _1007=require('./preVar');return _1007.hasOwnProperty("preVar")?_1007.preVar:_1007.hasOwnProperty("default")?_1007.default:_1007}()
+var getVar=function(){var _1008=require('./getVar');return _1008.hasOwnProperty("getVar")?_1008.getVar:_1008.hasOwnProperty("default")?_1008.default:_1008}()
+var preFn=function(){var _1009=require('./preFn');return _1009.hasOwnProperty("preFn")?_1009.preFn:_1009.hasOwnProperty("default")?_1009.default:_1009}()
+var getFn=function(){var _1010=require('./getFn');return _1010.hasOwnProperty("getFn")?_1010.getFn:_1010.hasOwnProperty("default")?_1010.default:_1010}()
+var ignore=function(){var _1011=require('./ignore');return _1011.hasOwnProperty("ignore")?_1011.ignore:_1011.hasOwnProperty("default")?_1011.default:_1011}()
+var clone=function(){var _1012=require('./clone');return _1012.hasOwnProperty("clone")?_1012.clone:_1012.hasOwnProperty("default")?_1012.default:_1012}()
+var join=function(){var _1013=require('./join');return _1013.hasOwnProperty("join")?_1013.join:_1013.hasOwnProperty("default")?_1013.default:_1013}()
+var concatSelector=function(){var _1014=require('./concatSelector');return _1014.hasOwnProperty("concatSelector")?_1014.concatSelector:_1014.hasOwnProperty("default")?_1014.default:_1014}()
+var eventbus=function(){var _1015=require('./eventbus.js');return _1015.hasOwnProperty("eventbus")?_1015.eventbus:_1015.hasOwnProperty("default")?_1015.default:_1015}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -220,10 +220,18 @@ var global = {
     }
   }
   More.prototype.preExtend = function(node) {
-
+    ignore(node, this.ignores, this.index);
+    var i = this.index;
+    var o = {
+      start: this.res.length
+    };
+    while(this.ignores[++i]) {}
+    var s = join(node.leaf(1), this.ignores, i);
+    o.selectors = s.split(',');
+    this.extendStack.push(o);
   }
   More.prototype.extend = function() {
-
+    console.log(this.extendStack)
   }
   More.prototype.ast = function() {
     return this.node;

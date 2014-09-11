@@ -134,4 +134,10 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{color:#000;}html p{margin:0}html{color:#001;}html div{padding:0}html{color:#002;}');
   });
+  it('&', function() {
+    var more = new More();
+    var s = 'a{color:#000;&:hover{}}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{color:#000;}a:hover{}');
+  });
 });
