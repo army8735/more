@@ -140,7 +140,7 @@ class More {
           self.styleset(true, node);
           break;
         case Node.BLOCK:
-          self.block(node);
+          self.block(true, node);
           break;
         case Node.FNC:
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
@@ -157,6 +157,9 @@ class More {
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(false, node);
+          break;
+        case Node.BLOCK:
+          self.block(false, node);
           break;
       }
     }
@@ -198,25 +201,32 @@ class More {
       }
     }
   }
-  block(node) {
+  block(start, node) {
     var self = this;
-    var last = node.last();
-    var prev = last.prev();
-    //当多级block的最后一个是styleset或}，会造成空白样式
-    if(prev.name() == Node.STYLESET) {
-      eventbus.on(last.nid(), function() {
-        ignore(last, self.ignores, self.index);
-      });
-    }
-    var first = node.leaf(1);
-    if(first.name() == Node.STYLESET) {
-      eventbus.on(first.prev().nid(), function() {
-        ignore(first.prev(), self.ignores, self.index);
-      });
+    if(start) {
+      var last = node.last();
+      var prev = last.prev();
+      //当多级block的最后一个是styleset或}，会造成空白样式
+      if(prev.name() == Node.STYLESET) {
+        eventbus.on(last.nid(), function() {
+          ignore(last, self.ignores, self.index);
+        });
+      }
+      var first = node.leaf(1);
+      if(first.name() == Node.STYLESET) {
+        eventbus.on(first.prev().nid(), function() {
+          ignore(first.prev(), self.ignores, self.index);
+        });
+      }
+      else {
+        var s = concatSelector(this.selectorStack);
+        this.res += s;
+        this.styleHash[s] = this.styleHash[s] || [];
+        this.styleHash[s].push(this.res.length);
+      }
     }
     else {
-      var s = concatSelector(this.selectorStack);
-      this.res += s;
+      //
     }
   }
   preExtend(node) {

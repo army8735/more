@@ -1,14 +1,14 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _1007=require('./preVar');return _1007.hasOwnProperty("preVar")?_1007.preVar:_1007.hasOwnProperty("default")?_1007.default:_1007}()
-var getVar=function(){var _1008=require('./getVar');return _1008.hasOwnProperty("getVar")?_1008.getVar:_1008.hasOwnProperty("default")?_1008.default:_1008}()
-var preFn=function(){var _1009=require('./preFn');return _1009.hasOwnProperty("preFn")?_1009.preFn:_1009.hasOwnProperty("default")?_1009.default:_1009}()
-var getFn=function(){var _1010=require('./getFn');return _1010.hasOwnProperty("getFn")?_1010.getFn:_1010.hasOwnProperty("default")?_1010.default:_1010}()
-var ignore=function(){var _1011=require('./ignore');return _1011.hasOwnProperty("ignore")?_1011.ignore:_1011.hasOwnProperty("default")?_1011.default:_1011}()
-var clone=function(){var _1012=require('./clone');return _1012.hasOwnProperty("clone")?_1012.clone:_1012.hasOwnProperty("default")?_1012.default:_1012}()
-var join=function(){var _1013=require('./join');return _1013.hasOwnProperty("join")?_1013.join:_1013.hasOwnProperty("default")?_1013.default:_1013}()
-var concatSelector=function(){var _1014=require('./concatSelector');return _1014.hasOwnProperty("concatSelector")?_1014.concatSelector:_1014.hasOwnProperty("default")?_1014.default:_1014}()
-var eventbus=function(){var _1015=require('./eventbus.js');return _1015.hasOwnProperty("eventbus")?_1015.eventbus:_1015.hasOwnProperty("default")?_1015.default:_1015}()
+var preVar=function(){var _1016=require('./preVar');return _1016.hasOwnProperty("preVar")?_1016.preVar:_1016.hasOwnProperty("default")?_1016.default:_1016}()
+var getVar=function(){var _1017=require('./getVar');return _1017.hasOwnProperty("getVar")?_1017.getVar:_1017.hasOwnProperty("default")?_1017.default:_1017}()
+var preFn=function(){var _1018=require('./preFn');return _1018.hasOwnProperty("preFn")?_1018.preFn:_1018.hasOwnProperty("default")?_1018.default:_1018}()
+var getFn=function(){var _1019=require('./getFn');return _1019.hasOwnProperty("getFn")?_1019.getFn:_1019.hasOwnProperty("default")?_1019.default:_1019}()
+var ignore=function(){var _1020=require('./ignore');return _1020.hasOwnProperty("ignore")?_1020.ignore:_1020.hasOwnProperty("default")?_1020.default:_1020}()
+var clone=function(){var _1021=require('./clone');return _1021.hasOwnProperty("clone")?_1021.clone:_1021.hasOwnProperty("default")?_1021.default:_1021}()
+var join=function(){var _1022=require('./join');return _1022.hasOwnProperty("join")?_1022.join:_1022.hasOwnProperty("default")?_1022.default:_1022}()
+var concatSelector=function(){var _1023=require('./concatSelector');return _1023.hasOwnProperty("concatSelector")?_1023.concatSelector:_1023.hasOwnProperty("default")?_1023.default:_1023}()
+var eventbus=function(){var _1024=require('./eventbus.js');return _1024.hasOwnProperty("eventbus")?_1024.eventbus:_1024.hasOwnProperty("default")?_1024.default:_1024}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -140,7 +140,7 @@ var global = {
           self.styleset(true, node);
           break;
         case Node.BLOCK:
-          self.block(node);
+          self.block(true, node);
           break;
         case Node.FNC:
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
@@ -157,6 +157,9 @@ var global = {
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(false, node);
+          break;
+        case Node.BLOCK:
+          self.block(false, node);
           break;
       }
     }
@@ -198,25 +201,27 @@ var global = {
       }
     }
   }
-  More.prototype.block = function(node) {
+  More.prototype.block = function(start, node) {
     var self = this;
-    var last = node.last();
-    var prev = last.prev();
-    //当多级block的最后一个是styleset或}，会造成空白样式
-    if(prev.name() == Node.STYLESET) {
-      eventbus.on(last.nid(), function() {
-        ignore(last, self.ignores, self.index);
-      });
-    }
-    var first = node.leaf(1);
-    if(first.name() == Node.STYLESET) {
-      eventbus.on(first.prev().nid(), function() {
-        ignore(first.prev(), self.ignores, self.index);
-      });
-    }
-    else {
-      var s = concatSelector(this.selectorStack);
-      this.res += s;
+    if(start) {
+      var last = node.last();
+      var prev = last.prev();
+      //当多级block的最后一个是styleset或}，会造成空白样式
+      if(prev.name() == Node.STYLESET) {
+        eventbus.on(last.nid(), function() {
+          ignore(last, self.ignores, self.index);
+        });
+      }
+      var first = node.leaf(1);
+      if(first.name() == Node.STYLESET) {
+        eventbus.on(first.prev().nid(), function() {
+          ignore(first.prev(), self.ignores, self.index);
+        });
+      }
+      else {
+        var s = concatSelector(this.selectorStack);
+        this.res += s;
+      }
     }
   }
   More.prototype.preExtend = function(node) {
