@@ -8,6 +8,7 @@ import ignore from './ignore';
 import clone from './clone';
 import join from './join';
 import concatSelector from './concatSelector';
+import eventbus from './eventbus.js';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -96,6 +97,7 @@ class More {
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
     if(isToken) {
       if(!isVirtual) {
+        eventbus.emit(node.nid());
         var token = node.token();
         //标识下一个string是否自动拆分
         if(token.content() == '~') {
@@ -193,8 +195,10 @@ class More {
       var next = node.next();
       this.selectorStack.pop();
       if(this.selectorStack.length) {
-        //当多级styleset结束时下个还是styleset或}，会造成空白样式
-        if(next && next.name() == Node.STYLESET) {
+        //当多级styleset结束时下个是styleset或}，会造成空白样式
+        if(next && (next.name() == Node.STYLESET
+          || next.name() == Node.TOKEN
+            && next.token().content() == '}')) {
           //
         }
         else {
@@ -204,7 +208,16 @@ class More {
     }
   }
   block(start, node) {
+    var self = this;
     if(start) {
+      var last = node.last();
+      var prev = last.prev();
+      //当多级block的最后一个是styleset或}，会造成空白样式
+      if(prev.name() == Node.STYLESET) {
+        eventbus.on(last.nid(), function() {console.log(1)
+          ignore(last, self.ignores, self.index);
+        });
+      }
       var s = concatSelector(this.selectorStack);
       this.res += s;
     }
