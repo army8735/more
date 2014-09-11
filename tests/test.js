@@ -102,6 +102,36 @@ describe('simple test', function() {
     var more = new More();
     var s = 'html,body{div,p{padding:0;a{color:#000}span{color:#fff}}margin:0;}';
     var res = more.parse(s);
-    expect(res).to.eql('html,body{}html div,html p,body div,body p{padding:0;}html div a,html p a,body div a,body p a{color:#000}html div span,html p span,body div span,body p span{color:#fff}html,body{margin:0;}');
+    expect(res).to.eql('html div,html p,body div,body p{padding:0;}html div a,html p a,body div a,body p a{color:#000}html div span,html p span,body div span,body p span{color:#fff}html,body{margin:0;}');
+  });
+  it('level 3', function() {
+    var more = new More();
+    var s = 'html{}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{}');
+  });
+  it('level 4', function() {
+    var more = new More();
+    var s = 'html{p{}}';
+    var res = more.parse(s);
+    expect(res).to.eql('html p{}');
+  });
+  it('level 5', function() {
+    var more = new More();
+    var s = 'html{p{margin:0}}';
+    var res = more.parse(s);
+    expect(res).to.eql('html p{margin:0}');
+  });
+  it('level 6', function() {
+    var more = new More();
+    var s = 'html{p{margin:0}div{padding:0}}';
+    var res = more.parse(s);
+    expect(res).to.eql('html p{margin:0}html div{padding:0}');
+  });
+  it('level 7', function() {
+    var more = new More();
+    var s = 'html{color:#000;p{margin:0}color:#001;div{padding:0}color:#002;}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{color:#000;}html p{margin:0}html{color:#001;}html div{padding:0}html{color:#002;}');
   });
 });

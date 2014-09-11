@@ -176,11 +176,15 @@ var global = {
   }
   More.prototype.styleset = function(start, node) {
     if(start) {
-      var prev = node.prev();
+      //忽略掉所有选择器，由block之前生成
       ignore(node.first(), this.ignores, this.index);
       //二级以上选择器样式集需先结束
       if(this.selectorStack.length) {
-        if(prev && prev.name() == Node.STYLESET) {
+        var prev = node.prev();
+        //前一个是styleset或者{时，会造成空样式
+        if(prev.name() == Node.STYLESET
+          || prev.name() == Node.TOKEN
+            && prev.token().content() == '{') {
           //
         }
         else {
@@ -192,9 +196,9 @@ var global = {
       this.selectorStack.push(s.split(','));
     }
     else {
-      var next = node.next();
       this.selectorStack.pop();
       if(this.selectorStack.length) {
+        var next = node.next();
         //当多级styleset结束时下个是styleset或}，会造成空白样式
         if(next && (next.name() == Node.STYLESET
           || next.name() == Node.TOKEN
@@ -214,12 +218,20 @@ var global = {
       var prev = last.prev();
       //当多级block的最后一个是styleset或}，会造成空白样式
       if(prev.name() == Node.STYLESET) {
-        eventbus.on(last.nid(), function() {console.log(1)
+        eventbus.on(last.nid(), function() {
           ignore(last, self.ignores, self.index);
         });
       }
-      var s = concatSelector(this.selectorStack);
-      this.res += s;
+      var first = node.leaf(1);
+      if(first.name() == Node.STYLESET) {
+        eventbus.on(first.prev().nid(), function() {
+          ignore(first.prev(), self.ignores, self.index);
+        });
+      }
+      else {
+        var s = concatSelector(this.selectorStack);
+        this.res += s;
+      }
     }
   }
   More.prototype.extend = function(node) {
