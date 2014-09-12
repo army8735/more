@@ -42,7 +42,7 @@ var Node = homunculus.getClass('node', 'css');
       }
     });
     self.recursion(self.node, newVarHash, globalVar);
-    return self.res.replace(/^{/, '').replace(/}$/, '').replace(/\s+/g, ' ');
+    return self.res.replace(/^{/, '').replace(/}$/, '');
   }
   Fn.prototype.recursion = function(node, newVarHash, globalVar) {
     var self = this;

@@ -134,6 +134,12 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{color:#000;}html p{margin:0}html{color:#001;}html div{padding:0}html{color:#002;}');
   });
+  it('ignore single level', function() {
+    var more = new More();
+    var s = 'html, p{}';
+    var res = more.parse(s);
+    expect(res).to.eql('html, p{}');
+  });
   it('&', function() {
     var more = new More();
     var s = 'a{color:#000;&:hover{}}';

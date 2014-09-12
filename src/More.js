@@ -9,6 +9,7 @@ import clone from './clone';
 import join from './join';
 import concatSelector from './concatSelector';
 import eventbus from './eventbus.js';
+import checkLevel from './checkLevel.js';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -166,10 +167,14 @@ class More {
   }
   styleset(start, node) {
     if(start) {
-      //忽略掉所有选择器，由block之前生成
-      ignore(node.first(), this.ignores, this.index);
+      var block = node.leaf(1);
+      block.hasLevel = checkLevel(block);
+      if(block.hasLevel || this.selectorStack.length) {
+        ignore(node.first(), this.ignores, this.index);
+      }
       //二级以上选择器样式集需先结束
       if(this.selectorStack.length) {
+        //忽略掉所有二级以上选择器，由block之前生成
         var prev = node.prev();
         //前一个是styleset或者{时，会造成空样式
         if(prev.name() == Node.STYLESET
@@ -220,7 +225,9 @@ class More {
       }
       else {
         var s = concatSelector(this.selectorStack);
-        this.res += s;
+        if(node.hasLevel || this.selectorStack.length > 1) {
+          this.res += s;
+        }
         this.styleHash[s] = this.styleHash[s] || [];
         this.styleHash[s].push(this.res.length);
       }

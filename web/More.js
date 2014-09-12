@@ -9,6 +9,7 @@ var clone=function(){var _9=require('./clone');return _9.hasOwnProperty("clone")
 var join=function(){var _10=require('./join');return _10.hasOwnProperty("join")?_10.join:_10.hasOwnProperty("default")?_10.default:_10}()
 var concatSelector=function(){var _11=require('./concatSelector');return _11.hasOwnProperty("concatSelector")?_11.concatSelector:_11.hasOwnProperty("default")?_11.default:_11}()
 var eventbus=function(){var _12=require('./eventbus.js');return _12.hasOwnProperty("eventbus")?_12.eventbus:_12.hasOwnProperty("default")?_12.default:_12}()
+var checkLevel=function(){var _13=require('./checkLevel.js');return _13.hasOwnProperty("checkLevel")?_13.checkLevel:_13.hasOwnProperty("default")?_13.default:_13}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -166,10 +167,14 @@ var global = {
   }
   More.prototype.styleset = function(start, node) {
     if(start) {
-      //忽略掉所有选择器，由block之前生成
-      ignore(node.first(), this.ignores, this.index);
+      var block = node.leaf(1);
+      block.hasLevel = checkLevel(block);
+      if(block.hasLevel || this.selectorStack.length) {
+        ignore(node.first(), this.ignores, this.index);
+      }
       //二级以上选择器样式集需先结束
       if(this.selectorStack.length) {
+        //忽略掉所有二级以上选择器，由block之前生成
         var prev = node.prev();
         //前一个是styleset或者{时，会造成空样式
         if(prev.name() == Node.STYLESET
@@ -220,7 +225,9 @@ var global = {
       }
       else {
         var s = concatSelector(this.selectorStack);
-        this.res += s;
+        if(node.hasLevel || this.selectorStack.length > 1) {
+          this.res += s;
+        }
         this.styleHash[s] = this.styleHash[s] || [];
         this.styleHash[s].push(this.res.length);
       }

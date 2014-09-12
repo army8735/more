@@ -51,5 +51,5 @@ exports.default=function(token, varHash, globalVar) {
       }
     }
   }
-  return s;
+  return s.replace(/\n/g, '');
 }});
