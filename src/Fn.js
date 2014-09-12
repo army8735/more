@@ -42,7 +42,7 @@ class Fn {
       }
     });
     self.recursion(self.node, newVarHash, globalVar);
-    return self.res.replace(/^{/, '').replace(/}$/, '');
+    return self.res.replace(/^{/, '').replace(/}$/, '').replace(/\s+/g, ' ');
   }
   recursion(node, newVarHash, globalVar) {
     var self = this;

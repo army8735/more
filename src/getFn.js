@@ -11,7 +11,7 @@ export default function(node, ignores, index, fnHash, globalFn, varHash, globanV
   var fn = fnHash[name] || globalFn[name];
   if(fn) {
     ignore(node, ignores, index);
-    var res = fn.compile(node.leaf(1), varHash, globanVar);
+    var res = fn.compile(node.leaf(1), varHash, globanVar).trim().replace(/;$/, '');
     var next = node.next();
     //fnc之后没有;号，除非跟着}结束，否则加上
     if(!next

@@ -1,14 +1,14 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _1016=require('./preVar');return _1016.hasOwnProperty("preVar")?_1016.preVar:_1016.hasOwnProperty("default")?_1016.default:_1016}()
-var getVar=function(){var _1017=require('./getVar');return _1017.hasOwnProperty("getVar")?_1017.getVar:_1017.hasOwnProperty("default")?_1017.default:_1017}()
-var preFn=function(){var _1018=require('./preFn');return _1018.hasOwnProperty("preFn")?_1018.preFn:_1018.hasOwnProperty("default")?_1018.default:_1018}()
-var getFn=function(){var _1019=require('./getFn');return _1019.hasOwnProperty("getFn")?_1019.getFn:_1019.hasOwnProperty("default")?_1019.default:_1019}()
-var ignore=function(){var _1020=require('./ignore');return _1020.hasOwnProperty("ignore")?_1020.ignore:_1020.hasOwnProperty("default")?_1020.default:_1020}()
-var clone=function(){var _1021=require('./clone');return _1021.hasOwnProperty("clone")?_1021.clone:_1021.hasOwnProperty("default")?_1021.default:_1021}()
-var join=function(){var _1022=require('./join');return _1022.hasOwnProperty("join")?_1022.join:_1022.hasOwnProperty("default")?_1022.default:_1022}()
-var concatSelector=function(){var _1023=require('./concatSelector');return _1023.hasOwnProperty("concatSelector")?_1023.concatSelector:_1023.hasOwnProperty("default")?_1023.default:_1023}()
-var eventbus=function(){var _1024=require('./eventbus.js');return _1024.hasOwnProperty("eventbus")?_1024.eventbus:_1024.hasOwnProperty("default")?_1024.default:_1024}()
+var preVar=function(){var _4=require('./preVar');return _4.hasOwnProperty("preVar")?_4.preVar:_4.hasOwnProperty("default")?_4.default:_4}()
+var getVar=function(){var _5=require('./getVar');return _5.hasOwnProperty("getVar")?_5.getVar:_5.hasOwnProperty("default")?_5.default:_5}()
+var preFn=function(){var _6=require('./preFn');return _6.hasOwnProperty("preFn")?_6.preFn:_6.hasOwnProperty("default")?_6.default:_6}()
+var getFn=function(){var _7=require('./getFn');return _7.hasOwnProperty("getFn")?_7.getFn:_7.hasOwnProperty("default")?_7.default:_7}()
+var ignore=function(){var _8=require('./ignore');return _8.hasOwnProperty("ignore")?_8.ignore:_8.hasOwnProperty("default")?_8.default:_8}()
+var clone=function(){var _9=require('./clone');return _9.hasOwnProperty("clone")?_9.clone:_9.hasOwnProperty("default")?_9.default:_9}()
+var join=function(){var _10=require('./join');return _10.hasOwnProperty("join")?_10.join:_10.hasOwnProperty("default")?_10.default:_10}()
+var concatSelector=function(){var _11=require('./concatSelector');return _11.hasOwnProperty("concatSelector")?_11.concatSelector:_11.hasOwnProperty("default")?_11.default:_11}()
+var eventbus=function(){var _12=require('./eventbus.js');return _12.hasOwnProperty("eventbus")?_12.eventbus:_12.hasOwnProperty("default")?_12.default:_12}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -221,7 +221,12 @@ var global = {
       else {
         var s = concatSelector(this.selectorStack);
         this.res += s;
+        this.styleHash[s] = this.styleHash[s] || [];
+        this.styleHash[s].push(this.res.length);
       }
+    }
+    else {
+      //
     }
   }
   More.prototype.preExtend = function(node) {
@@ -236,7 +241,7 @@ var global = {
     this.extendStack.push(o);
   }
   More.prototype.extend = function() {
-    console.log(this.extendStack)
+    //console.log(this.extendStack)
   }
   More.prototype.ast = function() {
     return this.node;

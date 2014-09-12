@@ -241,7 +241,7 @@ class More {
     this.extendStack.push(o);
   }
   extend() {
-    console.log(this.extendStack)
+    //console.log(this.extendStack)
   }
   ast() {
     return this.node;
