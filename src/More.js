@@ -141,13 +141,13 @@ class More {
           self.styleset(true, node);
           break;
         case Node.BLOCK:
-          self.block(true, node);
+          self.block(node);
           break;
         case Node.FNC:
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
           break;
         case Node.EXTEND:
-          self.preExtend(node);
+          self.preExtend(true, node);
           break;
       }
       //递归子节点
@@ -159,8 +159,8 @@ class More {
         case Node.STYLESET:
           self.styleset(false, node);
           break;
-        case Node.BLOCK:
-          self.block(false, node);
+        case Node.EXTEND:
+          self.preExtend(false, node);
           break;
       }
     }
@@ -206,49 +206,50 @@ class More {
       }
     }
   }
-  block(start, node) {
+  block(node) {
     var self = this;
-    if(start) {
-      var last = node.last();
-      var prev = last.prev();
-      //当多级block的最后一个是styleset或}，会造成空白样式
-      if(prev.name() == Node.STYLESET) {
-        eventbus.on(last.nid(), function() {
-          ignore(last, self.ignores, self.index);
-        });
-      }
-      var first = node.leaf(1);
-      if(first.name() == Node.STYLESET) {
-        eventbus.on(first.prev().nid(), function() {
-          ignore(first.prev(), self.ignores, self.index);
-        });
-      }
-      else {
-        var s = concatSelector(this.selectorStack);
-        if(node.hasLevel || this.selectorStack.length > 1) {
-          this.res += s;
-        }
-        this.styleHash[s] = this.styleHash[s] || [];
-        this.styleHash[s].push(this.res.length);
-      }
+    var last = node.last();
+    var prev = last.prev();
+    //当多级block的最后一个是styleset或}，会造成空白样式
+    if(prev.name() == Node.STYLESET) {
+      eventbus.on(last.nid(), function() {
+        ignore(last, self.ignores, self.index);
+      });
+    }
+    var first = node.leaf(1);
+    if(first.name() == Node.STYLESET) {
+      eventbus.on(first.prev().nid(), function() {
+        ignore(first.prev(), self.ignores, self.index);
+      });
     }
     else {
-      //
+      var s = concatSelector(this.selectorStack);
+      if(node.hasLevel || this.selectorStack.length > 1) {
+        this.res += s;
+      }
+      this.styleHash[s] = this.styleHash[s] || [];
+      this.styleHash[s].push(this.res.length);
     }
   }
-  preExtend(node) {
-    ignore(node, this.ignores, this.index);
-    var i = this.index;
-    var o = {
-      start: this.res.length
-    };
-    while(this.ignores[++i]) {}
-    var s = join(node.leaf(1), this.ignores, i);
-    o.selectors = s.split(',');
-    this.extendStack.push(o);
+  preExtend(start, node) {
+    if(start) {
+      ignore(node, this.ignores, this.index);
+      var i = this.index;
+      var o = {
+        start: this.res.length
+      };
+      while(this.ignores[++i]) {
+      }
+      var s = join(node.leaf(1), this.ignores, i);
+      o.selectors = s.split(',');
+      this.extendStack.push(o);
+    }
+    else {
+      this.extendStack[this.extendStack.length - 1].end = this.res.length;
+    }
   }
   extend() {
-    //console.log(this.extendStack)
+//    console.log(this.extendStack)
   }
   ast() {
     return this.node;
