@@ -17,12 +17,12 @@ describe('api', function() {
     var more = new More();
     expect(more.ast).to.be.a(Function);
   });
-  it('#global', function() {
+  it('#config', function() {
     var more = new More();
-    expect(more.global).to.be.a(Function);
+    expect(more.config).to.be.a(Function);
   });
-  it('More#global', function() {
-    expect(More.global).to.be.a(Function);
+  it('More#config', function() {
+    expect(More.config).to.be.a(Function);
   });
 });
 describe('simple test', function() {

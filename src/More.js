@@ -280,10 +280,10 @@ class More {
   imports() {
     return this.importStatck;
   }
-  global(data = {}) {
-    More.global(data);
+  config(data = {}) {
+    More.config(data);
   }
-  static global(data = {}) {
+  static config(data = {}) {
     Object.keys(data).forEach(function(k) {
       if(k == 'suffix') {
         data[k] = data[k].replace('.', '');
