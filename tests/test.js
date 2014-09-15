@@ -146,4 +146,10 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{color:#000;}a:hover{}');
   });
+  it('@import', function() {
+    var more = new More();
+    var s = '$v = "v";@import "a";@import url("b");@import url(c);@import url($v);';
+    var res = more.parse(s);
+    expect(res).to.eql('@import "a.css";@import url("b.css");@import url(c.css);@import url("v.css");');
+  });
 });

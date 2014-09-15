@@ -17,7 +17,8 @@ var Node = homunculus.getClass('node', 'css');
 var global = {
   var: {},
   fn: {},
-  style: {}
+  style: {},
+  suffix: 'css'
 };
 
 class More {
@@ -123,7 +124,14 @@ class More {
             self.autoSplit = false;
           }
           else {
-            self.res += getVar(token, self.varHash, global.var);
+            var str = getVar(token, self.varHash, global.var);
+            if(token.import) {
+              if(!/\.\w+['"]?$/.test(str)) {
+                str = str.replace(/(['"]?)$/, '.css$1');
+              }
+              self.importStack.push(str);
+            }
+            self.res += str;
           }
         }
         while(self.ignores[++self.index]) {
@@ -148,6 +156,9 @@ class More {
           break;
         case Node.EXTEND:
           self.preExtend(true, node);
+          break;
+        case Node.IMPORT:
+          self.impt(node);
           break;
       }
       //递归子节点
@@ -251,6 +262,15 @@ class More {
   extend() {
 //    console.log(this.extendStack)
   }
+  impt(node) {
+    var url = node.leaf(1);
+    if(url.size() == 1) {
+      url.first().token().import = true;
+    }
+    else {
+      url.leaf(2).token().import = true;
+    }
+  }
   ast() {
     return this.node;
   }
@@ -264,7 +284,12 @@ class More {
     More.global(data);
   }
   static global(data = {}) {
-    global = data;
+    Object.keys(data).forEach(function(k) {
+      if(k == 'suffix') {
+        data[k] = data[k].replace('.', '');
+      }
+      global[k] = data[k];
+    });
   }
 }
 
