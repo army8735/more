@@ -22,7 +22,7 @@ export default function(token, varHash, globalVar) {
           var j = s.indexOf('}', i + 3);
           if(j > -1) {
             c = s.slice(i + 2, j);
-            var vara = varHash[c] || globalVar[c] || '${' + c + '}';
+            var vara = varHash[c] || globalVar[c];
             if(vara) {
               s = s.slice(0, i)
                 + (type == Token.STRING && /^['"]/.test(s)

@@ -50,6 +50,24 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('body{ margin: $a}');
   });
+  it('${var}', function() {
+    var more = new More();
+    var s = '$a:1;body{ margin: ${a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{ margin: 1}');
+  });
+  it('undefined ${var}', function() {
+    var more = new More();
+    var s = 'body{ margin: ${a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{ margin: ${a}}');
+  });
+  it('escape $', function() {
+    var more = new More();
+    var s = 'body{ margin: "\\$a"}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{ margin: "\\$a"}');
+  });
   it('~ autoSplit', function() {
     var more = new More();
     var s = 'body{font-family:~"Arail, verdana"}';
