@@ -1,6 +1,6 @@
 {
   "name": "more-css",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "a css pre-compiler & agressive compressor",
   "maintainers": [
     {
@@ -27,6 +27,13 @@
       "url": "https://github.com/addyosmani/es6-module-loader/blob/master/LICENSE-MIT"
     }
   ],
+  "config": {
+    "blanket": {
+      "pattern": [
+        "more/src"
+      ]
+    }
+  },
   "dependencies": {
     "clean-css": "^2.2.13",
     "homunculus": "^0.5.3"

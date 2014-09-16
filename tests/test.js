@@ -188,4 +188,10 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:0}body{}div{}');
   });
+  it('@extend level', function() {
+    var more = new More();
+    var s = 'html{margin:0;body{@extend html}padding:1}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;}html{padding:1}');
+  });
 });
