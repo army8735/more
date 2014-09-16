@@ -206,11 +206,7 @@ class More {
       self.selectorStack.push(s.split(','));
     }
     else {
-      var next = node.next();
-      if(next && next.name() == Node.STYLESET) {
-        //
-      }
-      else if(node.last().last().prev().name() != Node.STYLESET) {
+      if(node.last().last().prev().name() != Node.STYLESET) {
         var s = concatSelector(self.selectorStack);
         var temp = self.res.lastIndexOf('}');
         normalize(s).split(',').forEach(function(se) {
@@ -221,6 +217,7 @@ class More {
       self.selectorStack.pop();
       if(self.selectorStack.length) {
         var s = concatSelector(self.selectorStack);
+        var next = node.next();
         //当多级styleset结束时下个是styleset或}，会造成空白样式
         if(next && (next.name() == Node.STYLESET
           || next.name() == Node.TOKEN
@@ -272,12 +269,16 @@ class More {
     };
     while(this.ignores[++i]) {
     }
-    var s = join(node.leaf(1), this.ignores, i);
+    var s = normalize(join(node.leaf(1), this.ignores, i));
     o.selectors = s.split(',');
     this.extendStack.push(o);
   }
   extend() {
-    console.log(this.extendStack)
+    console.log(this.extendStack);
+    var temp = 0;
+    this.extendStack.forEach(function(o) {
+      //
+    });
   }
   saveStyle() {
     var self = this;
@@ -285,7 +286,11 @@ class More {
       var arr = self.styleHash[key];
       self.styleHash[key] = '';
       for(var i = 0; i < arr.length; i += 2) {
-        self.styleHash[key] += self.res.slice(arr[i], arr[i+1]).trim().replace(/\n/g, '');
+        var s = self.res.slice(arr[i], arr[i+1]).trim().replace(/\n/g, '');
+        if(s.length && s.charAt(s.length - 1) != ';') {
+          s += ';';
+        }
+        self.styleHash[key] += s;
       }
     });
     console.log(this.styleHash);

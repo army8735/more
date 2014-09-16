@@ -7,5 +7,6 @@ define(function(require, exports, module){exports.default=function(s) {
     .replace(/\s*\]\s*/g, ']')
     .replace(/\s*\(\s*/g, '(')
     .replace(/\s*\)\s*/g, ')')
+    .replace(/\s*,\s*/g, ',')
     .replace(/\s*(~=|\^=|\$=|\*=|\|=|=)\s*/g, '$1');
 };});

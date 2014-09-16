@@ -1,16 +1,16 @@
 var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _4=require('./preVar');return _4.hasOwnProperty("preVar")?_4.preVar:_4.hasOwnProperty("default")?_4.default:_4}()
-var getVar=function(){var _5=require('./getVar');return _5.hasOwnProperty("getVar")?_5.getVar:_5.hasOwnProperty("default")?_5.default:_5}()
-var preFn=function(){var _6=require('./preFn');return _6.hasOwnProperty("preFn")?_6.preFn:_6.hasOwnProperty("default")?_6.default:_6}()
-var getFn=function(){var _7=require('./getFn');return _7.hasOwnProperty("getFn")?_7.getFn:_7.hasOwnProperty("default")?_7.default:_7}()
-var ignore=function(){var _8=require('./ignore');return _8.hasOwnProperty("ignore")?_8.ignore:_8.hasOwnProperty("default")?_8.default:_8}()
-var clone=function(){var _9=require('./clone');return _9.hasOwnProperty("clone")?_9.clone:_9.hasOwnProperty("default")?_9.default:_9}()
-var join=function(){var _10=require('./join');return _10.hasOwnProperty("join")?_10.join:_10.hasOwnProperty("default")?_10.default:_10}()
-var concatSelector=function(){var _11=require('./concatSelector');return _11.hasOwnProperty("concatSelector")?_11.concatSelector:_11.hasOwnProperty("default")?_11.default:_11}()
-var eventbus=function(){var _12=require('./eventbus.js');return _12.hasOwnProperty("eventbus")?_12.eventbus:_12.hasOwnProperty("default")?_12.default:_12}()
-var checkLevel=function(){var _13=require('./checkLevel.js');return _13.hasOwnProperty("checkLevel")?_13.checkLevel:_13.hasOwnProperty("default")?_13.default:_13}()
-var normalize=function(){var _14=require('./normalize.js');return _14.hasOwnProperty("normalize")?_14.normalize:_14.hasOwnProperty("default")?_14.default:_14}()
+var preVar=function(){var _1111=require('./preVar');return _1111.hasOwnProperty("preVar")?_1111.preVar:_1111.hasOwnProperty("default")?_1111.default:_1111}()
+var getVar=function(){var _1112=require('./getVar');return _1112.hasOwnProperty("getVar")?_1112.getVar:_1112.hasOwnProperty("default")?_1112.default:_1112}()
+var preFn=function(){var _1113=require('./preFn');return _1113.hasOwnProperty("preFn")?_1113.preFn:_1113.hasOwnProperty("default")?_1113.default:_1113}()
+var getFn=function(){var _1114=require('./getFn');return _1114.hasOwnProperty("getFn")?_1114.getFn:_1114.hasOwnProperty("default")?_1114.default:_1114}()
+var ignore=function(){var _1115=require('./ignore');return _1115.hasOwnProperty("ignore")?_1115.ignore:_1115.hasOwnProperty("default")?_1115.default:_1115}()
+var clone=function(){var _1116=require('./clone');return _1116.hasOwnProperty("clone")?_1116.clone:_1116.hasOwnProperty("default")?_1116.default:_1116}()
+var join=function(){var _1117=require('./join');return _1117.hasOwnProperty("join")?_1117.join:_1117.hasOwnProperty("default")?_1117.default:_1117}()
+var concatSelector=function(){var _1118=require('./concatSelector');return _1118.hasOwnProperty("concatSelector")?_1118.concatSelector:_1118.hasOwnProperty("default")?_1118.default:_1118}()
+var eventbus=function(){var _1119=require('./eventbus.js');return _1119.hasOwnProperty("eventbus")?_1119.eventbus:_1119.hasOwnProperty("default")?_1119.default:_1119}()
+var checkLevel=function(){var _1120=require('./checkLevel.js');return _1120.hasOwnProperty("checkLevel")?_1120.checkLevel:_1120.hasOwnProperty("default")?_1120.default:_1120}()
+var normalize=function(){var _1121=require('./normalize.js');return _1121.hasOwnProperty("normalize")?_1121.normalize:_1121.hasOwnProperty("default")?_1121.default:_1121}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -206,11 +206,7 @@ var global = {
       self.selectorStack.push(s.split(','));
     }
     else {
-      var next = node.next();
-      if(next && next.name() == Node.STYLESET) {
-        //
-      }
-      else if(node.last().last().prev().name() != Node.STYLESET) {
+      if(node.last().last().prev().name() != Node.STYLESET) {
         var s = concatSelector(self.selectorStack);
         var temp = self.res.lastIndexOf('}');
         normalize(s).split(',').forEach(function(se) {
@@ -221,6 +217,7 @@ var global = {
       self.selectorStack.pop();
       if(self.selectorStack.length) {
         var s = concatSelector(self.selectorStack);
+        var next = node.next();
         //当多级styleset结束时下个是styleset或}，会造成空白样式
         if(next && (next.name() == Node.STYLESET
           || next.name() == Node.TOKEN
@@ -272,12 +269,16 @@ var global = {
     };
     while(this.ignores[++i]) {
     }
-    var s = join(node.leaf(1), this.ignores, i);
+    var s = normalize(join(node.leaf(1), this.ignores, i));
     o.selectors = s.split(',');
     this.extendStack.push(o);
   }
   More.prototype.extend = function() {
-    console.log(this.extendStack)
+    console.log(this.extendStack);
+    var temp = 0;
+    this.extendStack.forEach(function(o) {
+      //
+    });
   }
   More.prototype.saveStyle = function() {
     var self = this;
@@ -285,7 +286,11 @@ var global = {
       var arr = self.styleHash[key];
       self.styleHash[key] = '';
       for(var i = 0; i < arr.length; i += 2) {
-        self.styleHash[key] += self.res.slice(arr[i], arr[i+1]).trim().replace(/\n/g, '');
+        var s = self.res.slice(arr[i], arr[i+1]).trim().replace(/\n/g, '');
+        if(s.length && s.charAt(s.length - 1) != ';') {
+          s += ';';
+        }
+        self.styleHash[key] += s;
       }
     });
     console.log(this.styleHash);
