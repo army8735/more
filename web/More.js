@@ -10,6 +10,7 @@ var join=function(){var _10=require('./join');return _10.hasOwnProperty("join")?
 var concatSelector=function(){var _11=require('./concatSelector');return _11.hasOwnProperty("concatSelector")?_11.concatSelector:_11.hasOwnProperty("default")?_11.default:_11}()
 var eventbus=function(){var _12=require('./eventbus.js');return _12.hasOwnProperty("eventbus")?_12.eventbus:_12.hasOwnProperty("default")?_12.default:_12}()
 var checkLevel=function(){var _13=require('./checkLevel.js');return _13.hasOwnProperty("checkLevel")?_13.checkLevel:_13.hasOwnProperty("default")?_13.default:_13}()
+var normalize=function(){var _14=require('./normalize.js');return _14.hasOwnProperty("normalize")?_14.normalize:_14.hasOwnProperty("default")?_14.default:_14}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -66,9 +67,10 @@ var global = {
       });
     }
 
-    this.varHash = preVar(this.node, this.ignores, this.preIndex);
-    this.fnHash = preFn(this.node, this.ignores, this.preIndex);
+    this.varHash = preVar(this.node, this.ignores, this.index);
+    this.fnHash = preFn(this.node, this.ignores, this.index);
     this.join(this.node);
+    this.saveStyle();
     this.extend();
     return this.res;
   }
@@ -84,7 +86,6 @@ var global = {
       }
       this.index++;
     }
-    this.preIndex = this.index;
     this.autoSplit = false;
     this.selectorStack = [];
     this.importStack = [];
@@ -155,7 +156,7 @@ var global = {
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
           break;
         case Node.EXTEND:
-          self.preExtend(true, node);
+          self.preExtend(node);
           break;
         case Node.IMPORT:
           self.impt(node);
@@ -170,22 +171,20 @@ var global = {
         case Node.STYLESET:
           self.styleset(false, node);
           break;
-        case Node.EXTEND:
-          self.preExtend(false, node);
-          break;
       }
     }
   }
   More.prototype.styleset = function(start, node) {
+    var self = this;
     if(start) {
       var block = node.leaf(1);
       block.hasLevel = checkLevel(block);
-      if(block.hasLevel || this.selectorStack.length) {
-        ignore(node.first(), this.ignores, this.index);
+      //忽略掉所有二级以上选择器，由block之前生成
+      if(block.hasLevel || self.selectorStack.length) {
+        ignore(node.first(), self.ignores, self.index);
       }
       //二级以上选择器样式集需先结束
       if(this.selectorStack.length) {
-        //忽略掉所有二级以上选择器，由block之前生成
         var prev = node.prev();
         //前一个是styleset或者{时，会造成空样式
         if(prev.name() == Node.STYLESET
@@ -194,17 +193,34 @@ var global = {
           //
         }
         else {
-          this.res += '}';
+          var s = concatSelector(self.selectorStack);
+          normalize(s).split(',').forEach(function(se) {
+            self.styleHash[se] = self.styleHash[se] || [];
+            self.styleHash[se].push(self.res.length);
+          });
+          self.res += '}';
         }
       }
       //存储当前层级父选择器集合
-      var s = join(node.first(), this.ignores, this.index, true);
-      this.selectorStack.push(s.split(','));
+      var s = join(node.first(), self.ignores, self.index, true);
+      self.selectorStack.push(s.split(','));
     }
     else {
-      this.selectorStack.pop();
-      if(this.selectorStack.length) {
-        var next = node.next();
+      var next = node.next();
+      if(next && next.name() == Node.STYLESET) {
+        //
+      }
+      else if(node.last().last().prev().name() != Node.STYLESET) {
+        var s = concatSelector(self.selectorStack);
+        var temp = self.res.lastIndexOf('}');
+        normalize(s).split(',').forEach(function(se) {
+          self.styleHash[se] = self.styleHash[se] || [];
+          self.styleHash[se].push(temp);
+        });
+      }
+      self.selectorStack.pop();
+      if(self.selectorStack.length) {
+        var s = concatSelector(self.selectorStack);
         //当多级styleset结束时下个是styleset或}，会造成空白样式
         if(next && (next.name() == Node.STYLESET
           || next.name() == Node.TOKEN
@@ -212,7 +228,11 @@ var global = {
           //
         }
         else {
-          this.res += concatSelector(this.selectorStack) + '{';
+          self.res += s + '{';
+          normalize(s).split(',').forEach(function(se) {
+            self.styleHash[se] = self.styleHash[se] || [];
+            self.styleHash[se].push(self.res.length);
+          });
         }
       }
     }
@@ -227,6 +247,7 @@ var global = {
         ignore(last, self.ignores, self.index);
       });
     }
+    var s = concatSelector(this.selectorStack);
     var first = node.leaf(1);
     if(first.name() == Node.STYLESET) {
       eventbus.on(first.prev().nid(), function() {
@@ -234,33 +255,40 @@ var global = {
       });
     }
     else {
-      var s = concatSelector(this.selectorStack);
       if(node.hasLevel || this.selectorStack.length > 1) {
-        this.res += s;
+        self.res += s;
       }
-      this.styleHash[s] = this.styleHash[s] || [];
-      this.styleHash[s].push(this.res.length);
+      normalize(s).split(',').forEach(function(se) {
+        self.styleHash[se] = self.styleHash[se] || [];
+        self.styleHash[se].push(self.res.length + 1);
+      });
     }
   }
-  More.prototype.preExtend = function(start, node) {
-    if(start) {
-      ignore(node, this.ignores, this.index);
-      var i = this.index;
-      var o = {
-        start: this.res.length
-      };
-      while(this.ignores[++i]) {
-      }
-      var s = join(node.leaf(1), this.ignores, i);
-      o.selectors = s.split(',');
-      this.extendStack.push(o);
+  More.prototype.preExtend = function(node) {
+    ignore(node, this.ignores, this.index);
+    var i = this.index;
+    var o = {
+      start: this.res.length
+    };
+    while(this.ignores[++i]) {
     }
-    else {
-      this.extendStack[this.extendStack.length - 1].end = this.res.length;
-    }
+    var s = join(node.leaf(1), this.ignores, i);
+    o.selectors = s.split(',');
+    this.extendStack.push(o);
   }
   More.prototype.extend = function() {
-//    console.log(this.extendStack)
+    console.log(this.extendStack)
+  }
+  More.prototype.saveStyle = function() {
+    var self = this;
+    Object.keys(self.styleHash).forEach(function(key) {
+      var arr = self.styleHash[key];
+      self.styleHash[key] = '';
+      for(var i = 0; i < arr.length; i += 2) {
+        self.styleHash[key] += self.res.slice(arr[i], arr[i+1]).trim().replace(/\n/g, '');
+      }
+    });
+    console.log(this.styleHash);
   }
   More.prototype.impt = function(node) {
     var url = node.leaf(1);

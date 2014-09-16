@@ -6,6 +6,7 @@ var Node = homunculus.getClass('node', 'css');
 exports.default=function(token, varHash, globalVar) {
   var s = token.content();
   var type = token.type();
+  //@media等关键字忽略之
   if(type == Token.HEAD) {
     return s;
   }
