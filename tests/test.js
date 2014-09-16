@@ -152,4 +152,40 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('@import "a.css";@import url("b.css");@import url(c.css);@import url("v.css");');
   });
+  it('@extend 1', function() {
+    var more = new More();
+    var s = 'html{margin:0}body{@extend html}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}body{margin:0;}');
+  });
+  it('@extend 2', function() {
+    var more = new More();
+    var s = 'html{margin:0}html{padding:0}body{@extend html}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}html{padding:0}body{margin:0;padding:0;}');
+  });
+  it('@extend multi', function() {
+    var more = new More();
+    var s = 'html{margin:0}div{padding:0}body{@extend html,div}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}div{padding:0}body{margin:0;padding:0;}');
+  });
+  it('@extend recursion 1', function() {
+    var more = new More();
+    var s = 'html{margin:0}body{@extend html}div{@extend body}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}body{margin:0;}div{margin:0;}');
+  });
+  it('@extend recursion 2', function() {
+    var more = new More();
+    var s = 'html{margin:0}body{@extend div}div{@extend html}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}body{}div{margin:0;}');
+  });
+  it('@extend circular', function() {
+    var more = new More();
+    var s = 'html{margin:0}body{@extend div}div{@extend body}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}body{}div{}');
+  });
 });

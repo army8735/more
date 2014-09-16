@@ -270,14 +270,26 @@ class More {
     while(this.ignores[++i]) {
     }
     var s = normalize(join(node.leaf(1), this.ignores, i));
-    o.selectors = s.split(',');
+    o.targets = s.split(',');
+    var se = normalize(concatSelector(this.selectorStack));
+    o.selectors = se.split(',');
     this.extendStack.push(o);
   }
   extend() {
-    console.log(this.extendStack);
     var temp = 0;
-    this.extendStack.forEach(function(o) {
-      //
+    var self = this;
+    self.extendStack.forEach(function(o) {
+      var v = '';
+      o.targets.forEach(function(se) {
+        v += self.styleHash[se];
+      });
+      if(v) {
+        self.res = self.res.slice(0, o.start + temp) + v + self.res.slice(o.start + temp);
+        temp += v.length;
+        o.selectors.forEach(function(se2) {
+          self.styleHash[se2] += v;
+        });
+      }
     });
   }
   saveStyle() {
@@ -293,7 +305,6 @@ class More {
         self.styleHash[key] += s;
       }
     });
-    console.log(this.styleHash);
   }
   impt(node) {
     var url = node.leaf(1);
