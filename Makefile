@@ -4,9 +4,6 @@ build:
 test: build
 	@mocha tests/test.js -R spec
 
-test-jsdc:
-	@mocha tests/test.js -R spec
-
 coveralls:
 	@mocha tests/test.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
 

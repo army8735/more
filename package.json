@@ -30,7 +30,7 @@
   "config": {
     "blanket": {
       "pattern": [
-        "more/src"
+        "more/build"
       ]
     }
   },
