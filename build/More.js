@@ -145,6 +145,7 @@ var global = {
       }
     }
     else {
+      eventbus.emit(node.nid(), true);
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(true, node);
@@ -167,6 +168,7 @@ var global = {
       leaves.forEach(function(leaf) {
         self.join(leaf);
       });
+      eventbus.emit(node.nid(), false);
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(false, node);
@@ -262,26 +264,44 @@ var global = {
     }
   }
   More.prototype.preExtend = function(node) {
-    ignore(node, this.ignores, this.index);
-    var i = this.index;
+    var self = this;
+    ignore(node, self.ignores, self.index);
+    var i = self.index;
     var o = {
-      start: this.res.length
+      start: self.res.length
     };
-    while(this.ignores[++i]) {
-    }
-    var s = normalize(join(node.leaf(1), this.ignores, i));
+    while(self.ignores[++i]) {}
+    var s = normalize(join(node.leaf(1), self.ignores, i));
     o.targets = s.split(',');
-    var se = normalize(concatSelector(this.selectorStack));
+    var se = normalize(concatSelector(self.selectorStack));
     o.selectors = se.split(',');
-    this.extendStack.push(o);
+    self.extendStack.push(o);
+    eventbus.on(node.parent().nid(), function(start) {
+      if(!start) {
+        o.blockEnd = self.res.length;
+      }
+    });
   }
   More.prototype.extend = function() {
     var temp = 0;
     var self = this;
+    var styleArray = Object.keys(self.styleHash);
     self.extendStack.forEach(function(o) {
       var v = '';
+      var v2 = '';
       o.targets.forEach(function(se) {
-        v += self.styleHash[se];
+        v += self.styleHash[se] || '';
+        styleArray.forEach(function(se2) {
+          if(se2.indexOf(se) == 0 && se2.length != se.length && o.selectors.indexOf(se2) == -1) {
+            var pseudo = concatSelector([o.selectors].concat([[se2.slice(se.length)]]));
+            pseudo = normalize(pseudo);
+            if(self.styleHash[se2]) {
+              v2 += pseudo + '{' + self.styleHash[se2] + '}';
+              self.styleHash[pseudo] = self.styleHash[pseudo] || '';
+              self.styleHash[pseudo] += self.styleHash[se2];
+            }
+          }
+        });
       });
       if(v) {
         self.res = self.res.slice(0, o.start + temp) + v + self.res.slice(o.start + temp);
@@ -289,6 +309,10 @@ var global = {
         o.selectors.forEach(function(se2) {
           self.styleHash[se2] += v;
         });
+      }
+      if(v2) {
+        self.res = self.res.slice(0, o.blockEnd + temp) + v2 + self.res.slice(o.blockEnd + temp);
+        temp += v2.length;
       }
     });
   }

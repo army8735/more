@@ -38,6 +38,9 @@ function off(name, callback) {
 // arguments as `emit` does, apart from the event name
 function emit(name, data) {
   var list = events[name];
+  if(!Array.isArray(data)) {
+    data = [data];
+  }
 
   if(list) {
     // Copy callback lists to prevent modification

@@ -212,4 +212,16 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;}html{padding:1}');
   });
+  it('@extend pseudo', function() {
+    var more = new More();
+    var s = 'body{margin:0}\nbody:hover{padding:0}\na{@extend body}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{margin:0}\nbody:hover{padding:0}\na{margin:0;}a:hover{padding:0;}');
+  });
+  it('@extend pseudo level', function() {
+    var more = new More();
+    var s = 'html{margin:0;body{@extend html}padding:1;&:hover{color:#000}}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;}html body:hover{color:#000;}html{padding:1;}html:hover{color:#000}');
+  });
 });
