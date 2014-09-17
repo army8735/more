@@ -29,9 +29,7 @@ function recursion(node, ignores, res) {
   }
 }
 
-export default function(node, ignores, i) {
-  var res = {};
+export default function(node, ignores, i, fnHash) {
   index = i;
-  recursion(node, ignores, res);
-  return res;
+  recursion(node, ignores, fnHash);
 }

@@ -32,9 +32,7 @@ function recursion(node, ignores, res) {
   }
 }
 
-export default function(node, ignores, i) {
-  var res = {};
+export default function(node, ignores, i, varHash) {
   index = i;
-  recursion(node, ignores, res);
-  return res;
+  recursion(node, ignores, varHash);
 }

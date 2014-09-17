@@ -17,12 +17,35 @@ describe('api', function() {
     var more = new More();
     expect(more.ast).to.be.a(Function);
   });
-  it('#config', function() {
+  it('#vars', function() {
     var more = new More();
-    expect(more.config).to.be.a(Function);
+    expect(more.vars).to.be.a(Function);
   });
-  it('More#config', function() {
-    expect(More.config).to.be.a(Function);
+  it('#fns', function() {
+    var more = new More();
+    expect(more.fns).to.be.a(Function);
+  });
+  it('#styles', function() {
+    var more = new More();
+    expect(more.styles).to.be.a(Function);
+  });
+  it('##vars', function() {
+    expect(More.vars).to.be.a(Function);
+  });
+  it('##fns', function() {
+    expect(More.fns).to.be.a(Function);
+  });
+  it('##styles', function() {
+    expect(More.styles).to.be.a(Function);
+  });
+  it('##suffix', function() {
+    expect(More.suffix).to.be.a(Function);
+  });
+  it('##root', function() {
+    expect(More.root).to.be.a(Function);
+  });
+  it('##localRoot', function() {
+    expect(More.localRoot).to.be.a(Function);
   });
 });
 describe('simple test', function() {

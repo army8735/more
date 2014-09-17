@@ -32,9 +32,6 @@ npm install more-css
 * ast():Object 返回解析后的语法树
 * tokens():Array<Object> 返回解析后的词法单元序列
 * imports():Array<String> 返回解析后的@import文件列表
-* suffix(str:String):String 设置/读取文件后缀名，默认css
-* root(str:String):String 设置/读取相对根路径
-* localRoot(str:String):String 设置/读取本地相对根路径
 * vars(data:Object):Object 设置/读取变量哈希
 * styles(data:Object):Object 设置/读取样式哈希
 * fns(data:Object):Object 设置/读取方法哈希

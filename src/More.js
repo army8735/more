@@ -16,28 +16,30 @@ var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
 var global = {
-  var: {},
-  fn: {},
-  style: {},
-  suffix: 'css'
+  vars: {},
+  fns: {},
+  styles: {},
+  suffix: 'css',
+  root: '',
+  localRoot: ''
 };
 
 class More {
-  constructor(data = { code: '' }) {
-    this.data = data;
+  constructor(code = '') {
+    this.code = code;
     this.node = null;
     this.parser = null;
+    this.varHash = {};
+    this.styleHash = {};
+    this.fnHash = {};
   }
-  parse(data) {
-    if(Object.prototype.toString.call(data) == '[object String]') {
-      this.data.code = data;
-    }
-    else if(data) {
-      this.data = data;
+  parse(code) {
+    if(code) {
+      this.code = code;
     }
     this.parser = homunculus.getParser('css');
     try {
-      this.node = this.parser.parse(this.data.code);
+      this.node = this.parser.parse(this.code);
       this.ignores = this.parser.ignore();
     }
     catch(e) {
@@ -48,27 +50,8 @@ class More {
     }
     this.init();
 
-    //初始化变量
-    if(this.data.var) {
-      Object.keys(this.data.var).forEach(function(k) {
-        this.varHash[k] = this.data.var[k];
-      });
-    }
-    //初始化函数
-    if(this.data.fn) {
-      Object.keys(this.data.fn).forEach(function(k) {
-        this.fnHash[k] = this.data.fn[k];
-      });
-    }
-    //初始化继承
-    if(this.data.style) {
-      Object.keys(this.data.style).forEach(function(k) {
-        this.styleHash[k] = this.data.style[k];
-      });
-    }
-
-    this.varHash = preVar(this.node, this.ignores, this.index);
-    this.fnHash = preFn(this.node, this.ignores, this.index);
+    preVar(this.node, this.ignores, this.index, this.varHash);
+    preFn(this.node, this.ignores, this.index, this.fnHash);
     this.join(this.node);
     this.saveStyle();
     this.extend();
@@ -90,10 +73,6 @@ class More {
     this.selectorStack = [];
     this.importStack = [];
     this.extendStack = [];
-
-    this.varHash = {};
-    this.styleHash = {};
-    this.fnHash = {};
   }
   join(node) {
     var self = this;
@@ -114,7 +93,7 @@ class More {
         if(!token.ignore) {
           //~String拆分语法
           if(self.autoSplit && token.type() == Token.STRING) {
-            var s = getVar(token, self.varHash, global.var);
+            var s = getVar(token, self.varHash, global.vars);
             var c = s.charAt(0);
             if(c != "'" && c != '"') {
               c = '"';
@@ -125,7 +104,7 @@ class More {
             self.autoSplit = false;
           }
           else {
-            var str = getVar(token, self.varHash, global.var);
+            var str = getVar(token, self.varHash, global.vars);
             if(token.import) {
               if(!/\.\w+['"]?$/.test(str)) {
                 str = str.replace(/(['"]?)$/, '.css$1');
@@ -154,7 +133,7 @@ class More {
           self.block(node);
           break;
         case Node.FNC:
-          self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fn, self.varHash, global.var);
+          self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fns, self.varHash, global.vars);
           break;
         case Node.EXTEND:
           self.preExtend(node);
@@ -348,16 +327,61 @@ class More {
   imports() {
     return this.importStatck;
   }
-  config(data = {}) {
-    More.config(data);
+
+  vars(o) {
+    if(o) {
+      this.varHash = o;
+    }
+    return this.varHash;
   }
-  static config(data = {}) {
-    Object.keys(data).forEach(function(k) {
-      if(k == 'suffix') {
-        data[k] = data[k].replace('.', '');
-      }
-      global[k] = data[k];
-    });
+  fns(o) {
+    if(o) {
+      this.fnHash = o;
+    }
+    return this.fnHash;
+  }
+  styles(o) {
+    if(o) {
+      this.styleHash = o;
+    }
+    return this.styleHash;
+  }
+
+  static suffix(str = null) {
+    if(str) {
+      global.suffix = str.replace(/^\./, '');
+    }
+    return global.suffix;
+  }
+  static root(str = null) {
+    if(str) {
+      global.root = str;
+    }
+    return global.root;
+  }
+  static localRoot(str = null) {
+    if(str) {
+      global.localRoot = str;
+    }
+    return global.localRoot;
+  }
+  static vars(o) {
+    if(o) {
+      global.varHash = o;
+    }
+    return global.varHash;
+  }
+  static fns(o) {
+    if(o) {
+      global.fnHash = o;
+    }
+    return global.fnHash;
+  }
+  static styles(o) {
+    if(o) {
+      global.styleHash = o;
+    }
+    return global.styleHash;
   }
 }
 
