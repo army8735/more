@@ -288,6 +288,18 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;line-height:2;}html body:hover{color:#000;}html body:hover{text-align:center;}html{padding:1;}html:hover{color:#000}a{line-height:2}a:hover{text-align:center}');
   });
+  it('normalize selector 1', function() {
+    var more = new More();
+    var s = 'html :hover{margin:0}body{@extend html:hover}';
+    var res = more.parse(s);
+    expect(res).to.eql('html :hover{margin:0}body{margin:0;}');
+  });
+  it('normalize selector 2', function() {
+    var more = new More();
+    var s = 'html > body{margin:0}div{@extend html>body}';
+    var res = more.parse(s);
+    expect(res).to.eql('html > body{margin:0}div{margin:0;}');
+  });
 });
 describe('ignore source css', function() {
   it('normal', function() {
