@@ -247,4 +247,24 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;}html body:hover{color:#000;}html{padding:1;}html:hover{color:#000}');
   });
+  it('@extend pseudo level multi', function() {
+    var more = new More();
+    var s = 'html{margin:0;body{@extend html,a}padding:1;&:hover{color:#000}}a{line-height:2}a:hover{text-align:center}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;line-height:2;}html body:hover{color:#000;}html body:hover{text-align:center;}html{padding:1;}html:hover{color:#000}a{line-height:2}a:hover{text-align:center}');
+  });
+});
+describe('ignore source css', function() {
+  it('normal', function() {
+    var more = new More();
+    var s = 'html { margin: 1px; }';
+    var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
+  it(':hover', function() {
+    var more = new More();
+    var s = 'html :hover { margin: 1px; }';
+    var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
 });
