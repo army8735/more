@@ -37,6 +37,14 @@ describe('api', function() {
     var more = new More();
     expect(more.configFile).to.be.a(Function);
   });
+  it('#build', function() {
+    var more = new More();
+    expect(more.build).to.be.a(Function);
+  });
+  it('#buildFile', function() {
+    var more = new More();
+    expect(more.buildFile).to.be.a(Function);
+  });
   it('#clean', function() {
     var more = new More();
     expect(more.clean).to.be.a(Function);
@@ -64,6 +72,12 @@ describe('api', function() {
   });
   it('##configFile', function() {
     expect(More.configFile).to.be.a(Function);
+  });
+  it('##build', function() {
+    expect(More.build).to.be.a(Function);
+  });
+  it('##buildFile', function() {
+    expect(More.buildFile).to.be.a(Function);
   });
   it('##clean', function() {
     expect(More.clean).to.be.a(Function);

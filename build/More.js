@@ -361,6 +361,12 @@ var single;
     this.fnHash = {};
     this.styleHash = {};
   }
+  More.prototype.build = function(code) {
+    //
+  }
+  More.prototype.buildFile = function(file) {
+    return this.build(fs.readFileSync(file, { encoding: 'utf-8' }));
+  }
 
   More.parse=function(code) {
     if(!single) {
@@ -373,6 +379,15 @@ var single;
       single = new More();
     }
     return single.parseFile(code);
+  }
+  More.build=function(code) {
+    if(!single) {
+      single = new More();
+    }
+    //
+  }
+  More.buildFile=function(file) {
+    return More.build(fs.readFileSync(file, { encoding: 'utf-8' }));
   }
   More.suffix=function(str) {
     if(str===void 0)str=null;if(str) {

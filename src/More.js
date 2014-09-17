@@ -361,6 +361,12 @@ class More {
     this.fnHash = {};
     this.styleHash = {};
   }
+  build(code) {
+    //
+  }
+  buildFile(file) {
+    return this.build(fs.readFileSync(file, { encoding: 'utf-8' }));
+  }
 
   static parse(code) {
     if(!single) {
@@ -373,6 +379,15 @@ class More {
       single = new More();
     }
     return single.parseFile(code);
+  }
+  static build(code) {
+    if(!single) {
+      single = new More();
+    }
+    //
+  }
+  static buildFile(file) {
+    return More.build(fs.readFileSync(file, { encoding: 'utf-8' }));
   }
   static suffix(str = null) {
     if(str) {

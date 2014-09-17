@@ -12,7 +12,7 @@ more定位于普通产品简化开发位置，而非广义CSS下游框架重量�
 
 目前提供层级功能、子文件拆分（实际上就是原标准的@import语法）、层级变量、自动拆分字符串、@extend深继承；还有css激进压缩器。
 
-详细见：https://github.com/army8735/more/wiki/%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3
+详细见：https://github.com/army8735/more/wiki/document
 
 build目录下为nodejs环境的module模块。
 web目录下为书写符合AMD/CMD规范的js文件。
