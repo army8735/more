@@ -36,7 +36,7 @@ npm install more-css
 * styles(data:Object):Object 设置/读取样式哈希
 * fns(data:Object):Object 设置/读取方法哈希
 * config(str:String):void 预编译一段css并将其结果作为此more对象之后预编译时的全局变量
-* config(file:String):void 同上，传入一个文件的路径
+* configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空设置
 
 ### 静态属性
@@ -48,7 +48,7 @@ npm install more-css
 * styles(data:Object):Object 全局设置/读取样式哈希
 * fns(data:Object):Object 全局设置/读取方法哈希
 * config(str:String):void 预编译一段css并将其结果作为之后全局预编译时的全局变量
-* config(file:String):void 同上，传入一个文件的路径
+* configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
 
 ## Demo
