@@ -54,14 +54,13 @@ function getM(arr, a, b) {
 		j: j
 	};
 }
-module.exports =  function(arr, compare) {
+export default function(arr, compare) {
 	if(!Array.isArray(arr)) {
 		throw new Error('quick sort need an array');
 	}
 	if(arr.length < 2) {
 		return arr;
 	}
-	//优化尽可能选取中间值，5等分取每组最大最小值，然后10个数取中值，保证最坏情况首次分割值也在2/5~3/5
 	if(!compare && arr.length > 9) {
 		var n = Math.floor(arr.length / 5);
 		var split = [];
