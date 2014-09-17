@@ -24,6 +24,8 @@ var global = {
   localRoot: ''
 };
 
+var single;
+
 
   function More(code) {
     if(code===void 0)code='';this.code = code;
@@ -346,7 +348,32 @@ var global = {
     }
     return this.styleHash;
   }
+  More.prototype.config = function(str) {
+    if(str) {
+      this.parse(str);
+    }
+  }
+  More.prototype.configFile = function(file) {
+    this.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  }
+  More.prototype.clean = function() {
+    this.varHash = {};
+    this.fnHash = {};
+    this.styleHash = {};
+  }
 
+  More.parse=function(code) {
+    if(!single) {
+      single = new More();
+    }
+    return single.parse(code);
+  }
+  More.parseFile=function(file) {
+    if(!single) {
+      single = new More();
+    }
+    return single.parseFile(code);
+  }
   More.suffix=function(str) {
     if(str===void 0)str=null;if(str) {
       global.suffix = str.replace(/^\./, '');
@@ -382,6 +409,27 @@ var global = {
       global.styleHash = o;
     }
     return global.styleHash;
+  }
+  More.config=function(str) {
+    if(str) {
+      More.parse(str);
+      global.vars = single.vars();
+      global.fns = single.fns();
+      global.styles = single.styles();
+    }
+  }
+  More.configFile=function(file) {
+    More.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  }
+  More.clean=function() {
+    global = {
+      vars: {},
+      fns: {},
+      styles: {},
+      suffix: 'css',
+      root: '',
+      localRoot: ''
+    };
   }
 
 

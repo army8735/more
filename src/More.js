@@ -24,6 +24,8 @@ var global = {
   localRoot: ''
 };
 
+var single;
+
 class More {
   constructor(code = '') {
     this.code = code;
@@ -346,7 +348,32 @@ class More {
     }
     return this.styleHash;
   }
+  config(str) {
+    if(str) {
+      this.parse(str);
+    }
+  }
+  configFile(file) {
+    this.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  }
+  clean() {
+    this.varHash = {};
+    this.fnHash = {};
+    this.styleHash = {};
+  }
 
+  static parse(code) {
+    if(!single) {
+      single = new More();
+    }
+    return single.parse(code);
+  }
+  static parseFile(file) {
+    if(!single) {
+      single = new More();
+    }
+    return single.parseFile(code);
+  }
   static suffix(str = null) {
     if(str) {
       global.suffix = str.replace(/^\./, '');
@@ -382,6 +409,27 @@ class More {
       global.styleHash = o;
     }
     return global.styleHash;
+  }
+  static config(str) {
+    if(str) {
+      More.parse(str);
+      global.vars = single.vars();
+      global.fns = single.fns();
+      global.styles = single.styles();
+    }
+  }
+  static configFile(file) {
+    More.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  }
+  static clean() {
+    global = {
+      vars: {},
+      fns: {},
+      styles: {},
+      suffix: 'css',
+      root: '',
+      localRoot: ''
+    };
   }
 }
 
