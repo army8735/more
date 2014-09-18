@@ -142,19 +142,19 @@ describe('simple test', function() {
     var more = new More();
     var s = 'fn($a){margin:$a}body{fn(2)}';
     var res = more.parse(s);
-    expect(res).to.eql('body{margin:2;}');
+    expect(res).to.eql('body{margin:2}');
   });
   it('fncall global var', function() {
     var more = new More();
     var s = '$a:1;fn(){margin:$a}body{fn(2)}';
     var res = more.parse(s);
-    expect(res).to.eql('body{margin:1;}');
+    expect(res).to.eql('body{margin:1}');
   });
   it('fncall var priority', function() {
     var more = new More();
     var s = '$a:1;fn($a){margin:$a}body{fn(2)}';
     var res = more.parse(s);
-    expect(res).to.eql('body{margin:2;}');
+    expect(res).to.eql('body{margin:2}');
   });
   it('undefined fncall', function() {
     var more = new More();
@@ -166,7 +166,7 @@ describe('simple test', function() {
     var more = new More();
     var s = 'fn($a){$a}body{fn(background:url(xxx))}';
     var res = more.parse(s);
-    expect(res).to.eql('body{background:url(xxx);}');
+    expect(res).to.eql('body{background:url(xxx)}');
   });
   it('level', function() {
     var more = new More();
@@ -299,6 +299,22 @@ describe('simple test', function() {
     var s = 'html > body{margin:0}div{@extend html>body}';
     var res = more.parse(s);
     expect(res).to.eql('html > body{margin:0}div{margin:0;}');
+  });
+});
+describe('config', function() {
+  it('code', function() {
+    var more = new More();
+    more.config('$a = 1;');
+    var s = 'html{margin:$a}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:1}');
+  });
+  it('file', function() {
+    var more = new More();
+    more.configFile(path.resolve(__dirname, './config.css'));
+    var s = 'html{margin:$a;$fn()}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:1;padding: 0}');
   });
 });
 describe('ignore source css', function() {

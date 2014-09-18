@@ -16,7 +16,7 @@ export default function(node, ignores, index, fnHash, globalFn, varHash, globanV
     //fnc之后没有;号，除非跟着}结束，否则加上
     if(!next
       || next.name() != Node.TOKEN
-      || next.token().content() == '}') {
+      || next.token().content() != '}') {
       res += ';';
     }
     return res;
