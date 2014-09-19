@@ -67,7 +67,12 @@ var single;
         this.res += this.ignores[this.index].content().replace(/\S/g, ' ');
       }
       else {
-        this.res += this.ignores[this.index].content();
+        var ig = this.ignores[this.index];
+        var s = ig.content();
+        if(ig.type() == Token.COMMENT && s.indexOf('//') == 0) {
+          s = '/*' + s.slice(2) + '*/';
+        }
+        this.res += s;
       }
       this.index++;
     }
@@ -119,6 +124,9 @@ var single;
         while(self.ignores[++self.index]) {
           var ig = self.ignores[self.index];
           var s = ig.type() == Token.ignores ? ig.content().replace(/\S/g, ' ') : ig.content();
+          if(ig.type() == Token.COMMENT && s.indexOf('//') == 0) {
+            s = '/*' + s.slice(2) + '*/';
+          }
           if(!ig.ignore) {
             self.res += s;
           }

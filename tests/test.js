@@ -300,6 +300,18 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html > body{margin:0}div{margin:0;}');
   });
+  it('ignroe begin', function() {
+    var more = new More();
+    var s = '/*sdfsdf*/html{}';
+    var res = more.parse(s);
+    expect(res).to.eql('/*sdfsdf*/html{}');
+  });
+  it('single comment', function() {
+    var more = new More();
+    var s = '//test\nhtml{}//test2';
+    var res = more.parse(s);
+    expect(res).to.eql('/*test*/\nhtml{}/*test2*/');
+  });
 });
 describe('config', function() {
   it('code', function() {
