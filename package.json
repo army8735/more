@@ -36,19 +36,19 @@
   },
   "dependencies": {
     "clean-css": "^2.2.16",
-    "homunculus": "^0.5.3"
+    "homunculus": "^0.5.4"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
     "coveralls": "^2.10.0",
     "expect.js": "^0.3.1",
-    "gulp": "^3.8.1",
-    "gulp-clean": "^0.2.4",
+    "gulp": "^3.8.8",
+    "gulp-clean": "^0.3.1",
     "gulp-jsdc": "^0.2.2",
-    "gulp-util": "^2.2.14",
-    "mocha": "^1.18.2",
+    "gulp-util": "^3.0.1",
+    "mocha": "^1.21.4",
     "mocha-lcov-reporter": "0.0.1",
-    "through2": "^0.4.2",
+    "through2": "^0.6.1",
     "jsdc": "0.4.10"
   },
   "main": "./index",

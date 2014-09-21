@@ -34,8 +34,27 @@ class More {
     this.varHash = {};
     this.styleHash = {};
     this.fnHash = {};
+    this.res = '';
+    this.index = 0;
+    this.msg = null;
+    this.autoSplit = false;
+    this.selectorStack = [];
+    this.importStack = [];
+    this.extendStack = [];
   }
   parse(code) {
+    this.preParse(code);
+    if(this.msg) {
+      return this.msg;
+    }
+
+    this.preJoin();
+    this.join(this.node);
+    this.saveStyle();
+    this.extend();
+    return this.res;
+  }
+  preParse(code) {
     if(code) {
       this.code = code;
     }
@@ -48,20 +67,12 @@ class More {
       if(typeof console != 'undefined') {
         console.error(e);
       }
-      return e.toString();
+      return this.msg = e.toString();
     }
-    this.init();
-
     preVar(this.node, this.ignores, this.index, this.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
-    this.join(this.node);
-    this.saveStyle();
-    this.extend();
-    return this.res;
   }
-  init() {
-    this.res = '';
-    this.index = 0;
+  preJoin() {
     while(this.ignores[this.index]) {
       if(this.ignores[this.index].type() == Token.ignores) {
         this.res += this.ignores[this.index].content().replace(/\S/g, ' ');
@@ -76,10 +87,6 @@ class More {
       }
       this.index++;
     }
-    this.autoSplit = false;
-    this.selectorStack = [];
-    this.importStack = [];
-    this.extendStack = [];
   }
   join(node) {
     var self = this;
@@ -358,7 +365,7 @@ class More {
   }
   config(str) {
     if(str) {
-      this.parse(str);
+      this.preParse(str);
     }
   }
   configFile(file) {

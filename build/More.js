@@ -34,8 +34,27 @@ var single;
     this.varHash = {};
     this.styleHash = {};
     this.fnHash = {};
+    this.res = '';
+    this.index = 0;
+    this.msg = null;
+    this.autoSplit = false;
+    this.selectorStack = [];
+    this.importStack = [];
+    this.extendStack = [];
   }
   More.prototype.parse = function(code) {
+    this.preParse(code);
+    if(this.msg) {
+      return this.msg;
+    }
+
+    this.preJoin();
+    this.join(this.node);
+    this.saveStyle();
+    this.extend();
+    return this.res;
+  }
+  More.prototype.preParse = function(code) {
     if(code) {
       this.code = code;
     }
@@ -48,20 +67,12 @@ var single;
       if(typeof console != 'undefined') {
         console.error(e);
       }
-      return e.toString();
+      return this.msg = e.toString();
     }
-    this.init();
-
     preVar(this.node, this.ignores, this.index, this.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
-    this.join(this.node);
-    this.saveStyle();
-    this.extend();
-    return this.res;
   }
-  More.prototype.init = function() {
-    this.res = '';
-    this.index = 0;
+  More.prototype.preJoin = function() {
     while(this.ignores[this.index]) {
       if(this.ignores[this.index].type() == Token.ignores) {
         this.res += this.ignores[this.index].content().replace(/\S/g, ' ');
@@ -76,10 +87,6 @@ var single;
       }
       this.index++;
     }
-    this.autoSplit = false;
-    this.selectorStack = [];
-    this.importStack = [];
-    this.extendStack = [];
   }
   More.prototype.join = function(node) {
     var self = this;
@@ -358,7 +365,7 @@ var single;
   }
   More.prototype.config = function(str) {
     if(str) {
-      this.parse(str);
+      this.preParse(str);
     }
   }
   More.prototype.configFile = function(file) {
