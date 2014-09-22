@@ -345,21 +345,45 @@ var single;
     return this.importStatck;
   }
 
-  More.prototype.vars = function(o) {
+  More.prototype.vars = function(o, mix) {
     if(o) {
-      this.varHash = o;
+      if(mix) {
+        var self = this;
+        Object.keys(o).forEach(function(k) {
+          self.varHash[k] = o[k];
+        });
+      }
+      else {
+        this.varHash = o;
+      }
     }
     return this.varHash;
   }
-  More.prototype.fns = function(o) {
+  More.prototype.fns = function(o, mix) {
     if(o) {
-      this.fnHash = o;
+      if(mix) {
+        var self = this;
+        Object.keys(o).forEach(function(k) {
+          self.fnHash[k] = o[k];
+        });
+      }
+      else {
+        this.fnHash = o;
+      }
     }
     return this.fnHash;
   }
-  More.prototype.styles = function(o) {
+  More.prototype.styles = function(o, mix) {
     if(o) {
-      this.styleHash = o;
+      if(mix) {
+        var self = this;
+        Object.keys(o).forEach(function(k) {
+          self.styleHash[k] = o[k];
+        });
+      }
+      else {
+        this.styleHash = o;
+      }
     }
     return this.styleHash;
   }
@@ -422,21 +446,42 @@ var single;
     }
     return global.localRoot;
   }
-  More.vars=function(o) {
+  More.vars=function(o, mix) {
     if(o) {
-      global.varHash = o;
+      if(mix) {
+        Object.keys(o).forEach(function(k) {
+          global.varHash[k] = o[k];
+        });
+      }
+      else {
+        global.varHash = o;
+      }
     }
     return global.varHash;
   }
-  More.fns=function(o) {
+  More.fns=function(o, mix) {
     if(o) {
-      global.fnHash = o;
+      if(mix) {
+        Object.keys(o).forEach(function(k) {
+          global.fnHash[k] = o[k];
+        });
+      }
+      else {
+        global.fnHash = o;
+      }
     }
     return global.fnHash;
   }
-  More.styles=function(o) {
+  More.styles=function(o, mix) {
     if(o) {
-      global.styleHash = o;
+      if(mix) {
+        Object.keys(o).forEach(function(k) {
+          global.styleHash[k] = o[k];
+        });
+      }
+      else {
+        global.styleHash = o;
+      }
     }
     return global.styleHash;
   }

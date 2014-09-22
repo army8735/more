@@ -345,21 +345,45 @@ class More {
     return this.importStatck;
   }
 
-  vars(o) {
+  vars(o, mix) {
     if(o) {
-      this.varHash = o;
+      if(mix) {
+        var self = this;
+        Object.keys(o).forEach(function(k) {
+          self.varHash[k] = o[k];
+        });
+      }
+      else {
+        this.varHash = o;
+      }
     }
     return this.varHash;
   }
-  fns(o) {
+  fns(o, mix) {
     if(o) {
-      this.fnHash = o;
+      if(mix) {
+        var self = this;
+        Object.keys(o).forEach(function(k) {
+          self.fnHash[k] = o[k];
+        });
+      }
+      else {
+        this.fnHash = o;
+      }
     }
     return this.fnHash;
   }
-  styles(o) {
+  styles(o, mix) {
     if(o) {
-      this.styleHash = o;
+      if(mix) {
+        var self = this;
+        Object.keys(o).forEach(function(k) {
+          self.styleHash[k] = o[k];
+        });
+      }
+      else {
+        this.styleHash = o;
+      }
     }
     return this.styleHash;
   }
@@ -422,21 +446,42 @@ class More {
     }
     return global.localRoot;
   }
-  static vars(o) {
+  static vars(o, mix) {
     if(o) {
-      global.varHash = o;
+      if(mix) {
+        Object.keys(o).forEach(function(k) {
+          global.varHash[k] = o[k];
+        });
+      }
+      else {
+        global.varHash = o;
+      }
     }
     return global.varHash;
   }
-  static fns(o) {
+  static fns(o, mix) {
     if(o) {
-      global.fnHash = o;
+      if(mix) {
+        Object.keys(o).forEach(function(k) {
+          global.fnHash[k] = o[k];
+        });
+      }
+      else {
+        global.fnHash = o;
+      }
     }
     return global.fnHash;
   }
-  static styles(o) {
+  static styles(o, mix) {
     if(o) {
-      global.styleHash = o;
+      if(mix) {
+        Object.keys(o).forEach(function(k) {
+          global.styleHash[k] = o[k];
+        });
+      }
+      else {
+        global.styleHash = o;
+      }
     }
     return global.styleHash;
   }
