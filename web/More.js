@@ -1,16 +1,17 @@
 define(function(require, exports, module){var fs=require('fs');
 var homunculus=require('homunculus');
-var preVar=function(){var _4=require('./preVar');return _4.hasOwnProperty("preVar")?_4.preVar:_4.hasOwnProperty("default")?_4.default:_4}()
-var getVar=function(){var _5=require('./getVar');return _5.hasOwnProperty("getVar")?_5.getVar:_5.hasOwnProperty("default")?_5.default:_5}()
-var preFn=function(){var _6=require('./preFn');return _6.hasOwnProperty("preFn")?_6.preFn:_6.hasOwnProperty("default")?_6.default:_6}()
-var getFn=function(){var _7=require('./getFn');return _7.hasOwnProperty("getFn")?_7.getFn:_7.hasOwnProperty("default")?_7.default:_7}()
-var ignore=function(){var _8=require('./ignore');return _8.hasOwnProperty("ignore")?_8.ignore:_8.hasOwnProperty("default")?_8.default:_8}()
-var clone=function(){var _9=require('./clone');return _9.hasOwnProperty("clone")?_9.clone:_9.hasOwnProperty("default")?_9.default:_9}()
-var join=function(){var _10=require('./join');return _10.hasOwnProperty("join")?_10.join:_10.hasOwnProperty("default")?_10.default:_10}()
-var concatSelector=function(){var _11=require('./concatSelector');return _11.hasOwnProperty("concatSelector")?_11.concatSelector:_11.hasOwnProperty("default")?_11.default:_11}()
-var eventbus=function(){var _12=require('./eventbus.js');return _12.hasOwnProperty("eventbus")?_12.eventbus:_12.hasOwnProperty("default")?_12.default:_12}()
-var checkLevel=function(){var _13=require('./checkLevel.js');return _13.hasOwnProperty("checkLevel")?_13.checkLevel:_13.hasOwnProperty("default")?_13.default:_13}()
-var normalize=function(){var _14=require('./normalize.js');return _14.hasOwnProperty("normalize")?_14.normalize:_14.hasOwnProperty("default")?_14.default:_14}()
+var preImport=function(){var _4=require('./preImport');return _4.hasOwnProperty("preImport")?_4.preImport:_4.hasOwnProperty("default")?_4.default:_4}()
+var preVar=function(){var _5=require('./preVar');return _5.hasOwnProperty("preVar")?_5.preVar:_5.hasOwnProperty("default")?_5.default:_5}()
+var getVar=function(){var _6=require('./getVar');return _6.hasOwnProperty("getVar")?_6.getVar:_6.hasOwnProperty("default")?_6.default:_6}()
+var preFn=function(){var _7=require('./preFn');return _7.hasOwnProperty("preFn")?_7.preFn:_7.hasOwnProperty("default")?_7.default:_7}()
+var getFn=function(){var _8=require('./getFn');return _8.hasOwnProperty("getFn")?_8.getFn:_8.hasOwnProperty("default")?_8.default:_8}()
+var ignore=function(){var _9=require('./ignore');return _9.hasOwnProperty("ignore")?_9.ignore:_9.hasOwnProperty("default")?_9.default:_9}()
+var clone=function(){var _10=require('./clone');return _10.hasOwnProperty("clone")?_10.clone:_10.hasOwnProperty("default")?_10.default:_10}()
+var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}()
+var concatSelector=function(){var _12=require('./concatSelector');return _12.hasOwnProperty("concatSelector")?_12.concatSelector:_12.hasOwnProperty("default")?_12.default:_12}()
+var eventbus=function(){var _13=require('./eventbus.js');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}()
+var checkLevel=function(){var _14=require('./checkLevel.js');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}()
+var normalize=function(){var _15=require('./normalize.js');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}()
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -47,12 +48,12 @@ var single;
     if(this.msg) {
       return this.msg;
     }
-
-    this.preJoin();
-    this.join(this.node);
-    this.saveStyle();
-    this.extend();
-    return this.res;
+    return this.parseOn();
+  }
+  More.prototype.parseFile = function(file) {
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    this.preParse(code);
+    return this.parseOn();
   }
   More.prototype.preParse = function(code) {
     if(code) {
@@ -69,8 +70,16 @@ var single;
       }
       return this.msg = e.toString();
     }
+    preImport(this.node, this.importStack);
     preVar(this.node, this.ignores, this.index, this.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
+  }
+  More.prototype.parseOn = function() {
+    this.preJoin();
+    this.join(this.node);
+    this.saveStyle();
+    this.extend();
+    return this.res;
   }
   More.prototype.preJoin = function() {
     while(this.ignores[this.index]) {
@@ -123,7 +132,6 @@ var single;
               if(!/\.\w+['"]?$/.test(str)) {
                 str = str.replace(/(['"]?)$/, '.css$1');
               }
-              self.importStack.push(str);
             }
             self.res += str;
           }

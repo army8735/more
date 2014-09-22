@@ -1,5 +1,6 @@
 module fs from 'fs';
 module homunculus from 'homunculus';
+import preImport from './preImport';
 import preVar from './preVar';
 import getVar from './getVar';
 import preFn from './preFn';
@@ -47,12 +48,12 @@ class More {
     if(this.msg) {
       return this.msg;
     }
-
-    this.preJoin();
-    this.join(this.node);
-    this.saveStyle();
-    this.extend();
-    return this.res;
+    return this.parseOn();
+  }
+  parseFile(file) {
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    this.preParse(code);
+    return this.parseOn();
   }
   preParse(code) {
     if(code) {
@@ -69,8 +70,16 @@ class More {
       }
       return this.msg = e.toString();
     }
+    preImport(this.node, this.importStack);
     preVar(this.node, this.ignores, this.index, this.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
+  }
+  parseOn() {
+    this.preJoin();
+    this.join(this.node);
+    this.saveStyle();
+    this.extend();
+    return this.res;
   }
   preJoin() {
     while(this.ignores[this.index]) {
@@ -123,7 +132,6 @@ class More {
               if(!/\.\w+['"]?$/.test(str)) {
                 str = str.replace(/(['"]?)$/, '.css$1');
               }
-              self.importStack.push(str);
             }
             self.res += str;
           }
