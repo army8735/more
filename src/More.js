@@ -1,6 +1,10 @@
 module fs from 'fs';
+module path from 'path';
+
 module homunculus from 'homunculus';
+
 import preImport from './preImport';
+import importVar from './importVar';
 import preVar from './preVar';
 import getVar from './getVar';
 import preFn from './preFn';
@@ -50,10 +54,43 @@ class More {
     }
     return this.parseOn();
   }
-  parseFile(file) {
+  mixFrom(file, data) {
+    var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    this.preParse(code);
-    return this.parseOn();
+    var more = new More();
+    more.preParse(code);
+    more.imports().forEach(function(im) {
+      if(global.suffix != 'css') {
+        im = im.replace(/\.\w+$/, global.suffix);
+      }
+      var iFile = path.join(path.dirname(file), im);
+      self.mixFrom(iFile, data);
+    });
+    var vars = more.vars();
+    Object.keys(vars).forEach(function(v) {
+      data.vars[v] = vars[v];
+    });
+  }
+  parseFile(file) {
+    var self = this;
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    self.preParse(code);
+    var data = {
+      vars: {}
+    };
+    self.imports().forEach(function(im) {
+      if(global.suffix != 'css') {
+        im = im.replace(/\.\w+$/, global.suffix);
+      }
+      var iFile = path.join(path.dirname(file), im);
+      self.mixFrom(iFile, data);
+    });
+    Object.keys(data.vars).forEach(function(v) {
+      if(!self.varHash.hasOwnProperty(v)) {
+        self.varHash[v] = data.vars[v];
+      }
+    });
+    return self.parseOn();
   }
   preParse(code) {
     if(code) {
@@ -350,7 +387,7 @@ class More {
     return this.parser.lexer.tokens();
   }
   imports() {
-    return this.importStatck;
+    return this.importStack;
   }
 
   vars(o, mix) {
@@ -396,12 +433,18 @@ class More {
     return this.styleHash;
   }
   config(str) {
+    var self = this;
     if(str) {
       this.preParse(str);
     }
+    return {
+      vars: self.varHash,
+      fns: self.fnHash,
+      styles: self.styleHash
+    };
   }
   configFile(file) {
-    this.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+    return this.config(fs.readFileSync(file, { encoding: 'utf-8' }));
   }
   clean() {
     this.varHash = {};
@@ -500,9 +543,10 @@ class More {
       global.fns = single.fns();
       global.styles = single.styles();
     }
+    return global;
   }
   static configFile(file) {
-    More.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+    return More.config(fs.readFileSync(file, { encoding: 'utf-8' }));
   }
   static clean() {
     global = {
@@ -513,6 +557,7 @@ class More {
       root: '',
       localRoot: ''
     };
+    return global;
   }
 }
 

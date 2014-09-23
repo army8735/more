@@ -312,6 +312,11 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('/*test*/\nhtml{}/*test2*/');
   });
+  it('@import var', function() {
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './1.css'));
+    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2;font-size:3}');
+  });
 });
 describe('config', function() {
   it('code', function() {
