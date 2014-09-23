@@ -4,7 +4,6 @@ module path from 'path';
 module homunculus from 'homunculus';
 
 import preImport from './preImport';
-import importVar from './importVar';
 import preVar from './preVar';
 import getVar from './getVar';
 import preFn from './preFn';
@@ -70,13 +69,18 @@ class More {
     Object.keys(vars).forEach(function(v) {
       data.vars[v] = vars[v];
     });
+    var fns = more.fns();
+    Object.keys(fns).forEach(function(v) {
+      data.fns[v] = fns[v];
+    });
   }
   parseFile(file) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
     self.preParse(code);
     var data = {
-      vars: {}
+      vars: {},
+      fns: {}
     };
     self.imports().forEach(function(im) {
       if(global.suffix != 'css') {
@@ -88,6 +92,11 @@ class More {
     Object.keys(data.vars).forEach(function(v) {
       if(!self.varHash.hasOwnProperty(v)) {
         self.varHash[v] = data.vars[v];
+      }
+    });
+    Object.keys(data.fns).forEach(function(v) {
+      if(!self.fnHash.hasOwnProperty(v)) {
+        self.fnHash[v] = data.fns[v];
       }
     });
     return self.parseOn();

@@ -1,0 +1,3 @@
+@import "2.css";
+$a:1;
+body{margin:$a;padding:$b;font-size:$c;fn1()}

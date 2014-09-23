@@ -4,18 +4,17 @@ var path=require('path');
 var homunculus=require('homunculus');
 
 var preImport=function(){var _4=require('./preImport');return _4.hasOwnProperty("preImport")?_4.preImport:_4.hasOwnProperty("default")?_4.default:_4}();
-var importVar=function(){var _5=require('./importVar');return _5.hasOwnProperty("importVar")?_5.importVar:_5.hasOwnProperty("default")?_5.default:_5}();
-var preVar=function(){var _6=require('./preVar');return _6.hasOwnProperty("preVar")?_6.preVar:_6.hasOwnProperty("default")?_6.default:_6}();
-var getVar=function(){var _7=require('./getVar');return _7.hasOwnProperty("getVar")?_7.getVar:_7.hasOwnProperty("default")?_7.default:_7}();
-var preFn=function(){var _8=require('./preFn');return _8.hasOwnProperty("preFn")?_8.preFn:_8.hasOwnProperty("default")?_8.default:_8}();
-var getFn=function(){var _9=require('./getFn');return _9.hasOwnProperty("getFn")?_9.getFn:_9.hasOwnProperty("default")?_9.default:_9}();
-var ignore=function(){var _10=require('./ignore');return _10.hasOwnProperty("ignore")?_10.ignore:_10.hasOwnProperty("default")?_10.default:_10}();
-var clone=function(){var _11=require('./clone');return _11.hasOwnProperty("clone")?_11.clone:_11.hasOwnProperty("default")?_11.default:_11}();
-var join=function(){var _12=require('./join');return _12.hasOwnProperty("join")?_12.join:_12.hasOwnProperty("default")?_12.default:_12}();
-var concatSelector=function(){var _13=require('./concatSelector');return _13.hasOwnProperty("concatSelector")?_13.concatSelector:_13.hasOwnProperty("default")?_13.default:_13}();
-var eventbus=function(){var _14=require('./eventbus.js');return _14.hasOwnProperty("eventbus")?_14.eventbus:_14.hasOwnProperty("default")?_14.default:_14}();
-var checkLevel=function(){var _15=require('./checkLevel.js');return _15.hasOwnProperty("checkLevel")?_15.checkLevel:_15.hasOwnProperty("default")?_15.default:_15}();
-var normalize=function(){var _16=require('./normalize.js');return _16.hasOwnProperty("normalize")?_16.normalize:_16.hasOwnProperty("default")?_16.default:_16}();
+var preVar=function(){var _5=require('./preVar');return _5.hasOwnProperty("preVar")?_5.preVar:_5.hasOwnProperty("default")?_5.default:_5}();
+var getVar=function(){var _6=require('./getVar');return _6.hasOwnProperty("getVar")?_6.getVar:_6.hasOwnProperty("default")?_6.default:_6}();
+var preFn=function(){var _7=require('./preFn');return _7.hasOwnProperty("preFn")?_7.preFn:_7.hasOwnProperty("default")?_7.default:_7}();
+var getFn=function(){var _8=require('./getFn');return _8.hasOwnProperty("getFn")?_8.getFn:_8.hasOwnProperty("default")?_8.default:_8}();
+var ignore=function(){var _9=require('./ignore');return _9.hasOwnProperty("ignore")?_9.ignore:_9.hasOwnProperty("default")?_9.default:_9}();
+var clone=function(){var _10=require('./clone');return _10.hasOwnProperty("clone")?_10.clone:_10.hasOwnProperty("default")?_10.default:_10}();
+var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}();
+var concatSelector=function(){var _12=require('./concatSelector');return _12.hasOwnProperty("concatSelector")?_12.concatSelector:_12.hasOwnProperty("default")?_12.default:_12}();
+var eventbus=function(){var _13=require('./eventbus.js');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
+var checkLevel=function(){var _14=require('./checkLevel.js');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
+var normalize=function(){var _15=require('./normalize.js');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -70,13 +69,18 @@ var single;
     Object.keys(vars).forEach(function(v) {
       data.vars[v] = vars[v];
     });
+    var fns = more.fns();
+    Object.keys(fns).forEach(function(v) {
+      data.fns[v] = fns[v];
+    });
   }
   More.prototype.parseFile = function(file) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
     self.preParse(code);
     var data = {
-      vars: {}
+      vars: {},
+      fns: {}
     };
     self.imports().forEach(function(im) {
       if(global.suffix != 'css') {
@@ -88,6 +92,11 @@ var single;
     Object.keys(data.vars).forEach(function(v) {
       if(!self.varHash.hasOwnProperty(v)) {
         self.varHash[v] = data.vars[v];
+      }
+    });
+    Object.keys(data.fns).forEach(function(v) {
+      if(!self.fnHash.hasOwnProperty(v)) {
+        self.fnHash[v] = data.fns[v];
       }
     });
     return self.parseOn();

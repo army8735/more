@@ -315,7 +315,7 @@ describe('simple test', function() {
   it('@import var', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'));
-    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2;font-size:3}');
+    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2;font-size:3;text-align:center}');
   });
 });
 describe('config', function() {
