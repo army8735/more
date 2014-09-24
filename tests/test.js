@@ -315,7 +315,15 @@ describe('simple test', function() {
   it('@import var', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'));
-    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2;font-size:3;text-align:center}');
+    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center}');
+  });
+  it('#parseFile(file, true)', function() {
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './1.css'), true);
+    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center}');
+    more = new More();
+    res2 = more.parseFile(path.join(__dirname, './2.css'));
+    expect(res2).to.eql('@import \"3.css\";\n1:2;\n2:2;\nfn1(){text-align:center;}\nbody{margin:1}');
   });
 });
 describe('config', function() {
