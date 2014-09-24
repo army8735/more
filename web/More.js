@@ -39,6 +39,7 @@ var relations = {};
     this.parser = null;
     this.varHash = {};
     this.styleHash = {};
+    this.styleTemp = 0;
     this.fnHash = {};
     this.res = '';
     this.index = 0;
@@ -46,7 +47,6 @@ var relations = {};
     this.autoSplit = false;
     this.selectorStack = [];
     this.importStack = [];
-    this.extendStack = [];
   }
   More.prototype.parse = function(code) {
     this.preParse(code);
@@ -78,8 +78,16 @@ var relations = {};
     Object.keys(fns).forEach(function(v) {
       data.fns[v] = fns[v];
     });
+    more.parseOn();
+    var styles = more.styles();
+    Object.keys(styles).forEach(function(v) {
+      data.styles[v] = data.styles[v] || '';
+      data.styles[v] += styles[v];
+    });
+    relations[file] = relations[file] || {};
+    relations[file].styles = clone(data.styles);
   }
-  //通过page参数区分是页面中link标签引入的css文件还是被css@import加载的
+  //通过page参数区分是页面中link标签引入的css文件或独立访问，还是被css@import加载的
   //后端可通过request.refferrer来识别
   //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件以及@import的文件
   //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
@@ -91,22 +99,23 @@ var relations = {};
       delete relations[file];
     }
     //否则是被@import导入的文件，直接使用已存的共享变量
-    else if(relations[file]) {
-      self.varHash = relations[file].vars;
-      self.fnHash = relations[file].fns;
-      self.styleHash = {};
-      delete relations[file];
-      self.preParse(code, true);
+    else if(relations.hasOwnProperty(file)) {
+      self.preParse(code);
       if(self.msg) {
         return self.msg;
       }
+      self.varHash = relations[file].vars;
+      self.fnHash = relations[file].fns;
+      self.styleHash = relations[file].styles;
+      delete relations[file];
       return self.parseOn();
     }
     //先预分析取得@import列表，递归其获取变量
     self.preParse(code);
     var data = {
       vars: {},
-      fns: {}
+      fns: {},
+      styles: {}
     };
     var list = [];
     self.imports().forEach(function(im) {
@@ -130,18 +139,22 @@ var relations = {};
         self.fnHash[v] = data.fns[v];
       }
     });
+    Object.keys(data.styles).forEach(function(v) {
+      if(!self.styleHash.hasOwnProperty(v)) {
+        self.styleHash[v] = data.styles[v];
+      }
+    });
     //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
     if(page) {
       list.forEach(function(iFile) {
-        relations[iFile] = {
-          vars: self.varHash,
-          fns: self.fnHash
-        }
+        relations[iFile] = relations[iFile] || {};
+        relations[iFile].vars = self.varHash;
+        relations[iFile].fns =  self.fnHash;
       });
     }
     return self.parseOn();
   }
-  More.prototype.preParse = function(code, onlyAst) {
+  More.prototype.preParse = function(code) {
     if(code) {
       this.code = code;
     }
@@ -156,17 +169,13 @@ var relations = {};
       }
       return this.msg = e.toString();
     }
-    if(!onlyAst) {
-      preImport(this.node, this.importStack);
-      preVar(this.node, this.ignores, this.index, this.varHash);
-      preFn(this.node, this.ignores, this.index, this.fnHash);
-    }
+    preImport(this.node, this.importStack);
+    preVar(this.node, this.ignores, this.index, this.varHash);
+    preFn(this.node, this.ignores, this.index, this.fnHash);
   }
   More.prototype.parseOn = function() {
     this.preJoin();
     this.join(this.node);
-    this.saveStyle();
-    this.extend();
     return this.res;
   }
   More.prototype.preJoin = function() {
@@ -249,7 +258,7 @@ var relations = {};
           self.res += getFn(node, self.ignores, self.index, self.fnHash, global.fns, self.varHash, global.vars);
           break;
         case Node.EXTEND:
-          self.preExtend(node);
+          self.extend(node);
           break;
         case Node.IMPORT:
           self.impt(node);
@@ -289,8 +298,7 @@ var relations = {};
         else {
           var s = concatSelector(self.selectorStack);
           normalize(s).split(',').forEach(function(se) {
-            self.styleHash[se] = self.styleHash[se] || [];
-            self.styleHash[se].push(self.res.length);
+            self.saveStyle(se, self.res.slice(self.styleTemp, self.res.length));
           });
           self.res += '}';
         }
@@ -304,8 +312,7 @@ var relations = {};
         var s = concatSelector(self.selectorStack);
         var temp = self.res.lastIndexOf('}');
         normalize(s).split(',').forEach(function(se) {
-          self.styleHash[se] = self.styleHash[se] || [];
-          self.styleHash[se].push(temp);
+          self.saveStyle(se, self.res.slice(self.styleTemp, temp));
         });
       }
       self.selectorStack.pop();
@@ -321,8 +328,7 @@ var relations = {};
         else {
           self.res += s + '{';
           normalize(s).split(',').forEach(function(se) {
-            self.styleHash[se] = self.styleHash[se] || [];
-            self.styleHash[se].push(self.res.length);
+            self.styleTemp = self.res.length;
           });
         }
       }
@@ -350,77 +356,48 @@ var relations = {};
         self.res += s;
       }
       normalize(s).split(',').forEach(function(se) {
-        self.styleHash[se] = self.styleHash[se] || [];
-        self.styleHash[se].push(self.res.length + 1);
+        self.styleTemp = self.res.length + 1;
       });
     }
   }
-  More.prototype.preExtend = function(node) {
+  More.prototype.extend = function(node) {
     var self = this;
     ignore(node, self.ignores, self.index);
     var i = self.index;
-    var o = {
-      start: self.res.length
-    };
     while(self.ignores[++i]) {}
     var s = normalize(join(node.leaf(1), self.ignores, i));
-    o.targets = s.split(',');
+    var targets = s.split(',');
+    targets.forEach(function(se) {
+      self.res += self.styleHash[se] || '';
+    });
     var se = normalize(concatSelector(self.selectorStack));
-    o.selectors = se.split(',');
-    self.extendStack.push(o);
+    se = se.split(',');
     eventbus.on(node.parent().nid(), function(start) {
       if(!start) {
-        o.blockEnd = self.res.length;
-      }
-    });
-  }
-  More.prototype.extend = function() {
-    var temp = 0;
-    var self = this;
-    var styleArray = Object.keys(self.styleHash);
-    self.extendStack.forEach(function(o) {
-      var v = '';
-      var v2 = '';
-      o.targets.forEach(function(se) {
-        v += self.styleHash[se] || '';
-        styleArray.forEach(function(se2) {
-          if(se2.indexOf(se) == 0 && se2.length != se.length && o.selectors.indexOf(se2) == -1) {
-            var pseudo = concatSelector([o.selectors].concat([[se2.slice(se.length)]]));
-            pseudo = normalize(pseudo);
-            if(self.styleHash[se2]) {
-              v2 += pseudo + '{' + self.styleHash[se2] + '}';
-              self.styleHash[pseudo] = self.styleHash[pseudo] || '';
-              self.styleHash[pseudo] += self.styleHash[se2];
+        var styleArray = Object.keys(self.styleHash);
+        targets.forEach(function(se1) {
+          styleArray.forEach(function(se2) {
+            if(se2.indexOf(se1) == 0 && se2.length != se1.length && se1.indexOf(se2) == -1) {
+              var pseudo = concatSelector([se].concat([[se2.slice(se1.length)]]));
+              pseudo = normalize(pseudo);
+              if(self.styleHash[se2]) {
+                self.res += pseudo + '{' + self.styleHash[se2] + '}';
+                self.styleHash[pseudo] = self.styleHash[pseudo] || '';
+                self.styleHash[pseudo] += self.styleHash[se2];
+              }
             }
-          }
+          });
         });
-      });
-      if(v) {
-        self.res = self.res.slice(0, o.start + temp) + v + self.res.slice(o.start + temp);
-        temp += v.length;
-        o.selectors.forEach(function(se2) {
-          self.styleHash[se2] += v;
-        });
-      }
-      if(v2) {
-        self.res = self.res.slice(0, o.blockEnd + temp) + v2 + self.res.slice(o.blockEnd + temp);
-        temp += v2.length;
       }
     });
   }
-  More.prototype.saveStyle = function() {
-    var self = this;
-    Object.keys(self.styleHash).forEach(function(key) {
-      var arr = self.styleHash[key];
-      self.styleHash[key] = '';
-      for(var i = 0; i < arr.length; i += 2) {
-        var s = self.res.slice(arr[i], arr[i+1]).trim().replace(/\n/g, '');
-        if(s.length && s.charAt(s.length - 1) != ';') {
-          s += ';';
-        }
-        self.styleHash[key] += s;
-      }
-    });
+  More.prototype.saveStyle = function(k, v) {
+    this.styleHash[k] = this.styleHash[k] || '';
+    v = v.trim();
+    if(v.length && v.charAt(v.length - 1) != ';') {
+      v += ';';
+    }
+    this.styleHash[k] += v;
   }
   More.prototype.impt = function(node) {
     var url = node.leaf(1);

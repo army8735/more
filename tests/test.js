@@ -268,7 +268,7 @@ describe('simple test', function() {
     var more = new More();
     var s = 'html{margin:0;body{@extend html}padding:1}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;}html{padding:1}');
+    expect(res).to.eql('html{margin:0;}html body{margin:0;}html{padding:1}');
   });
   it('@extend pseudo', function() {
     var more = new More();
@@ -280,13 +280,13 @@ describe('simple test', function() {
     var more = new More();
     var s = 'html{margin:0;body{@extend html}padding:1;&:hover{color:#000}}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;}html body:hover{color:#000;}html{padding:1;}html:hover{color:#000}');
+    expect(res).to.eql('html{margin:0;}html body{margin:0;}html{padding:1;}html:hover{color:#000}');
   });
   it('@extend pseudo level multi', function() {
     var more = new More();
     var s = 'html{margin:0;body{@extend html,a}padding:1;&:hover{color:#000}}a{line-height:2}a:hover{text-align:center}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:0;}html body{margin:0;padding:1;line-height:2;}html body:hover{color:#000;}html body:hover{text-align:center;}html{padding:1;}html:hover{color:#000}a{line-height:2}a:hover{text-align:center}');
+    expect(res).to.eql('html{margin:0;}html body{margin:0;}html{padding:1;}html:hover{color:#000}a{line-height:2}a:hover{text-align:center}');
   });
   it('normalize selector 1', function() {
     var more = new More();
@@ -315,15 +315,15 @@ describe('simple test', function() {
   it('@import var', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'));
-    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center}');
+    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
   });
   it('#parseFile(file, true)', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'), true);
-    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center}');
+    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
     more = new More();
     res2 = more.parseFile(path.join(__dirname, './2.css'));
-    expect(res2).to.eql('@import \"3.css\";\n1:2;\n2:2;\nfn1(){text-align:center;}\nbody{margin:1}');
+    expect(res2).to.eql('@import \"3.css\";\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}');
   });
 });
 describe('config', function() {

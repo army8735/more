@@ -2,4 +2,5 @@
 $a:2;
 $b:2;
 fn1(){text-align:center;}
-body{margin:$d}
+body{margin:$d;@extend .test2}
+div{@extend .test1}
