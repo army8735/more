@@ -91,7 +91,7 @@ class More {
   //后端可通过request.refferrer来识别
   //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件以及@import的文件
   //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
-  parseFile(file, page) {
+  parseFile(file, page = false) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
     //page传入时说明来源于页面，删除可能存在与其对应的共享变量作用域
@@ -586,6 +586,10 @@ class More {
       localRoot: ''
     };
     return global;
+  }
+  static clearRelation() {
+    relations = {};
+    return relations;
   }
 }
 

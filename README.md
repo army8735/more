@@ -28,7 +28,8 @@ npm install more-css
 ### More
 * constructor(code:String = '') 传入需要预编译的code
 * parse(code:String = null):String 预编译code，可以为空，否则会覆盖构造函数里传入的code
-* parseFile(file:String):String 转换一个css文件
+* parseFile(file:String, page:Boolean = false):String 转换一个css文件，page表明来源是否是页面
+ * 一般情况下可忽略page参数，高级用法详见[parseFile高级用法](https://github.com/army8735/more/wiki/document#parsefile高级用法)
 * ast():Object 返回解析后的语法树
 * tokens():Array<Object> 返回解析后的词法单元序列
 * imports():Array<String> 返回解析后的@import文件列表
@@ -38,6 +39,7 @@ npm install more-css
 * config(str:String):void 预编译一段css并将其结果作为此more对象之后预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空设置
+* clearRelation():void 清空内部维护的@import引入关系
 
 ### 静态属性
 * parse(code:String = null):String 快捷方式预编译，相当于一个More类的单例对象

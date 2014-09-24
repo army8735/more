@@ -325,6 +325,11 @@ describe('simple test', function() {
     res2 = more.parseFile(path.join(__dirname, './2.css'));
     expect(res2).to.eql('@import \"3.css\";\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}');
   });
+  it('#clearRelation', function() {
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './1.css'), true);
+    expect(More.clearRelation()).to.eql({});
+  });
 });
 describe('config', function() {
   it('code', function() {
