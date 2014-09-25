@@ -37,10 +37,6 @@ describe('api', function() {
     var more = new More();
     expect(more.configFile).to.be.a(Function);
   });
-  it('#build', function() {
-    var more = new More();
-    expect(more.build).to.be.a(Function);
-  });
   it('#buildFile', function() {
     var more = new More();
     expect(more.buildFile).to.be.a(Function);
@@ -73,14 +69,14 @@ describe('api', function() {
   it('##configFile', function() {
     expect(More.configFile).to.be.a(Function);
   });
-  it('##build', function() {
-    expect(More.build).to.be.a(Function);
-  });
   it('##buildFile', function() {
     expect(More.buildFile).to.be.a(Function);
   });
   it('##clean', function() {
     expect(More.clean).to.be.a(Function);
+  });
+  it('##clearRelation', function() {
+    expect(More.clearRelation).to.be.a(Function);
   });
 });
 describe('simple test', function() {
@@ -327,8 +323,13 @@ describe('simple test', function() {
   });
   it('#clearRelation', function() {
     var more = new More();
-    var res = more.parseFile(path.join(__dirname, './1.css'), true);
+    more.parseFile(path.join(__dirname, './1.css'), true);
     expect(More.clearRelation()).to.eql({});
+  });
+  it.only('#buildFile', function() {
+    var more = new More();
+    var res = more.buildFile(path.join(__dirname, './1.css'), true);
+    expect(res).to.eql('');
   });
 });
 describe('config', function() {

@@ -28,8 +28,6 @@ var global = {
   localRoot: ''
 };
 
-var single;
-
 var relations = {};
 
 class More {
@@ -123,9 +121,7 @@ class More {
         im = im.replace(/\.\w+$/, global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
-      if(list.indexOf(iFile) == -1) {
-        list.push(iFile);
-      }
+      list.push(iFile);
       self.mixFrom(iFile, data, list);
     });
     //合并@import文件中的变量
@@ -139,11 +135,7 @@ class More {
         self.fnHash[v] = data.fns[v];
       }
     });
-    Object.keys(data.styles).forEach(function(v) {
-      if(!self.styleHash.hasOwnProperty(v)) {
-        self.styleHash[v] = data.styles[v];
-      }
-    });
+    self.styleHash = data.styles;
     //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
     if(page) {
       list.forEach(function(iFile) {
@@ -479,33 +471,48 @@ class More {
     this.fnHash = {};
     this.styleHash = {};
   }
-  build(code) {
-    //
-  }
-  buildFile(file) {
-    return this.build(fs.readFileSync(file, { encoding: 'utf-8' }));
+  buildFile(file, page = false) {
+    var self = this;
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    //先预分析取得@import列表，递归其获取变量
+    self.preParse(code);
+    var data = {
+      vars: {},
+      fns: {},
+      styles: {}
+    };
+    var list = [];
+    self.imports().forEach(function(im) {
+      if(global.suffix != 'css') {
+        im = im.replace(/\.\w+$/, global.suffix);
+      }
+      var iFile = path.join(path.dirname(file), im);
+      list.push(iFile);
+      self.mixFrom(iFile, data, list);
+    });
+    //合并@import文件中的变量
+    Object.keys(data.vars).forEach(function(v) {
+      if(!self.varHash.hasOwnProperty(v)) {
+        self.varHash[v] = data.vars[v];
+      }
+    });
+    Object.keys(data.fns).forEach(function(v) {
+      if(!self.fnHash.hasOwnProperty(v)) {
+        self.fnHash[v] = data.fns[v];
+      }
+    });
+    self.styleHash = data.styles;
+    console.log(self.parseOn())
   }
 
   static parse(code) {
-    if(!single) {
-      single = new More();
-    }
-    return single.parse(code);
+    return (new More()).parse(code);
   }
   static parseFile(file) {
-    if(!single) {
-      single = new More();
-    }
-    return single.parseFile(code);
+    return (new More()).parseFile(code);
   }
-  static build(code) {
-    if(!single) {
-      single = new More();
-    }
-    //
-  }
-  static buildFile(file) {
-    return More.build(fs.readFileSync(file, { encoding: 'utf-8' }));
+  static buildFile(file, page) {
+    return (new More).buildFile(file, page);
   }
   static suffix(str = null) {
     if(str) {
@@ -566,10 +573,11 @@ class More {
   }
   static config(str) {
     if(str) {
-      More.parse(str);
-      global.vars = single.vars();
-      global.fns = single.fns();
-      global.styles = single.styles();
+      var more = new More();
+      more.parse(str);
+      global.vars = more.vars();
+      global.fns = more.fns();
+      global.styles = more.styles();
     }
     return global;
   }
