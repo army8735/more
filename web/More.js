@@ -63,7 +63,7 @@ var relations = {};
     more.preParse(code);
     more.imports().forEach(function(im) {
       if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, global.suffix);
+        im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
       list.push(iFile);
@@ -121,7 +121,7 @@ var relations = {};
     var list = [];
     self.imports().forEach(function(im) {
       if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, global.suffix);
+        im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
       list.push(iFile);
@@ -223,6 +223,9 @@ var relations = {};
             if(token.import) {
               if(!/\.\w+['"]?$/.test(str)) {
                 str = str.replace(/(['"]?)$/, '.css$1');
+              }
+              else if(!/\.css+['"]?$/.test(str)) {
+                str = str.replace(/\.\w+(['"]?)$/, '.css$1');
               }
             }
             self.res += str;
@@ -494,7 +497,7 @@ var relations = {};
     var list = [];
     self.imports().forEach(function(im) {
       if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, global.suffix);
+        im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
       list.push(iFile);
@@ -542,7 +545,7 @@ var relations = {};
     var res = '';
     more.imports().forEach(function(im) {
       if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, global.suffix);
+        im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
       res += More.buildIn(iFile, data);

@@ -338,6 +338,12 @@ describe('simple test', function() {
 //    fs.writeFileSync(path.join(__dirname, './bulid2.css'), res);
     expect(res).to.eql(fs.readFileSync(path.join(__dirname, './bulid2.css'), { encoding: 'utf-8' }));
   });
+  it('suffix', function() {
+    More.suffix('less');
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './1.less'));
+    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2}');
+  });
 });
 describe('config', function() {
   it('code', function() {
