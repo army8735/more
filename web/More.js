@@ -12,9 +12,10 @@ var ignore=function(){var _9=require('./ignore');return _9.hasOwnProperty("ignor
 var clone=function(){var _10=require('./clone');return _10.hasOwnProperty("clone")?_10.clone:_10.hasOwnProperty("default")?_10.default:_10}();
 var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}();
 var concatSelector=function(){var _12=require('./concatSelector');return _12.hasOwnProperty("concatSelector")?_12.concatSelector:_12.hasOwnProperty("default")?_12.default:_12}();
-var eventbus=function(){var _13=require('./eventbus.js');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
-var checkLevel=function(){var _14=require('./checkLevel.js');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
-var normalize=function(){var _15=require('./normalize.js');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
+var eventbus=function(){var _13=require('./eventbus');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
+var checkLevel=function(){var _14=require('./checkLevel');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
+var normalize=function(){var _15=require('./normalize');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
+var share=function(){var _16=require('./share');return _16.hasOwnProperty("share")?_16.share:_16.hasOwnProperty("default")?_16.default:_16}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -53,6 +54,8 @@ var relations = {};
     }
     return this.parseOn();
   }
+  //从入口处发起，递归入口css文件及其@import列表，以页面为作用域，将环境变量保存到data中
+  //后面的文件的变量会覆盖前者，styles除外
   More.prototype.mixFrom = function(file, data, list) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
@@ -74,7 +77,10 @@ var relations = {};
     Object.keys(fns).forEach(function(v) {
       data.fns[v] = fns[v];
     });
+    //执行过程中可能会存在变量未定义，因为使用后面文件中的定义，防止报错将其静音
+    share('silence', true);
     more.parseOn();
+    share('silence', false);
     var styles = more.styles();
     Object.keys(styles).forEach(function(v) {
       data.styles[v] = data.styles[v] || '';
@@ -475,6 +481,10 @@ var relations = {};
     if(self.msg) {
       return self.msg;
     }
+    //build前清空所有关系数据
+    if(page) {
+      relations = {};
+    }
     //先预分析取得@import列表，递归其获取变量
     var data = {
       vars: {},
@@ -505,13 +515,13 @@ var relations = {};
     var res = '';
     //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
     if(page) {
-      delete relations[file];
       list.forEach(function(iFile) {
         res += More.buildIn(iFile, {
           vars: self.varHash,
           fns: self.fnHash
         });
       });
+      relations = {};
     }
     //否则作用域为顺序，递归执行build即可
     else {

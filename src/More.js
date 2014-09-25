@@ -12,9 +12,10 @@ import ignore from './ignore';
 import clone from './clone';
 import join from './join';
 import concatSelector from './concatSelector';
-import eventbus from './eventbus.js';
-import checkLevel from './checkLevel.js';
-import normalize from './normalize.js';
+import eventbus from './eventbus';
+import checkLevel from './checkLevel';
+import normalize from './normalize';
+import share from './share';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -53,6 +54,8 @@ class More {
     }
     return this.parseOn();
   }
+  //从入口处发起，递归入口css文件及其@import列表，以页面为作用域，将环境变量保存到data中
+  //后面的文件的变量会覆盖前者，styles除外
   mixFrom(file, data, list) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
@@ -74,7 +77,10 @@ class More {
     Object.keys(fns).forEach(function(v) {
       data.fns[v] = fns[v];
     });
+    //执行过程中可能会存在变量未定义，因为使用后面文件中的定义，防止报错将其静音
+    share('silence', true);
     more.parseOn();
+    share('silence', false);
     var styles = more.styles();
     Object.keys(styles).forEach(function(v) {
       data.styles[v] = data.styles[v] || '';
@@ -475,6 +481,10 @@ class More {
     if(self.msg) {
       return self.msg;
     }
+    //build前清空所有关系数据
+    if(page) {
+      relations = {};
+    }
     //先预分析取得@import列表，递归其获取变量
     var data = {
       vars: {},
@@ -505,13 +515,13 @@ class More {
     var res = '';
     //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
     if(page) {
-      delete relations[file];
       list.forEach(function(iFile) {
         res += More.buildIn(iFile, {
           vars: self.varHash,
           fns: self.fnHash
         });
       });
+      relations = {};
     }
     //否则作用域为顺序，递归执行build即可
     else {
