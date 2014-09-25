@@ -56,6 +56,7 @@ npm install more-css
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
 * clearRelation():void 清空内部维护的@import引入关系
+* addKeyWord(kw:String/Array<String>):void 添加未知的css属性关键字以支持分析
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖

@@ -651,6 +651,9 @@ var relations = {};
     relations = {};
     return relations;
   }
+  More.addKeyword=function(kw) {
+    homunculus.getClass('rule', 'css').addKeyWord(kw);
+  }
 
 
 exports.default=More;});

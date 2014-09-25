@@ -343,6 +343,20 @@ describe('simple test', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.less'));
     expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2}');
+    More.suffix('css');
+  });
+  it('unknow kw', function() {
+    var more = new More();
+    var s = 'html{dd:1}body{@extend html}';
+    var res = more.parse(s);
+    expect(res.indexOf('Error:')).to.eql(0);
+  });
+  it('new kw', function() {
+    More.addKeyword('dd');
+    var more = new More();
+    var s = 'html{dd:1}body{@extend html}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{dd:1}body{dd:1;}');
   });
 });
 describe('config', function() {

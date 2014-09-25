@@ -651,6 +651,9 @@ class More {
     relations = {};
     return relations;
   }
+  static addKeyword(kw) {
+    homunculus.getClass('rule', 'css').addKeyWord(kw);
+  }
 }
 
 export default More;
