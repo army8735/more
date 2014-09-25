@@ -332,7 +332,7 @@ describe('simple test', function() {
 //    fs.writeFileSync(path.join(__dirname, './bulid1.css'), res);
     expect(res).to.eql(fs.readFileSync(path.join(__dirname, './bulid1.css'), { encoding: 'utf-8' }));
   });
-  it.only('#buildFile true', function() {
+  it('#buildFile true', function() {
     var more = new More();
     var res = more.buildFile(path.join(__dirname, './1.css'), true);
 //    fs.writeFileSync(path.join(__dirname, './bulid2.css'), res);
