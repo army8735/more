@@ -7,23 +7,19 @@ var Node = homunculus.getClass('node', 'css');
 
 var index;
 
-function recursion(node, ignores, res) {
+function recursion(node, ignores) {
   var isToken = node.name() == Node.TOKEN;
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(!isToken) {
-    if(node.name() == Node.VARDECL) {
-      var i = index;
-      while(ignores[++i]) {}
-      while(ignores[++i]) {}
-      var leaves = node.leaves();
-      var k = leaves[0].token().content().slice(1);
-      var v = join(leaves[2], ignores, i);
-      res[k] = v;
+    if(node.name() == Node.STYLESET) {
+      return;
+    }
+    else if(node.name() == Node.IMPORT) {
       index = ignore(node, ignores, index);
     }
     else {
       node.leaves().forEach(function(leaf) {
-        recursion(leaf, ignores, res);
+        recursion(leaf, ignores);
       });
     }
   }
@@ -32,7 +28,12 @@ function recursion(node, ignores, res) {
   }
 }
 
-exports.default=function(node, res) {
+exports.default=function(node, ignores, i, ignoreImport) {
+  if(ignoreImport) {
+    index = i;
+    recursion(node, ignores);
+  }
+  var res = [];
   var leaves = node.leaves();
   for(var i = 0, len = leaves.length; i < len; i++) {
     var leaf = leaves[i];
@@ -49,4 +50,5 @@ exports.default=function(node, res) {
       }
     }
   }
+  return res;
 }

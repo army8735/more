@@ -46,8 +46,8 @@ class More {
     this.selectorStack = [];
     this.importStack = [];
   }
-  parse(code) {
-    this.preParse(code);
+  parse(code, ignoreImport) {
+    this.preParse(code, ignoreImport);
     if(this.msg) {
       return this.msg;
     }
@@ -63,9 +63,7 @@ class More {
         im = im.replace(/\.\w+$/, global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
-      if(list.indexOf(iFile) == -1) {
-        list.push(iFile);
-      }
+      list.push(iFile);
       self.mixFrom(iFile, data);
     });
     var vars = more.vars();
@@ -92,16 +90,16 @@ class More {
   parseFile(file, page = false) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    self.preParse(code);
+    if(self.msg) {
+      return self.msg;
+    }
     //page传入时说明来源于页面，删除可能存在与其对应的共享变量作用域
     if(page) {
       delete relations[file];
     }
     //否则是被@import导入的文件，直接使用已存的共享变量
     else if(relations.hasOwnProperty(file)) {
-      self.preParse(code);
-      if(self.msg) {
-        return self.msg;
-      }
       self.varHash = relations[file].vars;
       self.fnHash = relations[file].fns;
       self.styleHash = relations[file].styles;
@@ -109,7 +107,6 @@ class More {
       return self.parseOn();
     }
     //先预分析取得@import列表，递归其获取变量
-    self.preParse(code);
     var data = {
       vars: {},
       fns: {},
@@ -146,7 +143,7 @@ class More {
     }
     return self.parseOn();
   }
-  preParse(code) {
+  preParse(code, ignoreImport) {
     if(code) {
       this.code = code;
     }
@@ -161,7 +158,7 @@ class More {
       }
       return this.msg = e.toString();
     }
-    preImport(this.node, this.importStack);
+    this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
     preVar(this.node, this.ignores, this.index, this.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
   }
@@ -419,7 +416,7 @@ class More {
         });
       }
       else {
-        this.varHash = o;
+        this.varHash = clone(o);
       }
     }
     return this.varHash;
@@ -447,7 +444,7 @@ class More {
         });
       }
       else {
-        this.styleHash = o;
+        this.styleHash = clone(o);
       }
     }
     return this.styleHash;
@@ -474,8 +471,11 @@ class More {
   buildFile(file, page = false) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    self.preParse(code, true);
+    if(self.msg) {
+      return self.msg;
+    }
     //先预分析取得@import列表，递归其获取变量
-    self.preParse(code);
     var data = {
       vars: {},
       fns: {},
@@ -488,7 +488,7 @@ class More {
       }
       var iFile = path.join(path.dirname(file), im);
       list.push(iFile);
-      self.mixFrom(iFile, data, list);
+      self.mixFrom(iFile, data, []);
     });
     //合并@import文件中的变量
     Object.keys(data.vars).forEach(function(v) {
@@ -502,7 +502,46 @@ class More {
       }
     });
     self.styleHash = data.styles;
-    console.log(self.parseOn())
+    var res = '';
+    //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
+    if(page) {
+      delete relations[file];
+      list.forEach(function(iFile) {
+        res += More.buildIn(iFile, {
+          vars: self.varHash,
+          fns: self.fnHash
+        });
+      });
+    }
+    //否则作用域为顺序，递归执行build即可
+    else {
+      list.forEach(function(iFile) {
+        res += More.buildFile(iFile);
+      });
+    }
+    res += self.parseOn();
+    return res;
+  }
+  static buildIn(file, data) {
+    var more = new More();
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    more.preParse(code, true);
+    if(more.msg) {
+      return more.msg;
+    }
+    var res = '';
+    more.imports().forEach(function(im) {
+      if(global.suffix != 'css') {
+        im = im.replace(/\.\w+$/, global.suffix);
+      }
+      var iFile = path.join(path.dirname(file), im);
+      res += More.buildIn(iFile, data);
+    });
+    more.vars(data.vars);
+    more.fns(data.fns);
+    more.styles(relations[file].styles);
+    res += more.parseOn();
+    return res;
   }
 
   static parse(code) {

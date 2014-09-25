@@ -3,18 +3,18 @@ var path=require('path');
 
 var homunculus=require('homunculus');
 
-var preImport=function(){var _1380=require('./preImport');return _1380.hasOwnProperty("preImport")?_1380.preImport:_1380.hasOwnProperty("default")?_1380.default:_1380}();
-var preVar=function(){var _1381=require('./preVar');return _1381.hasOwnProperty("preVar")?_1381.preVar:_1381.hasOwnProperty("default")?_1381.default:_1381}();
-var getVar=function(){var _1382=require('./getVar');return _1382.hasOwnProperty("getVar")?_1382.getVar:_1382.hasOwnProperty("default")?_1382.default:_1382}();
-var preFn=function(){var _1383=require('./preFn');return _1383.hasOwnProperty("preFn")?_1383.preFn:_1383.hasOwnProperty("default")?_1383.default:_1383}();
-var getFn=function(){var _1384=require('./getFn');return _1384.hasOwnProperty("getFn")?_1384.getFn:_1384.hasOwnProperty("default")?_1384.default:_1384}();
-var ignore=function(){var _1385=require('./ignore');return _1385.hasOwnProperty("ignore")?_1385.ignore:_1385.hasOwnProperty("default")?_1385.default:_1385}();
-var clone=function(){var _1386=require('./clone');return _1386.hasOwnProperty("clone")?_1386.clone:_1386.hasOwnProperty("default")?_1386.default:_1386}();
-var join=function(){var _1387=require('./join');return _1387.hasOwnProperty("join")?_1387.join:_1387.hasOwnProperty("default")?_1387.default:_1387}();
-var concatSelector=function(){var _1388=require('./concatSelector');return _1388.hasOwnProperty("concatSelector")?_1388.concatSelector:_1388.hasOwnProperty("default")?_1388.default:_1388}();
-var eventbus=function(){var _1389=require('./eventbus.js');return _1389.hasOwnProperty("eventbus")?_1389.eventbus:_1389.hasOwnProperty("default")?_1389.default:_1389}();
-var checkLevel=function(){var _1390=require('./checkLevel.js');return _1390.hasOwnProperty("checkLevel")?_1390.checkLevel:_1390.hasOwnProperty("default")?_1390.default:_1390}();
-var normalize=function(){var _1391=require('./normalize.js');return _1391.hasOwnProperty("normalize")?_1391.normalize:_1391.hasOwnProperty("default")?_1391.default:_1391}();
+var preImport=function(){var _4=require('./preImport');return _4.hasOwnProperty("preImport")?_4.preImport:_4.hasOwnProperty("default")?_4.default:_4}();
+var preVar=function(){var _5=require('./preVar');return _5.hasOwnProperty("preVar")?_5.preVar:_5.hasOwnProperty("default")?_5.default:_5}();
+var getVar=function(){var _6=require('./getVar');return _6.hasOwnProperty("getVar")?_6.getVar:_6.hasOwnProperty("default")?_6.default:_6}();
+var preFn=function(){var _7=require('./preFn');return _7.hasOwnProperty("preFn")?_7.preFn:_7.hasOwnProperty("default")?_7.default:_7}();
+var getFn=function(){var _8=require('./getFn');return _8.hasOwnProperty("getFn")?_8.getFn:_8.hasOwnProperty("default")?_8.default:_8}();
+var ignore=function(){var _9=require('./ignore');return _9.hasOwnProperty("ignore")?_9.ignore:_9.hasOwnProperty("default")?_9.default:_9}();
+var clone=function(){var _10=require('./clone');return _10.hasOwnProperty("clone")?_10.clone:_10.hasOwnProperty("default")?_10.default:_10}();
+var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}();
+var concatSelector=function(){var _12=require('./concatSelector');return _12.hasOwnProperty("concatSelector")?_12.concatSelector:_12.hasOwnProperty("default")?_12.default:_12}();
+var eventbus=function(){var _13=require('./eventbus.js');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
+var checkLevel=function(){var _14=require('./checkLevel.js');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
+var normalize=function(){var _15=require('./normalize.js');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -46,8 +46,8 @@ var relations = {};
     this.selectorStack = [];
     this.importStack = [];
   }
-  More.prototype.parse = function(code) {
-    this.preParse(code);
+  More.prototype.parse = function(code, ignoreImport) {
+    this.preParse(code, ignoreImport);
     if(this.msg) {
       return this.msg;
     }
@@ -63,9 +63,7 @@ var relations = {};
         im = im.replace(/\.\w+$/, global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
-      if(list.indexOf(iFile) == -1) {
-        list.push(iFile);
-      }
+      list.push(iFile);
       self.mixFrom(iFile, data);
     });
     var vars = more.vars();
@@ -92,16 +90,16 @@ var relations = {};
   More.prototype.parseFile = function(file, page) {
     if(page===void 0)page=false;var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    self.preParse(code);
+    if(self.msg) {
+      return self.msg;
+    }
     //page传入时说明来源于页面，删除可能存在与其对应的共享变量作用域
     if(page) {
       delete relations[file];
     }
     //否则是被@import导入的文件，直接使用已存的共享变量
     else if(relations.hasOwnProperty(file)) {
-      self.preParse(code);
-      if(self.msg) {
-        return self.msg;
-      }
       self.varHash = relations[file].vars;
       self.fnHash = relations[file].fns;
       self.styleHash = relations[file].styles;
@@ -109,7 +107,6 @@ var relations = {};
       return self.parseOn();
     }
     //先预分析取得@import列表，递归其获取变量
-    self.preParse(code);
     var data = {
       vars: {},
       fns: {},
@@ -146,7 +143,7 @@ var relations = {};
     }
     return self.parseOn();
   }
-  More.prototype.preParse = function(code) {
+  More.prototype.preParse = function(code, ignoreImport) {
     if(code) {
       this.code = code;
     }
@@ -161,7 +158,7 @@ var relations = {};
       }
       return this.msg = e.toString();
     }
-    preImport(this.node, this.importStack);
+    this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
     preVar(this.node, this.ignores, this.index, this.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
   }
@@ -419,7 +416,7 @@ var relations = {};
         });
       }
       else {
-        this.varHash = o;
+        this.varHash = clone(o);
       }
     }
     return this.varHash;
@@ -447,7 +444,7 @@ var relations = {};
         });
       }
       else {
-        this.styleHash = o;
+        this.styleHash = clone(o);
       }
     }
     return this.styleHash;
@@ -474,8 +471,11 @@ var relations = {};
   More.prototype.buildFile = function(file, page) {
     if(page===void 0)page=false;var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    self.preParse(code, true);
+    if(self.msg) {
+      return self.msg;
+    }
     //先预分析取得@import列表，递归其获取变量
-    self.preParse(code);
     var data = {
       vars: {},
       fns: {},
@@ -488,7 +488,7 @@ var relations = {};
       }
       var iFile = path.join(path.dirname(file), im);
       list.push(iFile);
-      self.mixFrom(iFile, data, list);
+      self.mixFrom(iFile, data, []);
     });
     //合并@import文件中的变量
     Object.keys(data.vars).forEach(function(v) {
@@ -502,7 +502,46 @@ var relations = {};
       }
     });
     self.styleHash = data.styles;
-    console.log(self.parseOn())
+    var res = '';
+    //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
+    if(page) {
+      delete relations[file];
+      list.forEach(function(iFile) {
+        res += More.buildIn(iFile, {
+          vars: self.varHash,
+          fns: self.fnHash
+        });
+      });
+    }
+    //否则作用域为顺序，递归执行build即可
+    else {
+      list.forEach(function(iFile) {
+        res += More.buildFile(iFile);
+      });
+    }
+    res += self.parseOn();
+    return res;
+  }
+  More.buildIn=function(file, data) {
+    var more = new More();
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    more.preParse(code, true);
+    if(more.msg) {
+      return more.msg;
+    }
+    var res = '';
+    more.imports().forEach(function(im) {
+      if(global.suffix != 'css') {
+        im = im.replace(/\.\w+$/, global.suffix);
+      }
+      var iFile = path.join(path.dirname(file), im);
+      res += More.buildIn(iFile, data);
+    });
+    more.vars(data.vars);
+    more.fns(data.fns);
+    more.styles(relations[file].styles);
+    res += more.parseOn();
+    return res;
   }
 
   More.parse=function(code) {
