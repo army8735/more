@@ -41,7 +41,6 @@ npm install more-css
 * config(str:String):void 预编译一段css并将其结果作为此more对象之后预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空设置
-* clearRelation():void 清空内部维护的@import引入关系
 
 ### 静态属性
 * parse(code:String = ''):String 快捷方式预编译，无需new步骤
@@ -56,6 +55,7 @@ npm install more-css
 * config(str:String):void 预编译一段css并将其结果作为之后全局预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
+* clearRelation():void 清空内部维护的@import引入关系
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
