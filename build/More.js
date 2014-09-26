@@ -34,7 +34,7 @@ var global = {
     this.node = null;
     this.parser = null;
     this.varHash = {};
-    this.styleHash = {};
+    this.styleHash = clone(global.styles);
     this.styleTemp = 0;
     this.fnHash = {};
     this.res = '';
@@ -349,7 +349,11 @@ var global = {
         var styleArray = Object.keys(self.styleHash);
         targets.forEach(function(se1) {
           styleArray.forEach(function(se2) {
-            if(se2.indexOf(se1) == 0 && se2.length != se1.length && se1.indexOf(se2) == -1) {
+            if(se2.indexOf(se1) == 0
+              && se2.length != se1.length
+              //确保伪类或孩子元素，防止@extend .test会继承.test1之类
+              && !/[\w-]/.test(se2.charAt(se1.length))
+              && se1.indexOf(se2) == -1) {
               var pseudo = concatSelector([se].concat([[se2.slice(se1.length)]]));
               pseudo = normalize(pseudo);
               if(self.styleHash[se2]) {
@@ -484,40 +488,40 @@ var global = {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.varHash[k] = o[k];
+          global.var[k] = o[k];
         });
       }
       else {
-        global.varHash = o;
+        global.vars = o;
       }
     }
-    return global.varHash;
+    return global.vars;
   }
   More.fns=function(o, mix) {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.fnHash[k] = o[k];
+          global.fns[k] = o[k];
         });
       }
       else {
-        global.fnHash = o;
+        global.fns = o;
       }
     }
-    return global.fnHash;
+    return global.fns;
   }
   More.styles=function(o, mix) {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.styleHash[k] = o[k];
+          global.styles[k] = o[k];
         });
       }
       else {
-        global.styleHash = o;
+        global.styles = o;
       }
     }
-    return global.styleHash;
+    return global.styles;
   }
   More.config=function(str, mix) {
     if(str) {

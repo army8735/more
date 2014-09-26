@@ -232,6 +232,24 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:0}div{padding:0}body{margin:0;padding:0;}');
   });
+  it('multi @extend', function() {
+    var more = new More();
+    var s = 'html{margin:0}div{padding:0}body{@extend html;@extend div}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}div{padding:0}body{margin:0;padding:0;}');
+  });
+  it('@extend error', function() {
+    var more = new More();
+    var s = 'html{margin:0}body{@extend div}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0}body{}');
+  });
+  it('@extend error2', function() {
+    var more = new More();
+    var s = '.test1{margin:0}.testb{padding:0}html{@extend .test;@extend .testb}';
+    var res = more.parse(s);
+    expect(res).to.eql('.test1{margin:0}.testb{padding:0}html{padding:0;}');
+  });
   it('@extend recursion 1', function() {
     var more = new More();
     var s = 'html{margin:0}body{@extend html}div{@extend body}';
@@ -312,14 +330,14 @@ describe('simple test', function() {
     More.suffix('less');
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.less'));
-    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:@b}');
+    expect(res).to.eql('@import \"2.css\";\n@import url(3.css);\n\nbody{margin:1;padding:@b;font-size:$c}');
     More.suffix('css');
   });
   it('suffix #parseFile true', function() {
     More.suffix('less');
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.less'), true);
-    expect(res).to.eql('\n\nbody{margin:1;padding:2}');
+    expect(res).to.eql('\n\n\n\nbody{margin:1;padding:2;font-size:3}');
     More.suffix('css');
   });
   it('unknow kw', function() {
@@ -334,6 +352,23 @@ describe('simple test', function() {
     var s = 'html{dd:1}body{@extend html}';
     var res = more.parse(s);
     expect(res).to.eql('html{dd:1}body{dd:1;}');
+  });
+  it('#parseFile when error', function() {
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './error.css'));
+    expect(res.indexOf('Error')).to.eql(0);
+  });
+  it('var in string', function() {
+    var more = new More();
+    var s = '$a: "a";html{margin:"$a"}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:"a"}');
+  });
+  it('#ast', function() {
+    var more = new More();
+    var s = 'html{}';
+    more.parse(s);
+    expect(more.ast()).to.eql(more.node);
   });
 });
 describe('config', function() {
@@ -350,6 +385,44 @@ describe('config', function() {
     var s = 'html{margin:$a;$fn()}';
     var res = more.parse(s);
     expect(res).to.eql('html{margin:1;padding: 0}');
+  });
+  it('#vars,#fns,#styles', function() {
+    var more = new More();
+    more.config('$a = 1;fn1(){padding:0}.test{color:#000}');
+    var s = 'html{margin:$a;fn1();@extend .test}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:1;padding:0;color:#000;}');
+  });
+  it('overwrite #vars,#fns,#styles', function() {
+    var more = new More();
+    more.config('$a = 1;fn1(){padding:0}.test{color:#000}');
+    more.config('$a = 2;fn1(){padding:1}.test{color:#f00}');
+    var s = 'html{margin:$a;fn1();@extend .test}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:2;padding:1;color:#f00;}');
+  });
+  it('mix #vars,#fns,#styles', function() {
+    var more = new More();
+    more.config('$a = 1;$b = 2;fn1(){padding:0}fn2(){padding:1}.test{color:#000}.test2{color:#fff}');
+    more.config('$a = 2;fn1(){padding:1}.test{color:#f00}', true);
+    var s = 'html{margin:$a;padding:$b;fn1();fn2();@extend .test;@extend .test2}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:2;padding:2;padding:1;padding:1;color:#f00;color:#fff;}');
+  });
+  it('#clean', function() {
+    var more = new More();
+    more.config('$a = 1;fn1(){padding:0}.test{color:#000}');
+    more.clean();
+    var s = 'html{margin:$a;fn1();@extend .test}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:$a;fn1();}');
+  });
+  it('static config', function() {
+    More.config('$a = 1;fn1(){padding:0}.test{color:#000}');
+    var more = new More();
+    var s = 'html{margin:$a;fn1();@extend .test}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:1;padding:0;color:#000;}');
   });
 });
 describe('ignore source css', function() {
