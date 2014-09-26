@@ -15,7 +15,6 @@ import concatSelector from './concatSelector';
 import eventbus from './eventbus';
 import checkLevel from './checkLevel';
 import normalize from './normalize';
-import share from './share';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');

@@ -1,7 +1,5 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
 
-var share=function(){var _20=require('./share');return _20.hasOwnProperty("share")?_20.share:_20.hasOwnProperty("default")?_20.default:_20}();
-
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
@@ -32,7 +30,7 @@ exports.default=function(token, varHash, globalVar) {
                   : vara)
                 + s.slice(j + 1);
             }
-            else if(typeof console != 'undefined' && !share('silence')) {
+            else if(typeof console != 'undefined') {
               console.warn(c + ' is undefined');
             }
           }
@@ -47,7 +45,7 @@ exports.default=function(token, varHash, globalVar) {
                 : vara)
               + s.slice(i + c.length + 1);
           }
-          else if(typeof console != 'undefined' && !share('silence')) {
+          else if(typeof console != 'undefined') {
             console.warn(c + ' is undefined');
           }
         }

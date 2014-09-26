@@ -1,7 +1,5 @@
 module homunculus from 'homunculus';
 
-import share from './share';
-
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
@@ -32,7 +30,7 @@ export default function(token, varHash, globalVar) {
                   : vara)
                 + s.slice(j + 1);
             }
-            else if(typeof console != 'undefined' && !share('silence')) {
+            else if(typeof console != 'undefined') {
               console.warn(c + ' is undefined');
             }
           }
@@ -47,7 +45,7 @@ export default function(token, varHash, globalVar) {
                 : vara)
               + s.slice(i + c.length + 1);
           }
-          else if(typeof console != 'undefined' && !share('silence')) {
+          else if(typeof console != 'undefined') {
             console.warn(c + ' is undefined');
           }
         }

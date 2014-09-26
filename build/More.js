@@ -15,7 +15,6 @@ var concatSelector=function(){var _12=require('./concatSelector');return _12.has
 var eventbus=function(){var _13=require('./eventbus');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
 var checkLevel=function(){var _14=require('./checkLevel');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
 var normalize=function(){var _15=require('./normalize');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
-var share=function(){var _16=require('./share');return _16.hasOwnProperty("share")?_16.share:_16.hasOwnProperty("default")?_16.default:_16}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
