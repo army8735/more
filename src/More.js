@@ -46,111 +46,88 @@ class More {
     this.importStack = [];
   }
   parse(code, ignoreImport) {
-    this.preParse(code, ignoreImport);
+    if(code) {
+      this.code = code;
+    }
+    this.preParse(ignoreImport);
     if(this.msg) {
       return this.msg;
     }
     return this.parseOn();
   }
-  //从入口处发起，递归入口css文件及其@import列表，以页面为作用域，将环境变量保存到data中
-  //后面的文件的变量会覆盖前者，styles除外
-  mixFrom(file, data, list) {
+  //combo指明为true时，将全部@import文件合并进来分析
+  //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件本身
+  //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
+  parseFile(file, combo) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    var more = new More();
-    more.preParse(code);
+    self.code = code;
+    self.preParse(combo);
+    if(self.msg) {
+      return self.msg;
+    }
+    if(combo && self.imports().length) {
+      var data = {
+        vars: {},
+        fns: {},
+        styles: {}
+      };
+      var list = [];
+      self.imports().forEach(function(im) {
+        if(global.suffix != 'css') {
+          im = im.replace(/\.\w+$/, '.' + global.suffix);
+        }
+        var iFile = path.join(path.dirname(file), im);
+        self.mixImport(iFile, data, list);
+      });
+      var res = '';
+      Object.keys(self.varHash).forEach(function(k) {
+        data.vars[k] = self.varHash[k];
+      });
+      Object.keys(self.fnHash).forEach(function(k) {
+        data.fns[k] = self.fns[k];
+      });
+      self.vars(data.vars);
+      self.fns(data.fns);
+      list.forEach(function(more, i) {
+        more.vars(data.vars);
+        more.fns(data.fns);
+        if(i) {
+          more.styles(list[i - 1].styles());
+        }
+        res += more.msg || more.parseOn();
+      });
+      self.styles(list[list.length - 1].styles());
+      return res += self.parseOn();
+    }
+    return self.parseOn();
+  }
+  mixImport(file, data, list) {
+    var self = this;
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    var more = new More(code);
+    more.preParse(true);
+    if(more.msg) {
+      return more.msg;
+    }
     more.imports().forEach(function(im) {
       if(global.suffix != 'css') {
         im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
-      list.push(iFile);
-      self.mixFrom(iFile, data);
+      self.mixImport(iFile, data, list);
     });
+    list.push(more);
     var vars = more.vars();
-    Object.keys(vars).forEach(function(v) {
-      data.vars[v] = vars[v];
+    Object.keys(vars).forEach(function(k) {
+      data.vars[k] = vars[k];
     });
     var fns = more.fns();
-    Object.keys(fns).forEach(function(v) {
-      data.fns[v] = fns[v];
+    Object.keys(fns).forEach(function(k) {
+      data.fns[k] = fns[k];
     });
-    //执行过程中可能会存在变量未定义，因为使用后面文件中的定义，防止报错将其静音
-    share('silence', true);
-    more.parseOn();
-    share('silence', false);
-    var styles = more.styles();
-    Object.keys(styles).forEach(function(v) {
-      data.styles[v] = data.styles[v] || '';
-      data.styles[v] += styles[v];
-    });
-    relations[file] = relations[file] || {};
-    relations[file].styles = clone(data.styles);
   }
-  //通过page参数区分是页面中link标签引入的css文件或独立访问，还是被css@import加载的
-  //后端可通过request.refferrer来识别
-  //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件以及@import的文件
-  //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
-  parseFile(file, page = false) {
-    var self = this;
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    self.preParse(code);
-    if(self.msg) {
-      return self.msg;
-    }
-    //page传入时说明来源于页面，删除可能存在与其对应的共享变量作用域
-    if(page) {
-      delete relations[file];
-    }
-    //否则是被@import导入的文件，直接使用已存的共享变量
-    else if(relations.hasOwnProperty(file)) {
-      self.varHash = relations[file].vars;
-      self.fnHash = relations[file].fns;
-      self.styleHash = relations[file].styles;
-      delete relations[file];
-      return self.parseOn();
-    }
-    //先预分析取得@import列表，递归其获取变量
-    var data = {
-      vars: {},
-      fns: {},
-      styles: {}
-    };
-    var list = [];
-    self.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
-      }
-      var iFile = path.join(path.dirname(file), im);
-      list.push(iFile);
-      self.mixFrom(iFile, data, list);
-    });
-    //合并@import文件中的变量
-    Object.keys(data.vars).forEach(function(v) {
-      if(!self.varHash.hasOwnProperty(v)) {
-        self.varHash[v] = data.vars[v];
-      }
-    });
-    Object.keys(data.fns).forEach(function(v) {
-      if(!self.fnHash.hasOwnProperty(v)) {
-        self.fnHash[v] = data.fns[v];
-      }
-    });
-    self.styleHash = data.styles;
-    //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
-    if(page) {
-      list.forEach(function(iFile) {
-        relations[iFile] = relations[iFile] || {};
-        relations[iFile].vars = self.varHash;
-        relations[iFile].fns =  self.fnHash;
-      });
-    }
-    return self.parseOn();
-  }
-  preParse(code, ignoreImport) {
-    if(code) {
-      this.code = code;
-    }
+  preParse(ignoreImport) {
     this.parser = homunculus.getParser('css');
     try {
       this.node = this.parser.parse(this.code);
@@ -479,94 +456,12 @@ class More {
     this.fnHash = {};
     this.styleHash = {};
   }
-  buildFile(file, page = false) {
-    var self = this;
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    self.preParse(code, true);
-    if(self.msg) {
-      return self.msg;
-    }
-    //build前清空所有关系数据
-    if(page) {
-      relations = {};
-    }
-    //先预分析取得@import列表，递归其获取变量
-    var data = {
-      vars: {},
-      fns: {},
-      styles: {}
-    };
-    var list = [];
-    self.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
-      }
-      var iFile = path.join(path.dirname(file), im);
-      list.push(iFile);
-      self.mixFrom(iFile, data, []);
-    });
-    //合并@import文件中的变量
-    Object.keys(data.vars).forEach(function(v) {
-      if(!self.varHash.hasOwnProperty(v)) {
-        self.varHash[v] = data.vars[v];
-      }
-    });
-    Object.keys(data.fns).forEach(function(v) {
-      if(!self.fnHash.hasOwnProperty(v)) {
-        self.fnHash[v] = data.fns[v];
-      }
-    });
-    self.styleHash = data.styles;
-    var res = '';
-    //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
-    if(page) {
-      list.forEach(function(iFile) {
-        res += More.buildIn(iFile, {
-          vars: self.varHash,
-          fns: self.fnHash
-        });
-      });
-      relations = {};
-    }
-    //否则作用域为顺序，递归执行build即可
-    else {
-      list.forEach(function(iFile) {
-        res += More.buildFile(iFile);
-      });
-    }
-    res += self.parseOn();
-    return res;
-  }
-  static buildIn(file, data) {
-    var more = new More();
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    more.preParse(code, true);
-    if(more.msg) {
-      return more.msg;
-    }
-    var res = '';
-    more.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
-      }
-      var iFile = path.join(path.dirname(file), im);
-      res += More.buildIn(iFile, data);
-    });
-    more.vars(data.vars);
-    more.fns(data.fns);
-    more.styles(relations[file].styles);
-    res += more.parseOn();
-    return res;
-  }
 
   static parse(code) {
     return (new More()).parse(code);
   }
-  static parseFile(file) {
-    return (new More()).parseFile(code);
-  }
-  static buildFile(file, page) {
-    return (new More).buildFile(file, page);
+  static parseFile(file, combo) {
+    return (new More()).parseFile(file, combo);
   }
   static suffix(str = null) {
     if(str) {

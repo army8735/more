@@ -3,19 +3,19 @@ var path=require('path');
 
 var homunculus=require('homunculus');
 
-var preImport=function(){var _3361=require('./preImport');return _3361.hasOwnProperty("preImport")?_3361.preImport:_3361.hasOwnProperty("default")?_3361.default:_3361}();
-var preVar=function(){var _3362=require('./preVar');return _3362.hasOwnProperty("preVar")?_3362.preVar:_3362.hasOwnProperty("default")?_3362.default:_3362}();
-var getVar=function(){var _3363=require('./getVar');return _3363.hasOwnProperty("getVar")?_3363.getVar:_3363.hasOwnProperty("default")?_3363.default:_3363}();
-var preFn=function(){var _3364=require('./preFn');return _3364.hasOwnProperty("preFn")?_3364.preFn:_3364.hasOwnProperty("default")?_3364.default:_3364}();
-var getFn=function(){var _3365=require('./getFn');return _3365.hasOwnProperty("getFn")?_3365.getFn:_3365.hasOwnProperty("default")?_3365.default:_3365}();
-var ignore=function(){var _3366=require('./ignore');return _3366.hasOwnProperty("ignore")?_3366.ignore:_3366.hasOwnProperty("default")?_3366.default:_3366}();
-var clone=function(){var _3367=require('./clone');return _3367.hasOwnProperty("clone")?_3367.clone:_3367.hasOwnProperty("default")?_3367.default:_3367}();
-var join=function(){var _3368=require('./join');return _3368.hasOwnProperty("join")?_3368.join:_3368.hasOwnProperty("default")?_3368.default:_3368}();
-var concatSelector=function(){var _3369=require('./concatSelector');return _3369.hasOwnProperty("concatSelector")?_3369.concatSelector:_3369.hasOwnProperty("default")?_3369.default:_3369}();
-var eventbus=function(){var _3370=require('./eventbus');return _3370.hasOwnProperty("eventbus")?_3370.eventbus:_3370.hasOwnProperty("default")?_3370.default:_3370}();
-var checkLevel=function(){var _3371=require('./checkLevel');return _3371.hasOwnProperty("checkLevel")?_3371.checkLevel:_3371.hasOwnProperty("default")?_3371.default:_3371}();
-var normalize=function(){var _3372=require('./normalize');return _3372.hasOwnProperty("normalize")?_3372.normalize:_3372.hasOwnProperty("default")?_3372.default:_3372}();
-var share=function(){var _3373=require('./share');return _3373.hasOwnProperty("share")?_3373.share:_3373.hasOwnProperty("default")?_3373.default:_3373}();
+var preImport=function(){var _4=require('./preImport');return _4.hasOwnProperty("preImport")?_4.preImport:_4.hasOwnProperty("default")?_4.default:_4}();
+var preVar=function(){var _5=require('./preVar');return _5.hasOwnProperty("preVar")?_5.preVar:_5.hasOwnProperty("default")?_5.default:_5}();
+var getVar=function(){var _6=require('./getVar');return _6.hasOwnProperty("getVar")?_6.getVar:_6.hasOwnProperty("default")?_6.default:_6}();
+var preFn=function(){var _7=require('./preFn');return _7.hasOwnProperty("preFn")?_7.preFn:_7.hasOwnProperty("default")?_7.default:_7}();
+var getFn=function(){var _8=require('./getFn');return _8.hasOwnProperty("getFn")?_8.getFn:_8.hasOwnProperty("default")?_8.default:_8}();
+var ignore=function(){var _9=require('./ignore');return _9.hasOwnProperty("ignore")?_9.ignore:_9.hasOwnProperty("default")?_9.default:_9}();
+var clone=function(){var _10=require('./clone');return _10.hasOwnProperty("clone")?_10.clone:_10.hasOwnProperty("default")?_10.default:_10}();
+var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}();
+var concatSelector=function(){var _12=require('./concatSelector');return _12.hasOwnProperty("concatSelector")?_12.concatSelector:_12.hasOwnProperty("default")?_12.default:_12}();
+var eventbus=function(){var _13=require('./eventbus');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
+var checkLevel=function(){var _14=require('./checkLevel');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
+var normalize=function(){var _15=require('./normalize');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
+var share=function(){var _16=require('./share');return _16.hasOwnProperty("share")?_16.share:_16.hasOwnProperty("default")?_16.default:_16}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -46,111 +46,88 @@ var global = {
     this.importStack = [];
   }
   More.prototype.parse = function(code, ignoreImport) {
-    this.preParse(code, ignoreImport);
+    if(code) {
+      this.code = code;
+    }
+    this.preParse(ignoreImport);
     if(this.msg) {
       return this.msg;
     }
     return this.parseOn();
   }
-  //从入口处发起，递归入口css文件及其@import列表，以页面为作用域，将环境变量保存到data中
-  //后面的文件的变量会覆盖前者，styles除外
-  More.prototype.mixFrom = function(file, data, list) {
+  //combo指明为true时，将全部@import文件合并进来分析
+  //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件本身
+  //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
+  More.prototype.parseFile = function(file, combo) {
     var self = this;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    var more = new More();
-    more.preParse(code);
+    self.code = code;
+    self.preParse(combo);
+    if(self.msg) {
+      return self.msg;
+    }
+    if(combo && self.imports().length) {
+      var data = {
+        vars: {},
+        fns: {},
+        styles: {}
+      };
+      var list = [];
+      self.imports().forEach(function(im) {
+        if(global.suffix != 'css') {
+          im = im.replace(/\.\w+$/, '.' + global.suffix);
+        }
+        var iFile = path.join(path.dirname(file), im);
+        self.mixImport(iFile, data, list);
+      });
+      var res = '';
+      Object.keys(self.varHash).forEach(function(k) {
+        data.vars[k] = self.varHash[k];
+      });
+      Object.keys(self.fnHash).forEach(function(k) {
+        data.fns[k] = self.fns[k];
+      });
+      self.vars(data.vars);
+      self.fns(data.fns);
+      list.forEach(function(more, i) {
+        more.vars(data.vars);
+        more.fns(data.fns);
+        if(i) {
+          more.styles(list[i - 1].styles());
+        }
+        res += more.msg || more.parseOn();
+      });
+      self.styles(list[list.length - 1].styles());
+      return res += self.parseOn();
+    }
+    return self.parseOn();
+  }
+  More.prototype.mixImport = function(file, data, list) {
+    var self = this;
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    var more = new More(code);
+    more.preParse(true);
+    if(more.msg) {
+      return more.msg;
+    }
     more.imports().forEach(function(im) {
       if(global.suffix != 'css') {
         im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
       var iFile = path.join(path.dirname(file), im);
-      list.push(iFile);
-      self.mixFrom(iFile, data);
+      self.mixImport(iFile, data, list);
     });
+    list.push(more);
     var vars = more.vars();
-    Object.keys(vars).forEach(function(v) {
-      data.vars[v] = vars[v];
+    Object.keys(vars).forEach(function(k) {
+      data.vars[k] = vars[k];
     });
     var fns = more.fns();
-    Object.keys(fns).forEach(function(v) {
-      data.fns[v] = fns[v];
+    Object.keys(fns).forEach(function(k) {
+      data.fns[k] = fns[k];
     });
-    //执行过程中可能会存在变量未定义，因为使用后面文件中的定义，防止报错将其静音
-    share('silence', true);
-    more.parseOn();
-    share('silence', false);
-    var styles = more.styles();
-    Object.keys(styles).forEach(function(v) {
-      data.styles[v] = data.styles[v] || '';
-      data.styles[v] += styles[v];
-    });
-    relations[file] = relations[file] || {};
-    relations[file].styles = clone(data.styles);
   }
-  //通过page参数区分是页面中link标签引入的css文件或独立访问，还是被css@import加载的
-  //后端可通过request.refferrer来识别
-  //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件以及@import的文件
-  //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
-  More.prototype.parseFile = function(file, page) {
-    if(page===void 0)page=false;var self = this;
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    self.preParse(code);
-    if(self.msg) {
-      return self.msg;
-    }
-    //page传入时说明来源于页面，删除可能存在与其对应的共享变量作用域
-    if(page) {
-      delete relations[file];
-    }
-    //否则是被@import导入的文件，直接使用已存的共享变量
-    else if(relations.hasOwnProperty(file)) {
-      self.varHash = relations[file].vars;
-      self.fnHash = relations[file].fns;
-      self.styleHash = relations[file].styles;
-      delete relations[file];
-      return self.parseOn();
-    }
-    //先预分析取得@import列表，递归其获取变量
-    var data = {
-      vars: {},
-      fns: {},
-      styles: {}
-    };
-    var list = [];
-    self.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
-      }
-      var iFile = path.join(path.dirname(file), im);
-      list.push(iFile);
-      self.mixFrom(iFile, data, list);
-    });
-    //合并@import文件中的变量
-    Object.keys(data.vars).forEach(function(v) {
-      if(!self.varHash.hasOwnProperty(v)) {
-        self.varHash[v] = data.vars[v];
-      }
-    });
-    Object.keys(data.fns).forEach(function(v) {
-      if(!self.fnHash.hasOwnProperty(v)) {
-        self.fnHash[v] = data.fns[v];
-      }
-    });
-    self.styleHash = data.styles;
-    //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
-    if(page) {
-      list.forEach(function(iFile) {
-        relations[iFile] = relations[iFile] || {};
-        relations[iFile].vars = self.varHash;
-        relations[iFile].fns =  self.fnHash;
-      });
-    }
-    return self.parseOn();
-  }
-  More.prototype.preParse = function(code, ignoreImport) {
-    if(code) {
-      this.code = code;
-    }
+  More.prototype.preParse = function(ignoreImport) {
     this.parser = homunculus.getParser('css');
     try {
       this.node = this.parser.parse(this.code);
@@ -479,94 +456,12 @@ var global = {
     this.fnHash = {};
     this.styleHash = {};
   }
-  More.prototype.buildFile = function(file, page) {
-    if(page===void 0)page=false;var self = this;
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    self.preParse(code, true);
-    if(self.msg) {
-      return self.msg;
-    }
-    //build前清空所有关系数据
-    if(page) {
-      relations = {};
-    }
-    //先预分析取得@import列表，递归其获取变量
-    var data = {
-      vars: {},
-      fns: {},
-      styles: {}
-    };
-    var list = [];
-    self.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
-      }
-      var iFile = path.join(path.dirname(file), im);
-      list.push(iFile);
-      self.mixFrom(iFile, data, []);
-    });
-    //合并@import文件中的变量
-    Object.keys(data.vars).forEach(function(v) {
-      if(!self.varHash.hasOwnProperty(v)) {
-        self.varHash[v] = data.vars[v];
-      }
-    });
-    Object.keys(data.fns).forEach(function(v) {
-      if(!self.fnHash.hasOwnProperty(v)) {
-        self.fnHash[v] = data.fns[v];
-      }
-    });
-    self.styleHash = data.styles;
-    var res = '';
-    //page传入时说明来源于页面，将变量存储于@import的文件中，共享变量作用域
-    if(page) {
-      list.forEach(function(iFile) {
-        res += More.buildIn(iFile, {
-          vars: self.varHash,
-          fns: self.fnHash
-        });
-      });
-      relations = {};
-    }
-    //否则作用域为顺序，递归执行build即可
-    else {
-      list.forEach(function(iFile) {
-        res += More.buildFile(iFile);
-      });
-    }
-    res += self.parseOn();
-    return res;
-  }
-  More.buildIn=function(file, data) {
-    var more = new More();
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    more.preParse(code, true);
-    if(more.msg) {
-      return more.msg;
-    }
-    var res = '';
-    more.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
-      }
-      var iFile = path.join(path.dirname(file), im);
-      res += More.buildIn(iFile, data);
-    });
-    more.vars(data.vars);
-    more.fns(data.fns);
-    more.styles(relations[file].styles);
-    res += more.parseOn();
-    return res;
-  }
 
   More.parse=function(code) {
     return (new More()).parse(code);
   }
-  More.parseFile=function(file) {
-    return (new More()).parseFile(code);
-  }
-  More.buildFile=function(file, page) {
-    return (new More).buildFile(file, page);
+  More.parseFile=function(file, combo) {
+    return (new More()).parseFile(file, combo);
   }
   More.suffix=function(str) {
     if(str===void 0)str=null;if(str) {

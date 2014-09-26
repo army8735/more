@@ -30,8 +30,6 @@ npm install more-css
 * parse(code:String = null):String 预编译code，可以为空，否则会覆盖构造函数里传入的code
 * parseFile(file:String, page:Boolean = false):String 转换css文件，page表明来源是否是页面
  * 一般情况下可忽略page参数，高级用法详见[parseFile高级用法](https://github.com/army8735/more/wiki/document#parsefile高级用法)
-* buildFile(file:String, page:Boolean = false):String 编译并合并css文件，在parse的基础上将@import的文件也包含进来
- * page参数用法同上
 * ast():Object 返回解析后的语法树
 * tokens():Array<Object> 返回解析后的词法单元序列
 * imports():Array<String> 返回解析后的@import文件列表
@@ -45,7 +43,6 @@ npm install more-css
 ### 静态属性
 * parse(code:String = ''):String 快捷方式预编译，无需new步骤
 * parseFile(code:String = '', page:Boolean = false):String 快捷方式预编译文件，无需new步骤
-* buildFile(file:String, page:Boolean = false):String 快捷方式编译并合并css文件，无需new步骤
 * suffix(str:String):String 全局设置/读取文件后缀名，默认css
 * root(str:String):String 全局设置/读取相对根路径
 * localRoot(str:String):String 全局设置/读取本地相对根路径
@@ -55,7 +52,6 @@ npm install more-css
 * config(str:String):void 预编译一段css并将其结果作为之后全局预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
-* clearRelation():void 清空内部维护的@import引入关系
 * addKeyWord(kw:String/Array<String>):void 添加未知的css属性关键字以支持分析
 
 ## Demo

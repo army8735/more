@@ -37,10 +37,6 @@ describe('api', function() {
     var more = new More();
     expect(more.configFile).to.be.a(Function);
   });
-  it('#buildFile', function() {
-    var more = new More();
-    expect(more.buildFile).to.be.a(Function);
-  });
   it('#clean', function() {
     var more = new More();
     expect(more.clean).to.be.a(Function);
@@ -68,9 +64,6 @@ describe('api', function() {
   });
   it('##configFile', function() {
     expect(More.configFile).to.be.a(Function);
-  });
-  it('##buildFile', function() {
-    expect(More.buildFile).to.be.a(Function);
   });
   it('##clean', function() {
     expect(More.clean).to.be.a(Function);
@@ -308,38 +301,25 @@ describe('simple test', function() {
   it('@import var', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'));
-    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
+    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:$b;font-size:$c;fn1();}\n.test2{background:#f00}');
   });
   it('#parseFile true', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'), true);
-    expect(res).to.eql('@import \"2.css\";\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
-    more = new More();
-    res2 = more.parseFile(path.join(__dirname, './2.css'));
-    expect(res2).to.eql('@import \"3.css\";\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}');
-  });
-  it('#clearRelation', function() {
-    var more = new More();
-    more.parseFile(path.join(__dirname, './1.css'), true);
-    expect(More.clearRelation()).to.eql({});
-  });
-  it('#buildFile', function() {
-    var more = new More();
-    var res = more.buildFile(path.join(__dirname, './1.css'));
-//    fs.writeFileSync(path.join(__dirname, './bulid1.css'), res);
-    expect(res).to.eql(fs.readFileSync(path.join(__dirname, './bulid1.css'), { encoding: 'utf-8' }));
-  });
-  it('#buildFile true', function() {
-    var more = new More();
-    var res = more.buildFile(path.join(__dirname, './1.css'), true);
-//    fs.writeFileSync(path.join(__dirname, './bulid2.css'), res);
-    expect(res).to.eql(fs.readFileSync(path.join(__dirname, './bulid2.css'), { encoding: 'utf-8' }));
+    expect(res).to.eql('\n\n\n.test1{line-height:1}\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
   });
   it('suffix', function() {
     More.suffix('less');
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.less'));
-    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:2}');
+    expect(res).to.eql('@import \"2.css\";\n\nbody{margin:1;padding:@b}');
+    More.suffix('css');
+  });
+  it('suffix #parseFile true', function() {
+    More.suffix('less');
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './1.less'), true);
+    expect(res).to.eql('\n\nbody{margin:1;padding:2}');
     More.suffix('css');
   });
   it('unknow kw', function() {
