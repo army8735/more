@@ -75,9 +75,6 @@ describe('api', function() {
   it('##clean', function() {
     expect(More.clean).to.be.a(Function);
   });
-  it('##clearRelation', function() {
-    expect(More.clearRelation).to.be.a(Function);
-  });
 });
 describe('simple test', function() {
   it('$var :', function() {

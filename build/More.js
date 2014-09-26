@@ -3,19 +3,19 @@ var path=require('path');
 
 var homunculus=require('homunculus');
 
-var preImport=function(){var _4=require('./preImport');return _4.hasOwnProperty("preImport")?_4.preImport:_4.hasOwnProperty("default")?_4.default:_4}();
-var preVar=function(){var _5=require('./preVar');return _5.hasOwnProperty("preVar")?_5.preVar:_5.hasOwnProperty("default")?_5.default:_5}();
-var getVar=function(){var _6=require('./getVar');return _6.hasOwnProperty("getVar")?_6.getVar:_6.hasOwnProperty("default")?_6.default:_6}();
-var preFn=function(){var _7=require('./preFn');return _7.hasOwnProperty("preFn")?_7.preFn:_7.hasOwnProperty("default")?_7.default:_7}();
-var getFn=function(){var _8=require('./getFn');return _8.hasOwnProperty("getFn")?_8.getFn:_8.hasOwnProperty("default")?_8.default:_8}();
-var ignore=function(){var _9=require('./ignore');return _9.hasOwnProperty("ignore")?_9.ignore:_9.hasOwnProperty("default")?_9.default:_9}();
-var clone=function(){var _10=require('./clone');return _10.hasOwnProperty("clone")?_10.clone:_10.hasOwnProperty("default")?_10.default:_10}();
-var join=function(){var _11=require('./join');return _11.hasOwnProperty("join")?_11.join:_11.hasOwnProperty("default")?_11.default:_11}();
-var concatSelector=function(){var _12=require('./concatSelector');return _12.hasOwnProperty("concatSelector")?_12.concatSelector:_12.hasOwnProperty("default")?_12.default:_12}();
-var eventbus=function(){var _13=require('./eventbus');return _13.hasOwnProperty("eventbus")?_13.eventbus:_13.hasOwnProperty("default")?_13.default:_13}();
-var checkLevel=function(){var _14=require('./checkLevel');return _14.hasOwnProperty("checkLevel")?_14.checkLevel:_14.hasOwnProperty("default")?_14.default:_14}();
-var normalize=function(){var _15=require('./normalize');return _15.hasOwnProperty("normalize")?_15.normalize:_15.hasOwnProperty("default")?_15.default:_15}();
-var share=function(){var _16=require('./share');return _16.hasOwnProperty("share")?_16.share:_16.hasOwnProperty("default")?_16.default:_16}();
+var preImport=function(){var _3361=require('./preImport');return _3361.hasOwnProperty("preImport")?_3361.preImport:_3361.hasOwnProperty("default")?_3361.default:_3361}();
+var preVar=function(){var _3362=require('./preVar');return _3362.hasOwnProperty("preVar")?_3362.preVar:_3362.hasOwnProperty("default")?_3362.default:_3362}();
+var getVar=function(){var _3363=require('./getVar');return _3363.hasOwnProperty("getVar")?_3363.getVar:_3363.hasOwnProperty("default")?_3363.default:_3363}();
+var preFn=function(){var _3364=require('./preFn');return _3364.hasOwnProperty("preFn")?_3364.preFn:_3364.hasOwnProperty("default")?_3364.default:_3364}();
+var getFn=function(){var _3365=require('./getFn');return _3365.hasOwnProperty("getFn")?_3365.getFn:_3365.hasOwnProperty("default")?_3365.default:_3365}();
+var ignore=function(){var _3366=require('./ignore');return _3366.hasOwnProperty("ignore")?_3366.ignore:_3366.hasOwnProperty("default")?_3366.default:_3366}();
+var clone=function(){var _3367=require('./clone');return _3367.hasOwnProperty("clone")?_3367.clone:_3367.hasOwnProperty("default")?_3367.default:_3367}();
+var join=function(){var _3368=require('./join');return _3368.hasOwnProperty("join")?_3368.join:_3368.hasOwnProperty("default")?_3368.default:_3368}();
+var concatSelector=function(){var _3369=require('./concatSelector');return _3369.hasOwnProperty("concatSelector")?_3369.concatSelector:_3369.hasOwnProperty("default")?_3369.default:_3369}();
+var eventbus=function(){var _3370=require('./eventbus');return _3370.hasOwnProperty("eventbus")?_3370.eventbus:_3370.hasOwnProperty("default")?_3370.default:_3370}();
+var checkLevel=function(){var _3371=require('./checkLevel');return _3371.hasOwnProperty("checkLevel")?_3371.checkLevel:_3371.hasOwnProperty("default")?_3371.default:_3371}();
+var normalize=function(){var _3372=require('./normalize');return _3372.hasOwnProperty("normalize")?_3372.normalize:_3372.hasOwnProperty("default")?_3372.default:_3372}();
+var share=function(){var _3373=require('./share');return _3373.hasOwnProperty("share")?_3373.share:_3373.hasOwnProperty("default")?_3373.default:_3373}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -28,8 +28,6 @@ var global = {
   root: '',
   localRoot: ''
 };
-
-var relations = {};
 
 
   function More(code) {
@@ -458,19 +456,23 @@ var relations = {};
     }
     return this.styleHash;
   }
-  More.prototype.config = function(str) {
+  More.prototype.config = function(str, mix) {
     var self = this;
     if(str) {
-      this.preParse(str);
+      var more = new More();
+      more.parse(str);
+      self.vars(more.vars(), mix);
+      self.fns(more.fns(), mix);
+      self.styles(more.styles(), mix);
     }
     return {
-      vars: self.varHash,
-      fns: self.fnHash,
-      styles: self.styleHash
+      vars: self.vars(),
+      fns: self.fns(),
+      styles: self.styles()
     };
   }
-  More.prototype.configFile = function(file) {
-    return this.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  More.prototype.configFile = function(file, mix) {
+    return this.config(fs.readFileSync(file, { encoding: 'utf-8' }), mix);
   }
   More.prototype.clean = function() {
     this.varHash = {};
@@ -623,18 +625,18 @@ var relations = {};
     }
     return global.styleHash;
   }
-  More.config=function(str) {
+  More.config=function(str, mix) {
     if(str) {
       var more = new More();
       more.parse(str);
-      global.vars = more.vars();
-      global.fns = more.fns();
-      global.styles = more.styles();
+      More.vars(more.vars(), mix);
+      More.fns(more.fns(), mix);
+      More.styles(more.styles(), mix);
     }
     return global;
   }
-  More.configFile=function(file) {
-    return More.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  More.configFile=function(file, mix) {
+    return More.config(fs.readFileSync(file, { encoding: 'utf-8' }), mix);
   }
   More.clean=function() {
     global = {
@@ -646,10 +648,6 @@ var relations = {};
       localRoot: ''
     };
     return global;
-  }
-  More.clearRelation=function() {
-    relations = {};
-    return relations;
   }
   More.addKeyword=function(kw) {
     homunculus.getClass('rule', 'css').addKeyWord(kw);

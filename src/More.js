@@ -29,8 +29,6 @@ var global = {
   localRoot: ''
 };
 
-var relations = {};
-
 class More {
   constructor(code = '') {
     this.code = code;
@@ -458,19 +456,23 @@ class More {
     }
     return this.styleHash;
   }
-  config(str) {
+  config(str, mix) {
     var self = this;
     if(str) {
-      this.preParse(str);
+      var more = new More();
+      more.parse(str);
+      self.vars(more.vars(), mix);
+      self.fns(more.fns(), mix);
+      self.styles(more.styles(), mix);
     }
     return {
-      vars: self.varHash,
-      fns: self.fnHash,
-      styles: self.styleHash
+      vars: self.vars(),
+      fns: self.fns(),
+      styles: self.styles()
     };
   }
-  configFile(file) {
-    return this.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  configFile(file, mix) {
+    return this.config(fs.readFileSync(file, { encoding: 'utf-8' }), mix);
   }
   clean() {
     this.varHash = {};
@@ -623,18 +625,18 @@ class More {
     }
     return global.styleHash;
   }
-  static config(str) {
+  static config(str, mix) {
     if(str) {
       var more = new More();
       more.parse(str);
-      global.vars = more.vars();
-      global.fns = more.fns();
-      global.styles = more.styles();
+      More.vars(more.vars(), mix);
+      More.fns(more.fns(), mix);
+      More.styles(more.styles(), mix);
     }
     return global;
   }
-  static configFile(file) {
-    return More.config(fs.readFileSync(file, { encoding: 'utf-8' }));
+  static configFile(file, mix) {
+    return More.config(fs.readFileSync(file, { encoding: 'utf-8' }), mix);
   }
   static clean() {
     global = {
@@ -646,10 +648,6 @@ class More {
       localRoot: ''
     };
     return global;
-  }
-  static clearRelation() {
-    relations = {};
-    return relations;
   }
   static addKeyword(kw) {
     homunculus.getClass('rule', 'css').addKeyWord(kw);
