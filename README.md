@@ -44,8 +44,7 @@ npm install more-css
 * parse(code:String = ''):String 快捷方式预编译，无需new步骤
 * parseFile(code:String = '', combo:Boolean = false):String 快捷方式预编译文件，无需new步骤
 * suffix(str:String):String 全局设置/读取文件后缀名，默认css
-* root(str:String):String 全局设置/读取相对根路径
-* localRoot(str:String):String 全局设置/读取本地相对根路径
+* root(str:String):String 全局设置/读取相对本地文件的根路径
 * vars(data:Object):Object 全局设置/读取变量哈希
 * styles(data:Object):Object 全局设置/读取样式哈希
 * fns(data:Object):Object 全局设置/读取方法哈希

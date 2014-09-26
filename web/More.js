@@ -24,8 +24,7 @@ var global = {
   fns: {},
   styles: {},
   suffix: 'css',
-  root: '',
-  localRoot: ''
+  root: ''
 };
 
 
@@ -76,7 +75,13 @@ var global = {
         if(global.suffix != 'css') {
           im = im.replace(/\.\w+$/, '.' + global.suffix);
         }
-        var iFile = path.join(path.dirname(file), im);
+        var iFile;
+        if(im.charAt(0) == '/') {
+          iFile = path.join(More.root(), '.' + im);
+        }
+        else {
+          iFile = path.join(path.dirname(file), im);
+        }
         self.mixImport(iFile, data, list);
       });
       var res = '';
@@ -113,7 +118,13 @@ var global = {
       if(global.suffix != 'css') {
         im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
-      var iFile = path.join(path.dirname(file), im);
+      var iFile;
+      if(im.charAt(0) == '/') {
+        iFile = path.join(More.root(), '.' + im);
+      }
+      else {
+        iFile = path.join(path.dirname(file), im);
+      }
       self.mixImport(iFile, data, list);
     });
     list.push(more);
@@ -467,22 +478,19 @@ var global = {
     return (new More()).parseFile(file, combo);
   }
   More.suffix=function(str) {
-    if(str===void 0)str=null;if(str) {
+    if(str) {
       global.suffix = str.replace(/^\./, '');
     }
     return global.suffix;
   }
   More.root=function(str) {
-    if(str===void 0)str=null;if(str) {
+    if(str) {
+      if(!/\/\\$/.test(str)) {
+        str += '/';
+      }
       global.root = str;
     }
     return global.root;
-  }
-  More.localRoot=function(str) {
-    if(str===void 0)str=null;if(str) {
-      global.localRoot = str;
-    }
-    return global.localRoot;
   }
   More.vars=function(o, mix) {
     if(o) {
@@ -542,8 +550,7 @@ var global = {
       fns: {},
       styles: {},
       suffix: 'css',
-      root: '',
-      localRoot: ''
+      root: ''
     };
     return global;
   }

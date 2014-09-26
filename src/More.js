@@ -24,8 +24,7 @@ var global = {
   fns: {},
   styles: {},
   suffix: 'css',
-  root: '',
-  localRoot: ''
+  root: ''
 };
 
 class More {
@@ -76,7 +75,13 @@ class More {
         if(global.suffix != 'css') {
           im = im.replace(/\.\w+$/, '.' + global.suffix);
         }
-        var iFile = path.join(path.dirname(file), im);
+        var iFile;
+        if(im.charAt(0) == '/') {
+          iFile = path.join(More.root(), '.' + im);
+        }
+        else {
+          iFile = path.join(path.dirname(file), im);
+        }
         self.mixImport(iFile, data, list);
       });
       var res = '';
@@ -113,7 +118,13 @@ class More {
       if(global.suffix != 'css') {
         im = im.replace(/\.\w+$/, '.' + global.suffix);
       }
-      var iFile = path.join(path.dirname(file), im);
+      var iFile;
+      if(im.charAt(0) == '/') {
+        iFile = path.join(More.root(), '.' + im);
+      }
+      else {
+        iFile = path.join(path.dirname(file), im);
+      }
       self.mixImport(iFile, data, list);
     });
     list.push(more);
@@ -466,23 +477,20 @@ class More {
   static parseFile(file, combo) {
     return (new More()).parseFile(file, combo);
   }
-  static suffix(str = null) {
+  static suffix(str) {
     if(str) {
       global.suffix = str.replace(/^\./, '');
     }
     return global.suffix;
   }
-  static root(str = null) {
+  static root(str) {
     if(str) {
+      if(!/\/\\$/.test(str)) {
+        str += '/';
+      }
       global.root = str;
     }
     return global.root;
-  }
-  static localRoot(str = null) {
-    if(str) {
-      global.localRoot = str;
-    }
-    return global.localRoot;
   }
   static vars(o, mix) {
     if(o) {
@@ -542,8 +550,7 @@ class More {
       fns: {},
       styles: {},
       suffix: 'css',
-      root: '',
-      localRoot: ''
+      root: ''
     };
     return global;
   }

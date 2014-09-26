@@ -56,9 +56,6 @@ describe('api', function() {
   it('##root', function() {
     expect(More.root).to.be.a(Function);
   });
-  it('##localRoot', function() {
-    expect(More.localRoot).to.be.a(Function);
-  });
   it('##config', function() {
     expect(More.config).to.be.a(Function);
   });
@@ -423,6 +420,12 @@ describe('config', function() {
     var s = 'html{margin:$a;fn1();@extend .test}';
     var res = more.parse(s);
     expect(res).to.eql('html{margin:1;padding:0;color:#000;}');
+  });
+  it('root', function() {
+    More.root(path.join(__dirname, './file'));
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './root.css'), true);
+    expect(res).to.eql('html{margin:0}');
   });
 });
 describe('ignore source css', function() {
