@@ -28,8 +28,8 @@ npm install more-css
 ### More
 * constructor(code:String = '') 传入需要预编译的code
 * parse(code:String = null):String 预编译code，可以为空，否则会覆盖构造函数里传入的code
-* parseFile(file:String, page:Boolean = false):String 转换css文件，page表明来源是否是页面
- * 一般情况下可忽略page参数，高级用法详见[parseFile高级用法](https://github.com/army8735/more/wiki/document#parsefile高级用法)
+* parseFile(file:String, combo:Boolean = false):String 转换css文件，combo表明是否静态合并@import的文件
+ * combo详见[parseFile高级用法](https://github.com/army8735/more/wiki/document#parsefile高级用法)
 * ast():Object 返回解析后的语法树
 * tokens():Array<Object> 返回解析后的词法单元序列
 * imports():Array<String> 返回解析后的@import文件列表
@@ -42,7 +42,7 @@ npm install more-css
 
 ### 静态属性
 * parse(code:String = ''):String 快捷方式预编译，无需new步骤
-* parseFile(code:String = '', page:Boolean = false):String 快捷方式预编译文件，无需new步骤
+* parseFile(code:String = '', combo:Boolean = false):String 快捷方式预编译文件，无需new步骤
 * suffix(str:String):String 全局设置/读取文件后缀名，默认css
 * root(str:String):String 全局设置/读取相对根路径
 * localRoot(str:String):String 全局设置/读取本地相对根路径
