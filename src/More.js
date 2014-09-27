@@ -15,6 +15,7 @@ import concatSelector from './concatSelector';
 import eventbus from './eventbus';
 import checkLevel from './checkLevel';
 import normalize from './normalize';
+import compress from './compress';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -556,6 +557,9 @@ class More {
   }
   static addKeyword(kw) {
     homunculus.getClass('rule', 'css').addKeyWord(kw);
+  }
+  static compress(code, radical) {
+    return compress(code, radical);
   }
 }
 
