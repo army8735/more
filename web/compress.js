@@ -1,4 +1,4 @@
-define(function(require, exports, module){var Clean=function(){var _108=require('clean-css');return _108.hasOwnProperty("Clean")?_108.Clean:_108.hasOwnProperty("default")?_108.default:_108}();
+define(function(require, exports, module){var Clean=function(){var _17=require('clean-css');return _17.hasOwnProperty("Clean")?_17.Clean:_17.hasOwnProperty("default")?_17.default:_17}();
 
 var homunculus=require('homunculus');
 
@@ -6,34 +6,19 @@ var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
 exports.default=function(code, radical) {
-  var clean = new Clean();
-  try {
-    code = clean.minify(code);
-    console.log(code)
-  }
-  catch(e) {
-    if(typeof console != 'undefined') {
-      console.error(e);
-    }
-    return e.toString();
-  }
-  if(!radical) {
-    return code;
-  }
-  return (new Compress(code)).compress();
+  return (new Compress(code, radical)).compress();
 }
 
 
 
-  function Compress(code) {
+  function Compress(code, radical) {
     this.code = code;
     this.head = '';
     this.body = '';
+    this.radical = radical;
   }
   Compress.prototype.compress = function() {
     var parser = homunculus.getParser('css');
-    var node;
-    var ignores;
     try {
       this.node = parser.parse(this.code);
       this.ignores = parser.ignore();
@@ -46,6 +31,10 @@ exports.default=function(code, radical) {
       return e.toString();
     }
     this.getHead();
+    if(!this.radical) {
+      var s = (new Clean()).minify(this.code.slice(this.head.length));
+      return this.head + s;
+    }
     this.merge();
     this.join();
     return this.head + this.body;
@@ -55,7 +44,7 @@ exports.default=function(code, radical) {
     for(var i = 0, len = leaves.length; i < len; i++) {
       var leaf = leaves[i];
       if(leaf.name() == Node.STYLESET) {
-        return;;
+        return;
       }
       this.joinHead(leaf);
     }
@@ -67,8 +56,8 @@ exports.default=function(code, radical) {
       var token = node.token();
       if(token.type() != Token.VIRTUAL) {
         self.head += token.content();
-        while(self.ignore[++self.index]) {
-          var ig = self.ignore[self.index];
+        while(self.ignores[++self.index]) {
+          var ig = self.ignores[self.index];
           self.head += ig.content();
         }
       }
