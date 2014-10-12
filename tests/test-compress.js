@@ -21,7 +21,7 @@ describe('head', function() {
   });
 });
 describe('merge', function() {
-  it('a same style', function() {
+  it.only('a same style', function() {
     var s = 'html{margin:0}body{margin:0}'
     expect(More.compress(s, true)).to.eql('html,body{margin:0}');
   });
