@@ -86,7 +86,7 @@ class Compress {
     }
     return list;
   }
-  rb(node, item, isSelector, isStyle) {
+  rb(node, item, isSelector, isStyle, isKey, isValue) {
     var self = this;
     var isToken = node.name() == Node.TOKEN;
     if(isToken) {
@@ -98,7 +98,12 @@ class Compress {
         else if(isStyle) {
           tempValue += token.content();
           if(token.type() == Token.HACK) {
-            tempStyle.hack = token.content();
+            if(isKey) {
+              tempStyle.prefixHack = token.content();
+            }
+            else {
+              tempStyle.suffixHack = token.content();
+            }
           }
           else if(token.type() == Token.IMPORTANT) {
             tempStyle.important = true;
@@ -123,14 +128,21 @@ class Compress {
       else if(node.name() == Node.STYLE) {
         tempStyle = {
           value: '',
-          hack: '',
+          prefixHack: '',
+          suffixHack: '',
           important: false
         };
         tempValue = '';
         isStyle = true;
       }
+      else if(node.name() == Node.KEY) {
+        isKey = true;
+      }
+      else if(node.name() == Node.VALUE) {
+        isValue = true;
+      }
       node.leaves().forEach(function(leaf) {
-        self.rb(leaf, item, isSelector, isStyle);
+        self.rb(leaf, item, isSelector, isStyle, isKey, isValue);
       });
       if(node.name() == Node.SELECTOR) {
         item.selectors.push(tempSelector);
