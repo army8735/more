@@ -1,4 +1,5 @@
 import Clean from 'clean-css';
+import sort from './sort';
 
 module homunculus from 'homunculus';
 
@@ -88,6 +89,9 @@ class Compress {
         styles: []
       };
       this.rb(leaf, item);
+      //将选择器排序，比较时可直接==比较
+      sort(item.selectors);
+      item.s2s = item.selectors.join(',');
       list.push(item);
     }
     return list;
@@ -156,6 +160,17 @@ class Compress {
       else if(node.name() == Node.STYLE) {
         tempStyle.value = tempValue;
         item.styles.push(tempStyle);
+      }
+    }
+  }
+  noImpact(list, first, last, child) {
+    var mode = false;
+    if(child !== undefined) {
+      mode = true;
+    }
+    for(var i = first; i <= last; i++) {
+      if(list[i].s2s.indexOf(':-ms-') > -1) {
+        return false;
       }
     }
   }

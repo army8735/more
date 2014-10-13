@@ -1,4 +1,5 @@
-define(function(require, exports, module){var Clean=function(){var _17=require('clean-css');return _17.hasOwnProperty("Clean")?_17.Clean:_17.hasOwnProperty("default")?_17.default:_17}();
+define(function(require, exports, module){var Clean=function(){var _8=require('clean-css');return _8.hasOwnProperty("Clean")?_8.Clean:_8.hasOwnProperty("default")?_8.default:_8}();
+var sort=function(){var _9=require('./sort');return _9.hasOwnProperty("sort")?_9.sort:_9.hasOwnProperty("default")?_9.default:_9}();
 
 var homunculus=require('homunculus');
 
@@ -88,6 +89,9 @@ var tempValue;
         styles: []
       };
       this.rb(leaf, item);
+      //将选择器排序，比较时可直接==比较
+      sort(item.selectors);
+      item.s2s = item.selectors.join(',');
       list.push(item);
     }
     return list;
@@ -156,6 +160,17 @@ var tempValue;
       else if(node.name() == Node.STYLE) {
         tempStyle.value = tempValue;
         item.styles.push(tempStyle);
+      }
+    }
+  }
+  Compress.prototype.noImpact = function(list, first, last, child) {
+    var mode = false;
+    if(child !== undefined) {
+      mode = true;
+    }
+    for(var i = first; i <= last; i++) {
+      if(list[i].s2s.indexOf(':-ms-') > -1) {
+        return false;
       }
     }
   }
