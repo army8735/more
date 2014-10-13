@@ -21,6 +21,16 @@ class Compress {
     this.radical = radical;
   }
   compress() {
+    try {
+      this.code = (new Clean({
+        processImport: false
+      })).minify(this.code);
+    } catch(e) {
+      return e.toString();
+    }
+    if(!this.radical) {
+      return this.code;
+    }
     var parser = homunculus.getParser('css');
     try {
       this.node = parser.parse(this.code);
@@ -34,12 +44,8 @@ class Compress {
       return e.toString();
     }
     var i = this.getHead();
-    if(!this.radical) {
-      var s = (new Clean()).minify(this.code.slice(this.head.length));
-      return this.head + s;
-    }
     var list = this.rebuild(i);
-    this.merge();
+    this.merge(list);
     this.join();
     return this.head + this.body;
   }

@@ -21,6 +21,16 @@ var tempValue;
     this.radical = radical;
   }
   Compress.prototype.compress = function() {
+    try {
+      this.code = (new Clean({
+        processImport: false
+      })).minify(this.code);
+    } catch(e) {
+      return e.toString();
+    }
+    if(!this.radical) {
+      return this.code;
+    }
     var parser = homunculus.getParser('css');
     try {
       this.node = parser.parse(this.code);
@@ -34,12 +44,8 @@ var tempValue;
       return e.toString();
     }
     var i = this.getHead();
-    if(!this.radical) {
-      var s = (new Clean()).minify(this.code.slice(this.head.length));
-      return this.head + s;
-    }
-    var list = this.rebuild(i);console.log(JSON.stringify(list))
-    this.merge();
+    var list = this.rebuild(i);
+    this.merge(list);
     this.join();
     return this.head + this.body;
   }
@@ -86,7 +92,7 @@ var tempValue;
     }
     return list;
   }
-  Compress.prototype.rb = function(node, item, isSelector, isStyle) {
+  Compress.prototype.rb = function(node, item, isSelector, isStyle, isKey, isValue) {
     var self = this;
     var isToken = node.name() == Node.TOKEN;
     if(isToken) {
@@ -98,7 +104,12 @@ var tempValue;
         else if(isStyle) {
           tempValue += token.content();
           if(token.type() == Token.HACK) {
-            tempStyle.hack = token.content();
+            if(isKey) {
+              tempStyle.prefixHack = token.content();
+            }
+            else {
+              tempStyle.suffixHack = token.content();
+            }
           }
           else if(token.type() == Token.IMPORTANT) {
             tempStyle.important = true;
@@ -123,14 +134,21 @@ var tempValue;
       else if(node.name() == Node.STYLE) {
         tempStyle = {
           value: '',
-          hack: '',
+          prefixHack: '',
+          suffixHack: '',
           important: false
         };
         tempValue = '';
         isStyle = true;
       }
+      else if(node.name() == Node.KEY) {
+        isKey = true;
+      }
+      else if(node.name() == Node.VALUE) {
+        isValue = true;
+      }
       node.leaves().forEach(function(leaf) {
-        self.rb(leaf, item, isSelector, isStyle);
+        self.rb(leaf, item, isSelector, isStyle, isKey, isValue);
       });
       if(node.name() == Node.SELECTOR) {
         item.selectors.push(tempSelector);
