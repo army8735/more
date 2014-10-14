@@ -79,7 +79,9 @@ class Compress {
      */
     this.merge(list);
     this.merge(list, true);
+    this.preJoin(list);
     this.union(list);
+    this.union(list, true);
     this.extract(list);
     return this.head + this.join(list);
   }
@@ -372,9 +374,72 @@ class Compress {
       this.merge(list, direction);
     }
   }
-  //聚合相同样式的选择器
-  union(list) {
-    //
+  preJoin(list) {
+    list.forEach(function(item) {
+      sort(item.styles, function(a, b) {
+        return a.key > b.key;
+      });
+      item.value = '';
+      var len = item.styles.length;
+      item.styles.forEach(function(style, i) {
+        item.value += style.key;
+        item.value += ':';
+        item.value += style.content.toLowerCase();
+        if(i < len - 1) {
+          item.value += ';';
+        }
+      });
+    });
+  }
+  //聚合相同样式的选择器，向前向后两个方向
+  union(list, direction) {
+    var res = false;
+    if(direction) {
+      outer:
+      for(var i = list.length - 1; i > 0; i--) {
+        for(var j = i - 1; j >= 0; j--) {
+          if(list[i].value == list[j].value) {
+            if(this.noImpact(list, i, j)) {
+              list[i].selectors = list[j].selectors.concat(list[i].selectors);
+              sort(list[i].selectors);
+              list[i].s2s = list[i].selectors.join(',');
+              list.splice(j, 1);
+              this.upImCache(j);
+              i--;
+              j--;
+              res = true;
+            }
+            else {
+              continue outer;
+            }
+          }
+        }
+      }
+    }
+    else {
+      outer:
+      for(var i = 0; i < list.length - 1; i++) {
+        for(var j = i + 1; j < list.length; j++) {
+          if(list[i].value == list[j].value) {
+            if(this.noImpact(list, i, j)) {
+              list[i].selectors = list[i].selectors.concat(list[j].selectors);
+              sort(list[i].selectors);
+              list[i].s2s = list[i].selectors.join(',');
+              list.splice(j, 1);
+              this.upImCache(j);
+              j--;
+              res = true;
+            }
+            else {
+              continue outer;
+            }
+          }
+        }
+      }
+    }
+    if(res) {
+      this.union(list, direction);
+    }
   }
   //提取公因子
   extract(list) {

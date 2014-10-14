@@ -41,7 +41,7 @@ describe('cleanCss', function() {
     var s = 'html{padding:0}div{border-width:0}html{border:1px solid #fff}';
     expect(More.compress(s)).to.eql(s);
   });
-  it('repeat', function() {
+  it('duplicate', function() {
     var s = 'html{margin:0}div{padding:1;margin:2}html{margin:1;padding:0}';
     expect(More.compress(s)).to.eql('div{padding:1;margin:2}html{margin:1;padding:0}');
   });
@@ -91,15 +91,15 @@ describe('merge', function() {
   });
   it('multi', function() {
     var s = 'html{margin:0}div{padding:1}html{padding:0}p{color:#fff}html{color:#FFF}';
-    expect(More.compress(s, true)).to.eql('div{padding:1}html{margin:0;padding:0;color:#FFF}p{color:#fff}');
+    expect(More.compress(s, true)).to.eql('div{padding:1}html{color:#FFF;margin:0;padding:0}p{color:#fff}');
   });
   it('several', function() {
     var s = 'html{margin:0}div{padding:1}html{padding:0}div{color:#fff}';
-    expect(More.compress(s, true)).to.eql('div{padding:1;color:#fff}html{margin:0;padding:0}');
+    expect(More.compress(s, true)).to.eql('div{color:#fff;padding:1}html{margin:0;padding:0}');
   });
   it('abbreviation 1', function() {
     var s = 'html{padding:0}div{border-width:0}html{border:1px solid #fff}';
-    expect(More.compress(s, true)).to.eql('div{border-width:0}html{padding:0;border:1px solid #fff}');
+    expect(More.compress(s, true)).to.eql('div{border-width:0}html{border:1px solid #fff;padding:0}');
   });
   it('abbreviation 2', function() {
     var s = 'html{padding:0}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
@@ -107,18 +107,28 @@ describe('merge', function() {
   });
   it('abbreviation 3', function() {
     var s = 'html{padding:0!important}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
-    expect(More.compress(s, true)).to.eql('div{border-width:0;padding-top:0}html{padding:0!important;border:1px solid #fff}');
-  });
-});
-describe('duplicate', function() {
-  it('repeat', function() {
-    var s = 'html{margin:0}div{padding:1;margin:2}html{margin:1;padding:0}';
-    expect(More.compress(s, true)).to.eql('div{padding:1;margin:2}html{margin:1;padding:0}');
+    expect(More.compress(s, true)).to.eql('div{border-width:0;padding-top:0}html{border:1px solid #fff;padding:0!important}');
   });
 });
 describe('union', function() {
-  it.skip('same style diff important', function() {
-    var s = 'html{margin:0}.a{margin:1 !important}body{margin:0}';
-    expect(More.compress(s, true)).to.eql('body,html{margin:0}.a{margin:1 !important}');
+  it('confilct', function() {
+    var s = 'html{margin:0}div{margin:1}body{margin:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
+  it('same value', function() {
+    var s = 'html{margin:0;padding:0}div{margin:0}body{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql('body,html{margin:0;padding:0}div{margin:0}');
+  });
+  it('abbreviation', function() {
+    var s = 'html{margin:0;padding:0}div{margin-top:0}body{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
+  it('sequence', function() {
+    var s = 'html{margin:0;padding:0}div{padding:1!important}body{padding:0;margin:0}';
+    expect(More.compress(s, true)).to.eql('body,html{margin:0;padding:0}div{padding:1!important}');
+  });
+  it('same style diff important', function() {
+    var s = 'html{margin:0}.a{margin:1!important}body{margin:0}';
+    expect(More.compress(s, true)).to.eql('body,html{margin:0}.a{margin:1!important}');
   });
 })
