@@ -14,59 +14,28 @@ var tempSelector;
 var tempStyle;
 var tempKey;
 var tempValue;
-var KEYS = {
-  background: true,
-  font: true,
-  margin: true,
-  padding: true,
-  'list-style': true,
-  overflow: true,
-  border: true,
-  'border-left': true,
-  'border-top': true,
-  'border-right': true,
-  'border-bottom': true,
-  'border-radius': true,
-  'background-position': true,
-  'background-color': true,
-  'background-repeat': true,
-  'background-attachment': true,
-  'background-image': true,
-  'font-style': true,
-  'line-height': true,
-  'font-family': true,
-  'font-variant': true,
-  'font-size': true,
-  'margin-left': true,
-  'margin-right': true,
-  'margin-bottom': true,
-  'margin-top': true,
-  'padding-left': true,
-  'padding-right': true,
-  'padding-bottom': true,
-  'padding-top': true,
-  'list-style-image': true,
-  'list-style-position': true,
-  'list-style-type': true,
-  'overlfow-x': true,
-  'overlfow-y': true,
-  'border-left-width': true,
-  'border-left-color': true,
-  'border-left-style': true,
-  'border-right-width': true,
-  'border-right-color': true,
-  'border-right-style': true,
-  'border-top-width': true,
-  'border-top-color': true,
-  'border-top-style': true,
-  'border-bottom-width': true,
-  'border-bottom-color': true,
-  'border-bottom-style': true,
-  'border-top-left-radius': true,
-  'border-top-right-radius': true,
-  'border-bottom-left-radius': true,
-  'border-bottom-right-radius': true
-};
+
+var KEYS = [
+  ['background', 'background-position', 'background-color', 'background-repeat', 'background-attachment', 'background-image'],
+  ['font', 'font-family', 'font-size', 'font-style', 'line-height', 'font-variant'],
+  ['margin', 'margin-left', 'margin-top', 'margin-right', 'margin-bottom'],
+  ['padding', 'padding-left', 'padding-top', 'padding-right', 'padding-bottom'],
+  ['overflow', 'overflow-x', 'overflow-y'],
+  ['border', 'border-width', 'border-style', 'border-color',
+    'border-left', 'border-top', 'border-right', 'border-bottom',
+    'border-left-width', 'border-left-color', 'border-left-style',
+    'border-right-width', 'border-right-color', 'border-right-style',
+    'border-top-width', 'border-top-color', 'border-top-style',
+    'border-bottom-width', 'border-bottom-color', 'border-bottom-style'],
+  ['list-style', 'list-style-image', 'list-style-position', 'list-style-type'],
+  ['border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius']
+];
+var KEY_HASH = {};
+KEYS.forEach(function(ks, i) {
+  ks.forEach(function(k) {
+    KEY_HASH[k] = i;
+  });
+});
 
 
   function Compress(code, radical) {
@@ -102,6 +71,7 @@ var KEYS = {
     var list = this.rebuild(i);
     this.merge(list);
     this.merge(list, true);
+    this.duplicate(list);
     this.union(list);
     return this.head + this.join(list);
   }
@@ -150,6 +120,9 @@ var KEYS = {
       list.push(item);
     }
     return list;
+  }
+  Compress.prototype.getKey = function(style) {
+    return style.key.slice(style.prefixHack.length).toLowerCase();
   }
   Compress.prototype.rb = function(node, item, isSelector, isStyle, isKey, isValue) {
     var self = this;
@@ -237,6 +210,7 @@ var KEYS = {
     }
   }
   Compress.prototype.noImpact = function(list, first, last, child) {
+    var self = this;
     //不指定child则两个选择器完全没冲突，否则仅child的样式无冲突
     var mode = false;
     if(child !== undefined) {
@@ -252,18 +226,26 @@ var KEYS = {
       return true;
     }
     //非紧邻先取可能缓存的判断结果
-    else if(!mode && this.imCache[first + ',' + last] !== undefined) {
+    else if(!mode && self.imCache[first + ',' + last] !== undefined) {
       return this.imCache[first + ',' + last];
     }
     //非紧邻若无相同样式或important优先级不同无影响
     else {
       var hash = {};
+      var abbreviation = {};
       //将last的样式出现记录在hash上
       list[last].styles.forEach(function(style) {
-        hash[style.key.slice(style.prefixHack.length)] = {
+        var key = self.getKey(style);
+        hash[key] = {
           important: style.important,
           value: style.value
         };
+        //注意一些缩写语句
+        if(KEY_HASH.hasOwnProperty(key)) {
+          abbreviation[KEY_HASH[key]] = {
+            important: style.important
+          };
+        }
       });
       //向前和向后以索引大小为基准
       if(first < last) {
@@ -272,15 +254,24 @@ var KEYS = {
           var styles = item.styles;
           for(var j = 0, len = styles.length; j < len; j++) {
             var style = styles[j];
-            var key = style.key.slice(style.prefixHack.length);
+            var key = self.getKey(style);
+            //值不等且优先级不等时冲突
             if(hash[key]
               && hash[key].value != style.value
               && hash[key].important == style.important) {
-              this.imCache[i + ',' + last] = false;
+              self.imCache[i + ',' + last] = false;
               return false;
             }
+            //有缩写且优先级不等也冲突
+            else if(!hash[key] && KEY_HASH.hasOwnProperty(key)) {
+              if(abbreviation.hasOwnProperty(KEY_HASH[key])
+                && style.important == abbreviation[KEY_HASH[key]].important) {
+                self.imCache[i + ',' + last] = false;
+                return false;
+              }
+            }
           }
-          this.imCache[i + ',' + last] = true;
+          self.imCache[i + ',' + last] = true;
         }
       }
       else {
@@ -289,19 +280,26 @@ var KEYS = {
           var styles = item.styles;
           for(var j = 0, len = styles.length; j < len; j++) {
             var style = styles[j];
-            var key = style.key.slice(style.prefixHack.length);
+            var key = self.getKey(style);
             if(hash[key]
               && hash[key].value != style.value
               && hash[key].important == style.important) {
-              this.imCache[i + ',' + last] = false;
+              self.imCache[i + ',' + last] = false;
               return false;
             }
+            else if(!hash[key] && KEY_HASH.hasOwnProperty(key)) {
+              if(abbreviation.hasOwnProperty(KEY_HASH[key])
+                && style.important == abbreviation[KEY_HASH[key]].important) {
+                self.imCache[i + ',' + last] = false;
+                return false;
+              }
+            }
           }
-          this.imCache[i + ',' + last] = true;
+          self.imCache[i + ',' + last] = true;
         }
       }
     }
-    this.imCache[first + ',' + last] = true;
+    self.imCache[first + ',' + last] = true;
     return true;
   }
   Compress.prototype.upImCache = function(index) {
@@ -365,6 +363,10 @@ var KEYS = {
     if(res) {
       this.merge(list, direction);
     }
+  }
+  //去除同一选择器中重复样式声明
+  Compress.prototype.duplicate = function(list) {
+    //
   }
   //聚合相同样式的选择器
   Compress.prototype.union = function(list) {

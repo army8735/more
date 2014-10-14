@@ -77,6 +77,14 @@ describe('merge', function() {
     var s = 'html{margin:0}div{padding:1}html{padding:0}div{color:#fff}';
     expect(More.compress(s, true)).to.eql('div{padding:1;color:#fff}html{margin:0;padding:0}');
   });
+  it('abbreviation 1', function() {
+    var s = 'html{padding:0}div{border-width:0}html{border:1px solid #fff}';
+    expect(More.compress(s, true)).to.eql('div{border-width:0}html{padding:0;border:1px solid #fff}');
+  });
+  it('abbreviation 2', function() {
+    var s = 'html{padding:0}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
 });
 describe('union', function() {
   it.skip('same style diff important', function() {
