@@ -101,6 +101,7 @@ class Compress {
     var i = this.getHead();
     var list = this.rebuild(i);
     this.merge(list);
+    this.merge(list, true);
     this.union(list);
     return this.head + this.join(list);
   }
@@ -204,6 +205,7 @@ class Compress {
         tempStyle = {
           key: '',
           value: '',
+          content: '',
           prefixHack: '',
           suffixHack: '',
           important: false
@@ -226,7 +228,8 @@ class Compress {
       }
       else if(node.name() == Node.STYLE) {
         tempStyle.key = tempKey;
-        tempStyle.value = tempValue;
+        tempStyle.content = tempValue;
+        tempStyle.value = tempValue.replace(/\s*!important\s*$/i, '').slice(0, tempValue.length - tempStyle.suffixHack.length);
         item.styles.push(tempStyle);
       }
     }
@@ -253,15 +256,15 @@ class Compress {
     //非紧邻若无相同样式或important优先级不同无影响
     else {
       var hash = {};
+      //将last的样式出现记录在hash上
+      list[last].styles.forEach(function(style) {
+        hash[style.key.slice(style.prefixHack.length)] = {
+          important: style.important,
+          value: style.value
+        };
+      });
       //向前和向后以索引大小为基准
       if(first < last) {
-        //将last的样式出现记录在hash上
-        list[last].styles.forEach(function(style) {
-          hash[style.key.slice(style.prefixHack.length)] = {
-            important: style.important,
-            value: style.value
-          };
-        });
         for(var i = first + 1; i < last; i++) {
           var item = list[i];
           var styles = item.styles;
@@ -269,61 +272,87 @@ class Compress {
             var style = styles[j];
             var key = style.key.slice(style.prefixHack.length);
             if(hash[key]
-              && hash[key].value == style.value
+              && hash[key].value != style.value
               && hash[key].important == style.important) {
-              this.imCache[first, i] = false;
+              this.imCache[i + ',' + last] = false;
               return false;
             }
-            this.imCache[first, i] = true;
+            this.imCache[i + ',' + last] = true;
           }
         }
       }
       else {
-        //将first的样式出现记录在hash上
-        list[first].styles.forEach(function(style) {
-          hash[style.key.slice(style.prefixHack.length)] = {
-            important: style.important,
-            value: style.value
-          };
-        });
-        for(var i = last - 1; i > first; i++) {
+        for(var i = first - 1; i > last; i--) {
           var item = list[i];
           var styles = item.styles;
           for(var j = 0, len = styles.length; j < len; j++) {
             var style = styles[j];
             var key = style.key.slice(style.prefixHack.length);
             if(hash[key]
-              && hash[key].value == style.value
+              && hash[key].value != style.value
               && hash[key].important == style.important) {
-              this.imCache[i, first] = false;
+              this.imCache[i + ',' + last] = false;
               return false;
             }
-            this.imCache[i, first] = true;
+            this.imCache[i + ',' + last] = true;
           }
         }
       }
     }
+    this.imCache[first + ',' + last] = true;
     return true;
   }
-  //合并相同选择器
-  merge(list) {
+  //合并相同选择器，向前向后两个方向
+  merge(list, direction) {
     //冒泡处理，因为可能处理后留有多个相同选择器，但后面的选择器可继续递归过程
     var res = false;
-    for(var i = 0; i < list.length - 1; i++) {
-      //
+    if(direction) {
+      outer:
+      for(var i = list.length - 1; i > 0; i--) {
+        for(var j = i - 1; j >= 0; j--) {
+          if(list[i].s2s == list[j].s2s) {
+            if(this.noImpact(list, i, j)) {
+              list[i].styles = list[j].styles.concat(list[i].styles);
+              list.splice(j, 1);
+              j--;
+              res = true;
+            }
+            else {
+              continue outer;
+            }
+          }
+        }
+      }
+    }
+    else {
+      outer:
+      for(var i = 0; i < list.length - 1; i++) {
+        for(var j = i + 1; j < list.length; j++) {
+          if(list[i].s2s == list[j].s2s) {
+            if(this.noImpact(list, i, j)) {
+              list[i].styles = list[i].styles.concat(list[j].styles);
+              list.splice(j, 1);
+              j--;
+              res = true;
+            }
+            else {
+              continue outer;
+            }
+          }
+        }
+      }
     }
     //递归处理，直到没有可合并的为止
     if(res) {
-      merge(list);
+      this.merge(list, direction);
     }
-    return res;
   }
   //聚合相同样式的选择器
   union(list) {
     //
   }
   join(list) {
-    var body = '';console.log(JSON.stringify(list))
+    var body = '';
     list.forEach(function(item) {
       body += item.s2s;
       body += '{';
@@ -331,7 +360,7 @@ class Compress {
       item.styles.forEach(function(style, i) {
         body += style.key;
         body += ':';
-        body += style.value;
+        body += style.content;
         if(i < len - 1) {
           body += ';';
         }

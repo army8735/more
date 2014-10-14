@@ -50,8 +50,8 @@ describe('merge', function() {
     expect(More.compress(s, true)).to.eql('div{padding:1}html{margin:0;padding:0}');
   });
   it('same selector diff important', function() {
-    var s = 'html{margin:0}.a{padding:1 !important}html{padding:0}';
-    expect(More.compress(s, true)).to.eql('html{margin:0;padding:0}.a{padding:1 !important}');
+    var s = 'html{margin:0}.a{padding:1!important}html{padding:0}';
+    expect(More.compress(s, true)).to.eql('html{margin:0;padding:0}.a{padding:1!important}');
   });
 });
 describe('union', function() {
