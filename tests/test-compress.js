@@ -85,6 +85,10 @@ describe('merge', function() {
     var s = 'html{padding:0}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
     expect(More.compress(s, true)).to.eql(s);
   });
+  it('abbreviation 3', function() {
+    var s = 'html{padding:0!important}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
+    expect(More.compress(s, true)).to.eql('div{border-width:0;padding-top:0}html{padding:0!important;border:1px solid #fff}');
+  });
 });
 describe('union', function() {
   it.skip('same style diff important', function() {
