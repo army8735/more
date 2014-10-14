@@ -109,6 +109,14 @@ describe('merge', function() {
     var s = 'html{padding:0!important}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
     expect(More.compress(s, true)).to.eql('div{border-width:0;padding-top:0}html{border:1px solid #fff;padding:0!important}');
   });
+  it('prefix hack', function() {
+    var s = 'html{margin:0}div{-webkit-padding:1}html{padding:0}';
+    expect(More.compress(s, true)).to.eql('div{-webkit-padding:1}html{margin:0;padding:0}');
+  });
+  it('suffix hack', function() {
+    var s = 'html{margin:0}div{padding:1\\0}html{padding:0}';
+    expect(More.compress(s, true)).to.eql('div{padding:1\\0}html{margin:0;padding:0}');
+  });
 });
 describe('union', function() {
   it('confilct', function() {
