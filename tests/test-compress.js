@@ -29,6 +29,14 @@ describe('cleanCss', function() {
     var s = 'html{margin:0}div{padding:1}html{padding:0}';
     expect(More.compress(s)).to.eql(s);
   });
+  it('multi', function() {
+    var s = 'html{margin:0}div{padding:1}html{padding:0}p{color:#fff}html{color:#FFF}';
+    expect(More.compress(s)).to.eql(s);
+  });
+  it('several', function() {
+    var s = 'html{margin:0}div{padding:1}html{padding:0}div{color:#fff}';
+    expect(More.compress(s)).to.eql(s);
+  });
   it('error', function() {
     var s = '*(#(*{{{';
     expect(More.compress(s).indexOf('Error') > -1).to.be.ok();
@@ -60,6 +68,14 @@ describe('merge', function() {
   it('sort selector > 9', function() {
     var s = '.a,.d,.c,.b,.e,.f,.g,.i,.h,.k,.j{margin:0}div{padding:1}.e,.a,.c,.b,.d,.g,.f,.h,.i,.k,.j{padding:0}';
     expect(More.compress(s, true)).to.eql('div{padding:1}.a,.b,.c,.d,.e,.f,.g,.h,.i,.j,.k{margin:0;padding:0}');
+  });
+  it('multi', function() {
+    var s = 'html{margin:0}div{padding:1}html{padding:0}p{color:#fff}html{color:#FFF}';
+    expect(More.compress(s, true)).to.eql('div{padding:1}html{margin:0;padding:0;color:#FFF}p{color:#fff}');
+  });
+  it('several', function() {
+    var s = 'html{margin:0}div{padding:1}html{padding:0}div{color:#fff}';
+    expect(More.compress(s, true)).to.eql('div{padding:1;color:#fff}html{margin:0;padding:0}');
   });
 });
 describe('union', function() {

@@ -229,7 +229,9 @@ class Compress {
       else if(node.name() == Node.STYLE) {
         tempStyle.key = tempKey;
         tempStyle.content = tempValue;
-        tempStyle.value = tempValue.replace(/\s*!important\s*$/i, '').slice(0, tempValue.length - tempStyle.suffixHack.length);
+        tempStyle.value = tempValue.replace(/\s*!important\s*$/i, '')
+          .slice(0, tempValue.length - tempStyle.suffixHack.length)
+          .toLowerCase();
         item.styles.push(tempStyle);
       }
     }
@@ -277,8 +279,8 @@ class Compress {
               this.imCache[i + ',' + last] = false;
               return false;
             }
-            this.imCache[i + ',' + last] = true;
           }
+          this.imCache[i + ',' + last] = true;
         }
       }
       else {
@@ -294,8 +296,8 @@ class Compress {
               this.imCache[i + ',' + last] = false;
               return false;
             }
-            this.imCache[i + ',' + last] = true;
           }
+          this.imCache[i + ',' + last] = true;
         }
       }
     }
@@ -329,6 +331,7 @@ class Compress {
               list[i].styles = list[j].styles.concat(list[i].styles);
               list.splice(j, 1);
               this.upImCache(j);
+              i--;
               j--;
               res = true;
             }
