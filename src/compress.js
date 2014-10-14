@@ -302,6 +302,20 @@ class Compress {
     this.imCache[first + ',' + last] = true;
     return true;
   }
+  upImCache(index) {
+    var self = this;
+    Object.keys(self.imCache).forEach(function(key) {
+      var arr = key.split(',');
+      if(arr[0] == index) {
+        self.imCache[(index-1) + ',' + arr[1]] = self.imCache[key];
+        delete self.imCache[key];
+      }
+      else if(arr[1] == index) {
+        self.imCache[arr[0] + ',' + (index-1)] = self.imCache[key];
+        delete self.imCache[key];
+      }
+    });
+  }
   //合并相同选择器，向前向后两个方向
   merge(list, direction) {
     //冒泡处理，因为可能处理后留有多个相同选择器，但后面的选择器可继续递归过程
@@ -314,6 +328,7 @@ class Compress {
             if(this.noImpact(list, i, j)) {
               list[i].styles = list[j].styles.concat(list[i].styles);
               list.splice(j, 1);
+              this.upImCache(j);
               j--;
               res = true;
             }
@@ -332,6 +347,7 @@ class Compress {
             if(this.noImpact(list, i, j)) {
               list[i].styles = list[i].styles.concat(list[j].styles);
               list.splice(j, 1);
+              this.upImCache(j);
               j--;
               res = true;
             }

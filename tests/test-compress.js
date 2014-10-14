@@ -53,6 +53,14 @@ describe('merge', function() {
     var s = 'html{margin:0}.a{padding:1!important}html{padding:0}';
     expect(More.compress(s, true)).to.eql('html{margin:0;padding:0}.a{padding:1!important}');
   });
+  it('sort selector', function() {
+    var s = '.a,.d,.c,.b,.e{margin:0}div{padding:1}.e,.a,.c,.b,.d{padding:0}';
+    expect(More.compress(s, true)).to.eql('div{padding:1}.a,.b,.c,.d,.e{margin:0;padding:0}');
+  });
+  it('sort selector > 9', function() {
+    var s = '.a,.d,.c,.b,.e,.f,.g,.i,.h,.k,.j{margin:0}div{padding:1}.e,.a,.c,.b,.d,.g,.f,.h,.i,.k,.j{padding:0}';
+    expect(More.compress(s, true)).to.eql('div{padding:1}.a,.b,.c,.d,.e,.f,.g,.h,.i,.j,.k{margin:0;padding:0}');
+  });
 });
 describe('union', function() {
   it.skip('same style diff important', function() {
