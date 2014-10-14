@@ -69,10 +69,18 @@ KEYS.forEach(function(ks, i) {
     }
     var i = this.getHead();
     var list = this.rebuild(i);
+    /* 获取新数据结构list后，处理以下5个步骤：
+      1合并相同选择器（检测是否冲突）、
+      2去除重复样式（合并后可能造成的重复，包括优先级重复）、
+      3去除被覆盖的样式（合并后可能造成的缩写覆盖）、
+      4聚合相同样式的选择器（样式确保唯一后排序，不冲突则合并相同的）、
+      5提取公因子（最大图形选择算法），
+      2和3已被clean-css实现，无需重复
+     */
     this.merge(list);
     this.merge(list, true);
-    this.duplicate(list);
     this.union(list);
+    this.extract(list);
     return this.head + this.join(list);
   }
   Compress.prototype.getHead = function() {
@@ -364,12 +372,12 @@ KEYS.forEach(function(ks, i) {
       this.merge(list, direction);
     }
   }
-  //去除同一选择器中重复样式声明
-  Compress.prototype.duplicate = function(list) {
-    //
-  }
   //聚合相同样式的选择器
   Compress.prototype.union = function(list) {
+    //
+  }
+  //提取公因子
+  Compress.prototype.extract = function(list) {
     //
   }
   Compress.prototype.join = function(list) {

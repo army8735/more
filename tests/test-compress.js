@@ -37,6 +37,26 @@ describe('cleanCss', function() {
     var s = 'html{margin:0}div{padding:1}html{padding:0}div{color:#fff}';
     expect(More.compress(s)).to.eql(s);
   });
+  it('abbreviation', function() {
+    var s = 'html{padding:0}div{border-width:0}html{border:1px solid #fff}';
+    expect(More.compress(s)).to.eql(s);
+  });
+  it('repeat', function() {
+    var s = 'html{margin:0}div{padding:1;margin:2}html{margin:1;padding:0}';
+    expect(More.compress(s)).to.eql('div{padding:1;margin:2}html{margin:1;padding:0}');
+  });
+  it('override 1', function() {
+    var s = 'html{margin-left:0}div{padding:1;margin:2}html{margin:1;padding:0}';
+    expect(More.compress(s)).to.eql('div{padding:1;margin:2}html{margin:1;padding:0}');
+  });
+  it('override 2', function() {
+    var s = 'html{border:1px solid #fff}div{border-left:1px solid #000}html{border-width:2px}';
+    expect(More.compress(s)).to.eql(s);
+  });
+  it('override 3', function() {
+    var s = 'html{border-width:2px}div{border-left:1px solid #000}html{border:1px solid #fff}';
+    expect(More.compress(s)).to.eql('div{border-left:1px solid #000}html{border:1px solid #fff}');
+  });
   it('error', function() {
     var s = '*(#(*{{{';
     expect(More.compress(s).indexOf('Error') > -1).to.be.ok();
@@ -88,6 +108,12 @@ describe('merge', function() {
   it('abbreviation 3', function() {
     var s = 'html{padding:0!important}div{border-width:0;padding-top:0}html{border:1px solid #fff}';
     expect(More.compress(s, true)).to.eql('div{border-width:0;padding-top:0}html{padding:0!important;border:1px solid #fff}');
+  });
+});
+describe('duplicate', function() {
+  it('repeat', function() {
+    var s = 'html{margin:0}div{padding:1;margin:2}html{margin:1;padding:0}';
+    expect(More.compress(s, true)).to.eql('div{padding:1;margin:2}html{margin:1;padding:0}');
   });
 });
 describe('union', function() {
