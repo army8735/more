@@ -22,24 +22,27 @@ gulp.task('clean-bulid', function() {
 
 function cb(file, enc, cb) {
   var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'build' + path.sep);
-  mkdir(path.dirname(target));
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
-  var content = file._contents;
-  content = content.toString('utf-8');
+  var content = file.contents.toString('utf-8');
   content = jsdc.parse(content);
-  fs.writeFileSync(target, content, { encoding: 'utf-8' });
-  target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
+  file.contents = new Buffer(content);
+  cb(null, file);
+}
+function cb2(file, enc, cb) {
+  var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
+  var content = file.contents.toString('utf-8');
   content = 'define(function(require, exports, module){' + content + '});';
-  fs.writeFileSync(target, content, { encoding: 'utf-8' });
+  file.contents = new Buffer(content);
   cb(null, file);
 }
 
 gulp.task('default', ['clean-bulid'], function() {
   gulp.src('./src/**/*.js')
-    .pipe(function() {
-      return through2.obj(cb);
-    }());
+    .pipe(through2.obj(cb))
+    .pipe(gulp.dest('./build/'))
+    .pipe(through2.obj(cb2))
+    .pipe(gulp.dest('./web/'));
 });
 
 gulp.task('watch', function() {
@@ -47,9 +50,10 @@ gulp.task('watch', function() {
     var args = Array.prototype.slice.call(arguments);
     args.forEach(function(arg) {
       gulp.src(arg.path)
-        .pipe(function() {
-          return through2.obj(cb);
-        }());
+        .pipe(through2.obj(cb))
+        .pipe(gulp.dest('./build/'))
+        .pipe(through2.obj(cb2))
+        .pipe(gulp.dest('./web/'));
     });
   });
 });
