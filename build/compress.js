@@ -1,6 +1,7 @@
-var Clean=function(){var _17=require('clean-css');return _17.hasOwnProperty("Clean")?_17.Clean:_17.hasOwnProperty("default")?_17.default:_17}();
-var sort=function(){var _18=require('./sort');return _18.hasOwnProperty("sort")?_18.sort:_18.hasOwnProperty("default")?_18.default:_18}();
-var KEY_HASH=function(){var _19=require('./abbreviationKey.js');return _19.hasOwnProperty("KEY_HASH")?_19.KEY_HASH:_19.hasOwnProperty("default")?_19.default:_19}();
+var Clean=function(){var _18=require('clean-css');return _18.hasOwnProperty("Clean")?_18.Clean:_18.hasOwnProperty("default")?_18.default:_18}();
+var sort=function(){var _19=require('./sort');return _19.hasOwnProperty("sort")?_19.sort:_19.hasOwnProperty("default")?_19.default:_19}();
+var KEY_HASH=function(){var _20=require('./abbreviationKey.js');return _20.hasOwnProperty("KEY_HASH")?_20.KEY_HASH:_20.hasOwnProperty("default")?_20.default:_20}();
+var CalArea=function(){var _21=require('./CalArea.js');return _21.hasOwnProperty("CalArea")?_21.CalArea:_21.hasOwnProperty("default")?_21.default:_21}();
 var impact=require('./impact');
 
 var homunculus=require('homunculus');
@@ -341,17 +342,17 @@ var tempValue;
         arr[parseInt(i)] = 1;
       });
       map.push(arr);
-    });console.log(keys,map)
+    });
     //同列相同部分视为一个矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器以优先取最大面积合并
     //当然至少要2列，因为1列为只出现在1个选择器中没必要提
-    //TODO:面积择优算法。目前想到的复杂度过高，无法用于实际场景
+    //面积择优算法：计算矩阵中可合并的所有面积，以最大面积优先合并
     //舍弃采用单行合并，即拥有某个样式的所有选择器尝试合并
     //当然因为优先级冲突不一定能够整行合并，应该递归其所有组合尝试，代价太大暂时忽略
-    var record = [];
-    var insert = [];
-    map.forEach(function(row, i) {
-
-    });
+    var calArea = new CalArea(list, map);
+    var res;
+    while(res = calArea.getMax()) {
+      //
+    }
   }
   Compress.prototype.join = function(list) {
     var body = '';

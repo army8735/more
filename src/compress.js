@@ -1,6 +1,7 @@
 import Clean from 'clean-css';
 import sort from './sort';
 import KEY_HASH from './abbreviationKey.js';
+import CalArea from './CalArea.js';
 module impact from './impact';
 
 module homunculus from 'homunculus';
@@ -341,17 +342,17 @@ class Compress {
         arr[parseInt(i)] = 1;
       });
       map.push(arr);
-    });console.log(keys,map)
+    });
     //同列相同部分视为一个矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器以优先取最大面积合并
     //当然至少要2列，因为1列为只出现在1个选择器中没必要提
-    //TODO:面积择优算法。目前想到的复杂度过高，无法用于实际场景
+    //面积择优算法：计算矩阵中可合并的所有面积，以最大面积优先合并
     //舍弃采用单行合并，即拥有某个样式的所有选择器尝试合并
     //当然因为优先级冲突不一定能够整行合并，应该递归其所有组合尝试，代价太大暂时忽略
-    var record = [];
-    var insert = [];
-    map.forEach(function(row, i) {
-
-    });
+    var calArea = new CalArea(list, map);
+    var res;
+    while(res = calArea.getMax()) {
+      //
+    }
   }
   join(list) {
     var body = '';

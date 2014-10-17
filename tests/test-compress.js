@@ -144,8 +144,13 @@ describe('union', function() {
     expect(More.compress(s, true)).to.eql('body,html{margin:0}.a{margin:1!important}');
   });
 });
-describe('extract', function() {
-  it.only('single', function() {
+describe.skip('calarea', function() {
+  describe('single', function() {
+
+  });
+});
+describe.skip('extract', function() {
+  it('single', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0;border:none}';
     expect(More.compress(s, true)).to.eql('.a,.b{margin:0}.a{padding:0}.b{border:none}');
   });
