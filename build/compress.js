@@ -296,7 +296,62 @@ var tempValue;
   }
   //提取公因子
   Compress.prototype.extract = function(list) {
-    //
+    //统计单个样式的出现信息，以便后续操作
+    //keys按顺序保存键值，即以单个样式本身toString()
+    //hash将相同单个样式收集到一个数组里
+    var hash = {};
+    var keys = [];
+    list.forEach(function(item, i) {
+      item.styles.forEach(function(style, j) {
+        var key = style.key + ':' + style.content;
+        if(!hash.hasOwnProperty(key)) {
+          hash[key] = [];
+          keys.push(key);
+        }
+        hash[key].push({
+          parent: item,
+          i: i,
+          j: j
+        });
+      });
+    });
+    //index记录对应索引的选择器是否出现此样式
+    //比如index[0]记录keys[0]的样式出现在哪些位置上，位置为选择器索引
+    //max标明最大样式数
+    var index = [];
+    var max = 0;
+    keys.forEach(function(o) {
+      var same = hash[o];
+      var temp = {};
+      same.forEach(function(o2) {
+        temp[o2.i] = true;
+        max = Math.max(max, o2.i);
+      });
+      index.push(temp);
+    });
+    //以单个样式为横坐标，选择器顺序索引为纵坐标，组成一个二维数组
+    //索引和位置对应，空的地方填0
+    var map = [];
+    index.forEach(function(temp, idx) {
+      var arr = new Array(max);
+      for(var i = 0; i <= max; i++) {
+        arr[i] = 0;
+      }
+      Object.keys(temp).forEach(function(i) {
+        arr[parseInt(i)] = 1;
+      });
+      map.push(arr);
+    });console.log(keys,map)
+    //同列相同部分视为一个矩形面积，不同列拥有相同位置和高度可合并计算面积——即拥有相同样式的不同选择器以优先取最大面积合并
+    //当然至少要2列，因为1列为只出现在1个选择器中没必要提
+    //TODO:面积择优算法。目前想到的复杂度过高，无法用于实际场景
+    //舍弃采用单行合并，即拥有某个样式的所有选择器尝试合并
+    //当然因为优先级冲突不一定能够整行合并，应该递归其所有组合尝试，代价太大暂时忽略
+    var record = [];
+    var insert = [];
+    map.forEach(function(row, i) {
+
+    });
   }
   Compress.prototype.join = function(list) {
     var body = '';

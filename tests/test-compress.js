@@ -77,6 +77,10 @@ describe('merge', function() {
     var s = 'html{margin:0}div{padding:1}html{padding:0}';
     expect(More.compress(s, true)).to.eql('div{padding:1}html{margin:0;padding:0}');
   });
+  it('ignore :-ms', function() {
+    var s = 'html{margin:0}div:-ms-hover{padding:1}html{padding:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
   it('same selector diff important', function() {
     var s = 'html{margin:0}.a{padding:1!important}html{padding:0}';
     expect(More.compress(s, true)).to.eql('html{margin:0;padding:0}.a{padding:1!important}');
@@ -139,4 +143,10 @@ describe('union', function() {
     var s = 'html{margin:0}.a{margin:1!important}body{margin:0}';
     expect(More.compress(s, true)).to.eql('body,html{margin:0}.a{margin:1!important}');
   });
-})
+});
+describe('extract', function() {
+  it.only('single', function() {
+    var s = '.a{margin:0;padding:0}.b{margin:0;border:none}';
+    expect(More.compress(s, true)).to.eql('.a,.b{margin:0}.a{padding:0}.b{border:none}');
+  });
+});
