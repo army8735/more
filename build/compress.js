@@ -61,6 +61,7 @@ var tempValue;
     this.merge(list, true);
     this.preJoin(list);
     this.union(list);
+    this.preRelease(list);
     this.extract(list);
     return this.head + this.join(list);
   }
@@ -109,9 +110,6 @@ var tempValue;
       list.push(item);
     }
     return list;
-  }
-  Compress.prototype.getKey = function(style) {
-    return style.key.slice(style.prefixHack.length).toLowerCase();
   }
   Compress.prototype.rb = function(node, item, isSelector, isStyle, isKey, isValue) {
     var self = this;
@@ -247,6 +245,7 @@ var tempValue;
     }
   }
   Compress.prototype.preJoin = function(list) {
+    //为union做准备，将选择器的样式拼接在一起存至value属性下，可直接==比较
     list.forEach(function(item) {
       sort(item.styles, function(a, b) {
         return a.key > b.key;
@@ -263,7 +262,13 @@ var tempValue;
       });
     });
   }
-  //聚合相同样式的选择器，向前向后两个方向
+  Compress.prototype.preRelease = function(list) {
+    //union完成后删除value属性
+    list.forEach(function(item) {
+      delete item.value;
+    });
+  }
+  //聚合相同样式的选择器
   Compress.prototype.union = function(list) {
     var res = false;
     outer:
