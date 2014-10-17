@@ -1,5 +1,7 @@
 var Clean=function(){var _17=require('clean-css');return _17.hasOwnProperty("Clean")?_17.Clean:_17.hasOwnProperty("default")?_17.default:_17}();
 var sort=function(){var _18=require('./sort');return _18.hasOwnProperty("sort")?_18.sort:_18.hasOwnProperty("default")?_18.default:_18}();
+var KEY_HASH=function(){var _19=require('./abbreviationKey.js');return _19.hasOwnProperty("KEY_HASH")?_19.KEY_HASH:_19.hasOwnProperty("default")?_19.default:_19}();
+var impact=require('./impact');
 
 var homunculus=require('homunculus');
 
@@ -14,28 +16,6 @@ var tempSelector;
 var tempStyle;
 var tempKey;
 var tempValue;
-
-var KEYS = [
-  ['background', 'background-position', 'background-color', 'background-repeat', 'background-attachment', 'background-image'],
-  ['font', 'font-family', 'font-size', 'font-style', 'line-height', 'font-variant'],
-  ['margin', 'margin-left', 'margin-top', 'margin-right', 'margin-bottom'],
-  ['padding', 'padding-left', 'padding-top', 'padding-right', 'padding-bottom'],
-  ['overflow', 'overflow-x', 'overflow-y'],
-  ['border', 'border-width', 'border-style', 'border-color',
-    'border-left', 'border-top', 'border-right', 'border-bottom',
-    'border-left-width', 'border-left-color', 'border-left-style',
-    'border-right-width', 'border-right-color', 'border-right-style',
-    'border-top-width', 'border-top-color', 'border-top-style',
-    'border-bottom-width', 'border-bottom-color', 'border-bottom-style'],
-  ['list-style', 'list-style-image', 'list-style-position', 'list-style-type'],
-  ['border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius']
-];
-var KEY_HASH = {};
-KEYS.forEach(function(ks, i) {
-  ks.forEach(function(k) {
-    KEY_HASH[k] = i;
-  });
-});
 
 
   function Compress(code, radical) {
@@ -218,113 +198,6 @@ KEYS.forEach(function(ks, i) {
       }
     }
   }
-  Compress.prototype.noImpact = function(list, first, last, child) {
-    var self = this;
-    //不指定child则两个选择器完全没冲突，否则仅child的样式无冲突
-    var mode = false;
-    if(child !== undefined) {
-      mode = true;
-    }
-    for(var i = Math.min(first, last); i <= Math.max(first, last); i++) {
-      if(list[i].s2s.indexOf(':-ms-') > -1) {
-        return false;
-      }
-    }
-    //紧邻选择器无优先级影响
-    if(first == last - 1 || first == last + 1) {
-      return true;
-    }
-    //非紧邻先取可能缓存的判断结果
-    else if(!mode && self.imCache[first + ',' + last] !== undefined) {
-      return this.imCache[first + ',' + last];
-    }
-    //非紧邻若无相同样式或important优先级不同无影响
-    else {
-      var hash = {};
-      var abbreviation = {};
-      //将last的样式出现记录在hash上
-      list[last].styles.forEach(function(style) {
-        var key = self.getKey(style);
-        hash[key] = {
-          important: style.important,
-          value: style.value
-        };
-        //注意一些缩写语句
-        if(KEY_HASH.hasOwnProperty(key)) {
-          abbreviation[KEY_HASH[key]] = {
-            important: style.important
-          };
-        }
-      });
-      //向前和向后以索引大小为基准
-      if(first < last) {
-        for(var i = first + 1; i < last; i++) {
-          var item = list[i];
-          var styles = item.styles;
-          for(var j = 0, len = styles.length; j < len; j++) {
-            var style = styles[j];
-            var key = self.getKey(style);
-            //值不等且优先级不等时冲突
-            if(hash[key]
-              && hash[key].value != style.value
-              && hash[key].important == style.important) {
-              self.imCache[i + ',' + last] = false;
-              return false;
-            }
-            //有缩写且优先级不等也冲突
-            else if(!hash[key] && KEY_HASH.hasOwnProperty(key)) {
-              if(abbreviation.hasOwnProperty(KEY_HASH[key])
-                && style.important == abbreviation[KEY_HASH[key]].important) {
-                self.imCache[i + ',' + last] = false;
-                return false;
-              }
-            }
-          }
-          self.imCache[i + ',' + last] = true;
-        }
-      }
-      else {
-        for(var i = first - 1; i > last; i--) {
-          var item = list[i];
-          var styles = item.styles;
-          for(var j = 0, len = styles.length; j < len; j++) {
-            var style = styles[j];
-            var key = self.getKey(style);
-            if(hash[key]
-              && hash[key].value != style.value
-              && hash[key].important == style.important) {
-              self.imCache[i + ',' + last] = false;
-              return false;
-            }
-            else if(!hash[key] && KEY_HASH.hasOwnProperty(key)) {
-              if(abbreviation.hasOwnProperty(KEY_HASH[key])
-                && style.important == abbreviation[KEY_HASH[key]].important) {
-                self.imCache[i + ',' + last] = false;
-                return false;
-              }
-            }
-          }
-          self.imCache[i + ',' + last] = true;
-        }
-      }
-    }
-    self.imCache[first + ',' + last] = true;
-    return true;
-  }
-  Compress.prototype.upImCache = function(index) {
-    var self = this;
-    Object.keys(self.imCache).forEach(function(key) {
-      var arr = key.split(',');
-      if(arr[0] == index) {
-        self.imCache[(index-1) + ',' + arr[1]] = self.imCache[key];
-        delete self.imCache[key];
-      }
-      else if(arr[1] == index) {
-        self.imCache[arr[0] + ',' + (index-1)] = self.imCache[key];
-        delete self.imCache[key];
-      }
-    });
-  }
   //合并相同选择器，向前向后两个方向
   Compress.prototype.merge = function(list, direction) {
     //冒泡处理，因为可能处理后留有多个相同选择器，但后面的选择器可继续递归过程
@@ -334,10 +207,10 @@ KEYS.forEach(function(ks, i) {
       for(var i = list.length - 1; i > 0; i--) {
         for(var j = i - 1; j >= 0; j--) {
           if(list[i].s2s == list[j].s2s) {
-            if(this.noImpact(list, i, j)) {
+            if(impact.noImpact(list, i, j)) {
               list[i].styles = list[j].styles.concat(list[i].styles);
               list.splice(j, 1);
-              this.upImCache(j);
+              impact.upImCache(j);
               i--;
               j--;
               res = true;
@@ -354,10 +227,10 @@ KEYS.forEach(function(ks, i) {
       for(var i = 0; i < list.length - 1; i++) {
         for(var j = i + 1; j < list.length; j++) {
           if(list[i].s2s == list[j].s2s) {
-            if(this.noImpact(list, i, j)) {
+            if(impact.noImpact(list, i, j)) {
               list[i].styles = list[i].styles.concat(list[j].styles);
               list.splice(j, 1);
-              this.upImCache(j);
+              impact.upImCache(j);
               j--;
               res = true;
             }
@@ -397,12 +270,12 @@ KEYS.forEach(function(ks, i) {
     for(var i = 0; i < list.length - 1; i++) {
       for(var j = i + 1; j < list.length; j++) {
         if(list[i].value == list[j].value) {
-          if(this.noImpact(list, i, j)) {
+          if(impact.noImpact(list, i, j)) {
             list[i].selectors = list[i].selectors.concat(list[j].selectors);
             sort(list[i].selectors);
             list[i].s2s = list[i].selectors.join(',');
             list.splice(j, 1);
-            this.upImCache(j);
+            impact.upImCache(j);
             j--;
             res = true;
           }

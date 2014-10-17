@@ -1,11 +1,11 @@
-import KEY_HASH from './abbreviationKey.js';
+define(function(require, exports, module){var KEY_HASH=function(){var _23=require('./abbreviationKey.js');return _23.hasOwnProperty("KEY_HASH")?_23.KEY_HASH:_23.hasOwnProperty("default")?_23.default:_23}();
 
 var imCache = {};
 
-export function getKey(style) {
+exports.getKey=getKey;function getKey(style) {
   return style.key.slice(style.prefixHack.length).toLowerCase();
 }
-export function noImpact(list, first, last, child) {
+exports.noImpact=noImpact;function noImpact(list, first, last, child) {
   //不指定child则两个选择器完全没冲突，否则仅child的样式无冲突
   var mode = false;
   if(child !== undefined) {
@@ -97,7 +97,7 @@ export function noImpact(list, first, last, child) {
   imCache[first + ',' + last] = true;
   return true;
 }
-export function upImCache(index) {
+exports.upImCache=upImCache;function upImCache(index) {
   Object.keys(imCache).forEach(function(key) {
     var arr = key.split(',');
     if(arr[0] == index) {
@@ -109,4 +109,4 @@ export function upImCache(index) {
       delete imCache[key];
     }
   });
-}
+}});

@@ -20,6 +20,11 @@ gulp.task('clean-bulid', function() {
     .pipe(clean());
 });
 
+gulp.task('clean-web', function() {
+  return gulp.src('./web/*')
+    .pipe(clean());
+});
+
 function cb(file, enc, cb) {
   var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'build' + path.sep);
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
@@ -37,7 +42,7 @@ function cb2(file, enc, cb) {
   cb(null, file);
 }
 
-gulp.task('default', ['clean-bulid'], function() {
+gulp.task('default', ['clean-bulid', 'clean-web'], function() {
   gulp.src('./src/**/*.js')
     .pipe(through2.obj(cb))
     .pipe(gulp.dest('./build/'))
