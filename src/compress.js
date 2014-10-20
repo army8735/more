@@ -331,21 +331,21 @@ class Compress {
       var same = hash[o];
       var temp = {};
       same.forEach(function(o2) {
-        temp[o2.i] = true;
+        temp[o2.i] = o2.j;
         max = Math.max(max, o2.i);
       });
       index.push(temp);
-    });
+    });console.log(keys)
     //以单个样式为横坐标，选择器顺序索引为纵坐标，组成一个二维数组
-    //索引和位置对应，空的地方填0
+    //索引和位置对应，表示此样式出现在对应选择器的第几个，空的地方填-1
     var map = [];
     index.forEach(function(temp, idx) {
       var arr = new Array(max);
       for(var i = 0; i <= max; i++) {
-        arr[i] = 0;
+        arr[i] = -1;
       }
       Object.keys(temp).forEach(function(i) {
-        arr[parseInt(i)] = 1;
+        arr[parseInt(i)] = temp[i];
       });
       map.push(arr);
     });
