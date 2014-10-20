@@ -1,11 +1,14 @@
-define(function(require, exports, module){var impact=require('./impact');
+define(function(require, exports, module){var ImpactChild=function(){var _0=require('./ImpactChild');return _0.hasOwnProperty("ImpactChild")?_0.ImpactChild:_0.hasOwnProperty("default")?_0.default:_0}();
 
-exports.default=function(){
-  function _0(list, map) {
+
+  function CalArea(list, map) {
+    this.impact = new ImpactChild();
     this.list = list;
     this.map = map;//console.log(map)
   }
-  _0.prototype.getMax = function() {
+  CalArea.prototype.getMax = function() {
     //
   }
-return _0}();});
+
+
+exports.default=CalArea;});

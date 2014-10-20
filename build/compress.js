@@ -1,8 +1,8 @@
-var Clean=function(){var _18=require('clean-css');return _18.hasOwnProperty("Clean")?_18.Clean:_18.hasOwnProperty("default")?_18.default:_18}();
-var sort=function(){var _19=require('./sort');return _19.hasOwnProperty("sort")?_19.sort:_19.hasOwnProperty("default")?_19.default:_19}();
-var KEY_HASH=function(){var _20=require('./abbreviationKey.js');return _20.hasOwnProperty("KEY_HASH")?_20.KEY_HASH:_20.hasOwnProperty("default")?_20.default:_20}();
-var CalArea=function(){var _21=require('./CalArea.js');return _21.hasOwnProperty("CalArea")?_21.CalArea:_21.hasOwnProperty("default")?_21.default:_21}();
-var impact=require('./impact');
+var Clean=function(){var _20=require('clean-css');return _20.hasOwnProperty("Clean")?_20.Clean:_20.hasOwnProperty("default")?_20.default:_20}();
+var sort=function(){var _21=require('./sort');return _21.hasOwnProperty("sort")?_21.sort:_21.hasOwnProperty("default")?_21.default:_21}();
+var KEY_HASH=function(){var _22=require('./abbreviationKey.js');return _22.hasOwnProperty("KEY_HASH")?_22.KEY_HASH:_22.hasOwnProperty("default")?_22.default:_22}();
+var CalArea=function(){var _23=require('./CalArea.js');return _23.hasOwnProperty("CalArea")?_23.CalArea:_23.hasOwnProperty("default")?_23.default:_23}();
+var Impact=function(){var _24=require('./Impact');return _24.hasOwnProperty("Impact")?_24.Impact:_24.hasOwnProperty("default")?_24.default:_24}();
 
 var homunculus=require('homunculus');
 
@@ -23,7 +23,7 @@ var tempValue;
     this.code = code;
     this.radical = radical;
     this.head = '';
-    this.imCache = {};
+    this.impact = new Impact();
   }
   Compress.prototype.compress = function() {
     try {
@@ -206,10 +206,10 @@ var tempValue;
       for(var i = list.length - 1; i > 0; i--) {
         for(var j = i - 1; j >= 0; j--) {
           if(list[i].s2s == list[j].s2s) {
-            if(impact.noImpact(list, i, j)) {
+            if(this.impact.noImpact(list, i, j)) {
               list[i].styles = list[j].styles.concat(list[i].styles);
               list.splice(j, 1);
-              impact.upCache(j);
+              this.impact.upCache(j);
               i--;
               j--;
               res = true;
@@ -226,10 +226,10 @@ var tempValue;
       for(var i = 0; i < list.length - 1; i++) {
         for(var j = i + 1; j < list.length; j++) {
           if(list[i].s2s == list[j].s2s) {
-            if(impact.noImpact(list, i, j)) {
+            if(this.impact.noImpact(list, i, j)) {
               list[i].styles = list[i].styles.concat(list[j].styles);
               list.splice(j, 1);
-              impact.upCache(j);
+              this.impact.upCache(j);
               j--;
               res = true;
             }
@@ -276,12 +276,12 @@ var tempValue;
     for(var i = 0; i < list.length - 1; i++) {
       for(var j = i + 1; j < list.length; j++) {
         if(list[i].value == list[j].value) {
-          if(impact.noImpact(list, i, j)) {
+          if(this.impact.noImpact(list, i, j)) {
             list[i].selectors = list[i].selectors.concat(list[j].selectors);
             sort(list[i].selectors);
             list[i].s2s = list[i].selectors.join(',');
             list.splice(j, 1);
-            impact.upCache(j);
+            this.impact.upCache(j);
             j--;
             res = true;
           }

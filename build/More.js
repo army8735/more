@@ -3,19 +3,19 @@ var path=require('path');
 
 var homunculus=require('homunculus');
 
-var preImport=function(){var _5=require('./preImport');return _5.hasOwnProperty("preImport")?_5.preImport:_5.hasOwnProperty("default")?_5.default:_5}();
-var preVar=function(){var _6=require('./preVar');return _6.hasOwnProperty("preVar")?_6.preVar:_6.hasOwnProperty("default")?_6.default:_6}();
-var getVar=function(){var _7=require('./getVar');return _7.hasOwnProperty("getVar")?_7.getVar:_7.hasOwnProperty("default")?_7.default:_7}();
-var preFn=function(){var _8=require('./preFn');return _8.hasOwnProperty("preFn")?_8.preFn:_8.hasOwnProperty("default")?_8.default:_8}();
-var getFn=function(){var _9=require('./getFn');return _9.hasOwnProperty("getFn")?_9.getFn:_9.hasOwnProperty("default")?_9.default:_9}();
-var ignore=function(){var _10=require('./ignore');return _10.hasOwnProperty("ignore")?_10.ignore:_10.hasOwnProperty("default")?_10.default:_10}();
-var clone=function(){var _11=require('./clone');return _11.hasOwnProperty("clone")?_11.clone:_11.hasOwnProperty("default")?_11.default:_11}();
-var join=function(){var _12=require('./join');return _12.hasOwnProperty("join")?_12.join:_12.hasOwnProperty("default")?_12.default:_12}();
-var concatSelector=function(){var _13=require('./concatSelector');return _13.hasOwnProperty("concatSelector")?_13.concatSelector:_13.hasOwnProperty("default")?_13.default:_13}();
-var eventbus=function(){var _14=require('./eventbus');return _14.hasOwnProperty("eventbus")?_14.eventbus:_14.hasOwnProperty("default")?_14.default:_14}();
-var checkLevel=function(){var _15=require('./checkLevel');return _15.hasOwnProperty("checkLevel")?_15.checkLevel:_15.hasOwnProperty("default")?_15.default:_15}();
-var normalize=function(){var _16=require('./normalize');return _16.hasOwnProperty("normalize")?_16.normalize:_16.hasOwnProperty("default")?_16.default:_16}();
-var compress=function(){var _17=require('./compress');return _17.hasOwnProperty("compress")?_17.compress:_17.hasOwnProperty("default")?_17.default:_17}();
+var preImport=function(){var _7=require('./preImport');return _7.hasOwnProperty("preImport")?_7.preImport:_7.hasOwnProperty("default")?_7.default:_7}();
+var preVar=function(){var _8=require('./preVar');return _8.hasOwnProperty("preVar")?_8.preVar:_8.hasOwnProperty("default")?_8.default:_8}();
+var getVar=function(){var _9=require('./getVar');return _9.hasOwnProperty("getVar")?_9.getVar:_9.hasOwnProperty("default")?_9.default:_9}();
+var preFn=function(){var _10=require('./preFn');return _10.hasOwnProperty("preFn")?_10.preFn:_10.hasOwnProperty("default")?_10.default:_10}();
+var getFn=function(){var _11=require('./getFn');return _11.hasOwnProperty("getFn")?_11.getFn:_11.hasOwnProperty("default")?_11.default:_11}();
+var ignore=function(){var _12=require('./ignore');return _12.hasOwnProperty("ignore")?_12.ignore:_12.hasOwnProperty("default")?_12.default:_12}();
+var clone=function(){var _13=require('./clone');return _13.hasOwnProperty("clone")?_13.clone:_13.hasOwnProperty("default")?_13.default:_13}();
+var join=function(){var _14=require('./join');return _14.hasOwnProperty("join")?_14.join:_14.hasOwnProperty("default")?_14.default:_14}();
+var concatSelector=function(){var _15=require('./concatSelector');return _15.hasOwnProperty("concatSelector")?_15.concatSelector:_15.hasOwnProperty("default")?_15.default:_15}();
+var eventbus=function(){var _16=require('./eventbus');return _16.hasOwnProperty("eventbus")?_16.eventbus:_16.hasOwnProperty("default")?_16.default:_16}();
+var checkLevel=function(){var _17=require('./checkLevel');return _17.hasOwnProperty("checkLevel")?_17.checkLevel:_17.hasOwnProperty("default")?_17.default:_17}();
+var normalize=function(){var _18=require('./normalize');return _18.hasOwnProperty("normalize")?_18.normalize:_18.hasOwnProperty("default")?_18.default:_18}();
+var compress=function(){var _19=require('./compress');return _19.hasOwnProperty("compress")?_19.compress:_19.hasOwnProperty("default")?_19.default:_19}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');

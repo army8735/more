@@ -2,7 +2,7 @@ import Clean from 'clean-css';
 import sort from './sort';
 import KEY_HASH from './abbreviationKey.js';
 import CalArea from './CalArea.js';
-module impact from './impact';
+import Impact from './Impact';
 
 module homunculus from 'homunculus';
 
@@ -23,7 +23,7 @@ class Compress {
     this.code = code;
     this.radical = radical;
     this.head = '';
-    this.imCache = {};
+    this.impact = new Impact();
   }
   compress() {
     try {
@@ -206,10 +206,10 @@ class Compress {
       for(var i = list.length - 1; i > 0; i--) {
         for(var j = i - 1; j >= 0; j--) {
           if(list[i].s2s == list[j].s2s) {
-            if(impact.noImpact(list, i, j)) {
+            if(this.impact.noImpact(list, i, j)) {
               list[i].styles = list[j].styles.concat(list[i].styles);
               list.splice(j, 1);
-              impact.upCache(j);
+              this.impact.upCache(j);
               i--;
               j--;
               res = true;
@@ -226,10 +226,10 @@ class Compress {
       for(var i = 0; i < list.length - 1; i++) {
         for(var j = i + 1; j < list.length; j++) {
           if(list[i].s2s == list[j].s2s) {
-            if(impact.noImpact(list, i, j)) {
+            if(this.impact.noImpact(list, i, j)) {
               list[i].styles = list[i].styles.concat(list[j].styles);
               list.splice(j, 1);
-              impact.upCache(j);
+              this.impact.upCache(j);
               j--;
               res = true;
             }
@@ -276,12 +276,12 @@ class Compress {
     for(var i = 0; i < list.length - 1; i++) {
       for(var j = i + 1; j < list.length; j++) {
         if(list[i].value == list[j].value) {
-          if(impact.noImpact(list, i, j)) {
+          if(this.impact.noImpact(list, i, j)) {
             list[i].selectors = list[i].selectors.concat(list[j].selectors);
             sort(list[i].selectors);
             list[i].s2s = list[i].selectors.join(',');
             list.splice(j, 1);
-            impact.upCache(j);
+            this.impact.upCache(j);
             j--;
             res = true;
           }
