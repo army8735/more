@@ -52,7 +52,8 @@ npm install more-css
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
 * addKeyWord(kw:String/Array<String>):void 添加未知的css属性关键字以支持分析
-* compress(code:String, radical:Boolean = false):String 压缩css代码，radical表明是否使用激进安全算法
+* compress(code:String, radical:Boolean = false):String 基于clean-css压缩css代码，radical表明是否使用激进安全算法
+* compress(code:String, options:Object = { processImport: false }, radical:Boolean = false):String 同上，增加options选项，传给clean-css
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖

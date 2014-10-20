@@ -9,8 +9,8 @@ var homunculus=require('homunculus');
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
-exports.default=function(code, radical) {
-  return (new Compress(code, radical)).compress();
+exports.default=function(code, options, radical) {
+  return (new Compress(code, options, radical)).compress();
 }
 
 var tempSelector;
@@ -19,17 +19,23 @@ var tempKey;
 var tempValue;
 
 
-  function Compress(code, radical) {
+  function Compress(code, options, radical) {
     this.code = code;
+    if(options === true || options === false || options === undefined) {
+      radical = options;
+      options = {};
+    }
+    if(!options.hasOwnProperty('processImport')) {
+      options.processImport = false;
+    }
+    this.options = options;
     this.radical = radical;
     this.head = '';
     this.impact = new Impact();
   }
   Compress.prototype.compress = function() {
     try {
-      this.code = (new Clean({
-        processImport: false
-      })).minify(this.code);
+      this.code = (new Clean(this.options)).minify(this.code);
     } catch(e) {
       return e.toString();
     }
