@@ -209,7 +209,7 @@ var tempValue;
             if(impact.noImpact(list, i, j)) {
               list[i].styles = list[j].styles.concat(list[i].styles);
               list.splice(j, 1);
-              impact.upImCache(j);
+              impact.upCache(j);
               i--;
               j--;
               res = true;
@@ -229,7 +229,7 @@ var tempValue;
             if(impact.noImpact(list, i, j)) {
               list[i].styles = list[i].styles.concat(list[j].styles);
               list.splice(j, 1);
-              impact.upImCache(j);
+              impact.upCache(j);
               j--;
               res = true;
             }
@@ -281,7 +281,7 @@ var tempValue;
             sort(list[i].selectors);
             list[i].s2s = list[i].selectors.join(',');
             list.splice(j, 1);
-            impact.upImCache(j);
+            impact.upCache(j);
             j--;
             res = true;
           }

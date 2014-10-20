@@ -1,16 +1,12 @@
 define(function(require, exports, module){var KEY_HASH=function(){var _25=require('./abbreviationKey.js');return _25.hasOwnProperty("KEY_HASH")?_25.KEY_HASH:_25.hasOwnProperty("default")?_25.default:_25}();
 
 var imCache = {};
+var imCacheChild = {};
 
 exports.getKey=getKey;function getKey(style) {
   return style.key.slice(style.prefixHack.length).toLowerCase();
 }
-exports.noImpact=noImpact;function noImpact(list, first, last, child) {
-  //不指定child则两个选择器完全没冲突，否则仅child的样式无冲突
-  var mode = false;
-  if(child !== undefined) {
-    mode = true;
-  }
+exports.noImpact=noImpact;function noImpact(list, first, last) {
   for(var i = Math.min(first, last); i <= Math.max(first, last); i++) {
     if(list[i].s2s.indexOf(':-ms-') > -1) {
       return false;
@@ -21,7 +17,7 @@ exports.noImpact=noImpact;function noImpact(list, first, last, child) {
     return true;
   }
   //非紧邻先取可能缓存的判断结果
-  else if(!mode && imCache[first + ',' + last] !== undefined) {
+  else if(imCache.hasOwnProperty([first + ',' + last])) {
     return imCache[first + ',' + last];
   }
   //非紧邻若无相同样式或important优先级不同无影响
@@ -97,7 +93,7 @@ exports.noImpact=noImpact;function noImpact(list, first, last, child) {
   imCache[first + ',' + last] = true;
   return true;
 }
-exports.upImCache=upImCache;function upImCache(index) {
+exports.upCache=upCache;function upCache(index) {
   Object.keys(imCache).forEach(function(key) {
     var arr = key.split(',');
     if(arr[0] == index) {
@@ -109,4 +105,7 @@ exports.upImCache=upImCache;function upImCache(index) {
       delete imCache[key];
     }
   });
+}
+exports.noImpactChild=noImpactChild;function noImpactChild(list, first, last, child) {
+
 }});

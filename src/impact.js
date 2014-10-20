@@ -1,16 +1,12 @@
 import KEY_HASH from './abbreviationKey.js';
 
 var imCache = {};
+var imCacheChild = {};
 
 export function getKey(style) {
   return style.key.slice(style.prefixHack.length).toLowerCase();
 }
-export function noImpact(list, first, last, child) {
-  //不指定child则两个选择器完全没冲突，否则仅child的样式无冲突
-  var mode = false;
-  if(child !== undefined) {
-    mode = true;
-  }
+export function noImpact(list, first, last) {
   for(var i = Math.min(first, last); i <= Math.max(first, last); i++) {
     if(list[i].s2s.indexOf(':-ms-') > -1) {
       return false;
@@ -21,7 +17,7 @@ export function noImpact(list, first, last, child) {
     return true;
   }
   //非紧邻先取可能缓存的判断结果
-  else if(!mode && imCache[first + ',' + last] !== undefined) {
+  else if(imCache.hasOwnProperty([first + ',' + last])) {
     return imCache[first + ',' + last];
   }
   //非紧邻若无相同样式或important优先级不同无影响
@@ -97,7 +93,7 @@ export function noImpact(list, first, last, child) {
   imCache[first + ',' + last] = true;
   return true;
 }
-export function upImCache(index) {
+export function upCache(index) {
   Object.keys(imCache).forEach(function(key) {
     var arr = key.split(',');
     if(arr[0] == index) {
@@ -109,4 +105,7 @@ export function upImCache(index) {
       delete imCache[key];
     }
   });
+}
+export function noImpactChild(list, first, last, child) {
+
 }
