@@ -336,7 +336,7 @@ var tempValue;
         max = Math.max(max, o2.i);
       });
       index.push(temp);
-    });console.log(keys)
+    });
     //以单个样式为横坐标，选择器顺序索引为纵坐标，组成一个二维数组
     //索引和位置对应，表示此样式出现在对应选择器的第几个，空的地方填-1
     var map = [];
@@ -358,11 +358,14 @@ var tempValue;
     var calArea = new CalArea(list, map, keys);
     var res;
     while(res = calArea.getMax()) {
-      console.log(res);
+//      console.log(res);
       this.insert[res.y1] = res.sel + '{' + res.val + '}';
       res.xs.forEach(function(x) {
         for(var i = res.y1; i <= res.y2; i++) {
-          list[i].styles.splice(map[i][x], 1);
+          //可能冲突表中连续的1为没有这个样式标明无冲突，检查其是否为-1
+          if(map[res.xs[0]][i] > -1) {
+            list[i].styles.splice(map[x][i], 1);
+          }
         }
       });
     }
@@ -375,18 +378,21 @@ var tempValue;
       if(self.insert.hasOwnProperty(i)) {
         body += self.insert[i];
       }
-      body += item.s2s;
-      body += '{';
-      var len = item.styles.length;
-      item.styles.forEach(function(style, i) {
-        body += style.key;
-        body += ':';
-        body += style.content;
-        if(i < len - 1) {
-          body += ';';
-        }
-      });
-      body += '}';
+      //有可能为空
+      if(item.styles.length) {
+        body += item.s2s;
+        body += '{';
+        var len = item.styles.length;
+        item.styles.forEach(function(style, i) {
+          body += style.key;
+          body += ':';
+          body += style.content;
+          if(i < len - 1) {
+            body += ';';
+          }
+        });
+        body += '}';
+      }
     });
     return body;
   }

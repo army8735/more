@@ -13,7 +13,8 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
   }
   CalArea.prototype.init = function() {
     var self = this;
-    console.log(self.map);
+    console.log(0, self.keys);
+    console.log(1, self.map);
     //初始化构建全部冲突表，横向表示一个选择器中的样式，纵向表示一个样式出现在不同的选择器中
     //只计算纵向，因为横向没必要
     //这个表不同于map表，连续的1表示无冲突可以合并，0反之，2表示已被合并过，3表示可合并但结果反而变大没有合并
@@ -47,19 +48,22 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
       }
       res.push(nrr);
     });
-    console.log(res);
+    console.log(2, res);
     //冒泡递归计算面积，每个节点可使用多次，具体去重在另外逻辑中做
     //纵列的标识不会单个出现，至少有2个，因为可合并样式至少会出现在2个选择器中
     res.forEach(function(arr, i) {
       for(var j = 0, len = arr.length; j < len - 1; j++) {
         if(arr[j] == 1) {
-          var k = arr.indexOf(1, j + 1);
-          self.record(i, j, k);
+          var k = arr.indexOf(0, j + 2);
+          if(k == -1) {
+            k = len;
+          }
+          self.record(i, j, k - 1);
           j = k + 1;
         }
       }
     });
-    console.log(this.area)
+    console.log(3, this.area)
     //将面积从大到小排列
     sort(this.area, function(a, b) {
       return (a.y2 - a.y1) * a.xs.length < (b.y2 - b.y1) * b.xs.length;
@@ -112,6 +116,7 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
       //获取最大面积后要检查合并后是否体积变小
       var val = '';
       var temp = 0;
+      var count = 0;
       res.xs.forEach(function(x, i) {
         val += self.keys[x];
         if(i < res.xs.length - 1) {
@@ -120,19 +125,27 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
       });
       var sel = '';
       for(var i = res.y1; i <= res.y2; i++) {
-        sel += self.list[i].s2s;
-        if(i < res.y2) {
-          sel += ',';
-        }
-        //注意当被提取的样式所属的选择器不止一个样式时，会多省略1个分号
-        if(self.list[i].styles.length) {
-          temp++;
+        //可能冲突表中连续的1为没有这个样式标明无冲突，检查其是否为-1
+        if(self.map[res.xs[0]][i] > -1) {
+          sel += self.list[i].s2s;
+          if(i < res.y2) {
+            sel += ',';
+          }
+          //注意当被提取的样式所属的选择器不止一个样式时，会多省略1个分号
+          //否则会省略整个选择器
+          if(self.list[i].styles.length > 1) {
+            temp++;
+          }
+          else {
+            temp += self.list[i].s2s.length + 2;
+          }
+          count++;
         }
       }
       //比较增减
-      var reduce = val.length * (res.y2 - res.y1 + 1) + temp;
+      var reduce = val.length * count + temp;
       var increase = sel.length + 2 + val.length;
-      console.log(val, sel, reduce, increase)
+      console.log(4, val, sel, reduce, increase, count, temp)
       if(reduce > increase) {
         for(var i = 0, len = res.xs.length; i < len; i++) {
           var x = res.xs[i];
