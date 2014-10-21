@@ -2,10 +2,12 @@ define(function(require, exports, module){var ImpactChild=function(){var _0=requ
 var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1.sort:_1.hasOwnProperty("default")?_1.default:_1}();
 
 
-  function CalArea(list, map) {
+  function CalArea(list, map, keys) {
     this.list = list;
     this.map = map;
-    this.history = [];
+    this.keys = keys;
+    this.area = [];
+    this.history = {};
     this.impact = new ImpactChild();
     this.init();
   }
@@ -57,21 +59,21 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
         }
       }
     });
-    console.log(this.history)
-    //冒泡递归计算面积从大到小排列
-    sort(this.history, function(a, b) {
-      return (a.y2 - a.y1) * a.xs.length;
+    console.log(this.area)
+    //将面积从大到小排列
+    sort(this.area, function(a, b) {
+      return (a.y2 - a.y1) * a.xs.length < (b.y2 - b.y1) * b.xs.length;
     });
   }
   CalArea.prototype.record = function(col, start, end) {
     var self = this;
     //遍历之前的矩阵，发现可以扩充的部分则增量扩充，即原有的复制后扩充，保证所有方式都存储
-    self.history.forEach(function(item) {
+    self.area.forEach(function(item) {
       //冒泡组合出此次可填充的矩阵边
       for(var i = start; i < end - 1; i++) {
         for(var j = i + 1; j < end; j++) {
           if(item.y1 == i && item.y2 == j) {
-            self.history.push({
+            self.area.push({
               xs: item.xs.concat(col),
               y1: item.y1,
               y2: item.y2
@@ -81,17 +83,69 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
       }
     });
     //本身可以组成一个矩阵，将其存入
-    self.history.push({
+    self.area.push({
       xs: [col],
       y1: start,
       y2: end
     });
   }
   CalArea.prototype.getMax = function() {
-    //因为存在最大面积的
-  }
-  CalArea.prototype.useMax = function() {
-    //
+    var self = this;
+    //以null作标识已无面积可用
+    //每次取出最大值后，将其记录，后续如果出现冲突直接跳过
+    while(self.area.length) {
+      var res = this.area.pop();
+      var has = false;
+      outer:
+      for(var i = 0, len = res.xs.length; i < len; i++) {
+        var x = res.xs[i];
+        for(var y = res.y1; y < res.y2; y++) {
+          if(self.history.hasOwnProperty([x + ',' + y])) {
+            has = true;
+            break outer;
+          }
+        }
+      }
+      if(has) {
+        continue;
+      }
+      //获取最大面积后要检查合并后是否体积变小
+      var val = '';
+      var temp = 0;
+      res.xs.forEach(function(x, i) {
+        val += self.keys[x];
+        if(i < res.xs.length - 1) {
+          val += ';';
+        }
+      });
+      var sel = '';
+      for(var i = res.y1; i <= res.y2; i++) {
+        sel += self.list[i].s2s;
+        if(i < res.y2) {
+          sel += ',';
+        }
+        //注意当被提取的样式所属的选择器不止一个样式时，会多省略1个分号
+        if(self.list[i].styles.length) {
+          temp++;
+        }
+      }
+      //比较增减
+      var reduce = val.length * (res.y2 - res.y1 + 1) + temp;
+      var increase = sel.length + 2 + val.length;
+      console.log(val, sel, reduce, increase)
+      if(reduce > increase) {
+        for(var i = 0, len = res.xs.length; i < len; i++) {
+          var x = res.xs[i];
+          for(var y = res.y1; y < res.y2; y++) {
+            self.history[x + ',' + y] = true;
+          }
+        }
+        res.val = val;
+        res.sel = sel;
+        return res;
+      }
+    }
+    return null;
   }
 
 

@@ -132,7 +132,7 @@ describe('union', function() {
     expect(More.compress(s, true)).to.eql('body,html{margin:0;padding:0}div{margin:0}');
   });
   it('abbreviation', function() {
-    var s = 'html{margin:0;padding:0}div{margin-top:0}body{margin:0;padding:0}';
+    var s = 'html{margin:0}div{margin-top:0}body{margin:0}';
     expect(More.compress(s, true)).to.eql(s);
   });
   it('sequence', function() {
@@ -144,14 +144,13 @@ describe('union', function() {
     expect(More.compress(s, true)).to.eql('body,html{margin:0}.a{margin:1!important}');
   });
 });
-describe.skip('calarea', function() {
-  describe('single', function() {
-
-  });
-});
-describe.skip('extract', function() {
+describe('extract', function() {
   it('single', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0;border:none}';
     expect(More.compress(s, true)).to.eql('.a,.b{margin:0}.a{padding:0}.b{border:none}');
+  });
+  it('abbreviation', function() {
+    var s = '.a{margin:0;padding:0}.b{margin-top:0}.c{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a{margin:0}.b{margin-top:0}.c{margin:0}');
   });
 });

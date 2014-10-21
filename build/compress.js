@@ -31,6 +31,7 @@ var tempValue;
     this.options = options;
     this.radical = radical;
     this.head = '';
+    this.insert = {};
     this.impact = new Impact();
   }
   Compress.prototype.compress = function() {
@@ -354,15 +355,26 @@ var tempValue;
     //面积择优算法：计算矩阵中可合并的所有面积，以最大面积优先合并
     //舍弃采用单行合并，即拥有某个样式的所有选择器尝试合并
     //当然因为优先级冲突不一定能够整行合并，应该递归其所有组合尝试，代价太大暂时忽略
-    var calArea = new CalArea(list, map);
+    var calArea = new CalArea(list, map, keys);
     var res;
     while(res = calArea.getMax()) {
-      //
+      console.log(res);
+      this.insert[res.y1] = res.sel + '{' + res.val + '}';
+      res.xs.forEach(function(x) {
+        for(var i = res.y1; i <= res.y2; i++) {
+          list[i].styles.splice(map[i][x], 1);
+        }
+      });
     }
   }
   Compress.prototype.join = function(list) {
+    var self = this;
     var body = '';
-    list.forEach(function(item) {
+    list.forEach(function(item, i) {
+      //extract提炼出来的插入
+      if(self.insert.hasOwnProperty(i)) {
+        body += self.insert[i];
+      }
       body += item.s2s;
       body += '{';
       var len = item.styles.length;
