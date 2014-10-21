@@ -1,10 +1,11 @@
 var ImpactChild=function(){var _0=require('./ImpactChild');return _0.hasOwnProperty("ImpactChild")?_0.ImpactChild:_0.hasOwnProperty("default")?_0.default:_0}();
+var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1.sort:_1.hasOwnProperty("default")?_1.default:_1}();
 
 
   function CalArea(list, map) {
     this.list = list;
     this.map = map;
-    this.history = {};
+    this.history = [];
     this.impact = new ImpactChild();
     this.init();
   }
@@ -25,7 +26,7 @@ var ImpactChild=function(){var _0=require('./ImpactChild');return _0.hasOwnPrope
         nrr[i] = 0;
       }
       //冒泡计算，可合并一定是连续出现，因为是单个样式
-      //不会出现2个可合并串有重合的情况
+      //不会出现2个可合并串有重合或相邻的情况
       for(var i = 0, len = arr.length; i < len - 1; i++) {
         //要判断是否有此样式
         if(arr[i] > -1) {
@@ -44,8 +45,47 @@ var ImpactChild=function(){var _0=require('./ImpactChild');return _0.hasOwnPrope
       }
       res.push(nrr);
     });
-    console.log(res)
-    //冒泡递归计算面积从大到小排列，每个节点可使用多次，具体去重在另外逻辑中做
+    console.log(res);
+    //冒泡递归计算面积，每个节点可使用多次，具体去重在另外逻辑中做
+    //纵列的标识不会单个出现，至少有2个，因为可合并样式至少会出现在2个选择器中
+    res.forEach(function(arr, i) {
+      for(var j = 0, len = arr.length; j < len - 1; j++) {
+        if(arr[j] == 1) {
+          var k = arr.indexOf(1, j + 1);
+          self.record(i, j, k);
+          j = k + 1;
+        }
+      }
+    });
+    console.log(this.history)
+    //冒泡递归计算面积从大到小排列
+    sort(this.history, function(a, b) {
+      return (a.y2 - a.y1) * a.xs.length;
+    });
+  }
+  CalArea.prototype.record = function(col, start, end) {
+    var self = this;
+    //遍历之前的矩阵，发现可以扩充的部分则增量扩充，即原有的复制后扩充，保证所有方式都存储
+    self.history.forEach(function(item) {
+      //冒泡组合出此次可填充的矩阵边
+      for(var i = start; i < end - 1; i++) {
+        for(var j = i + 1; j < end; j++) {
+          if(item.y1 == i && item.y2 == j) {
+            self.history.push({
+              xs: item.xs.concat(col),
+              y1: item.y1,
+              y2: item.y2
+            });
+          }
+        }
+      }
+    });
+    //本身可以组成一个矩阵，将其存入
+    self.history.push({
+      xs: [col],
+      y1: start,
+      y2: end
+    });
   }
   CalArea.prototype.getMax = function() {
     //因为存在最大面积的

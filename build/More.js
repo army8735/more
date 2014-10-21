@@ -3,19 +3,19 @@ var path=require('path');
 
 var homunculus=require('homunculus');
 
-var preImport=function(){var _7=require('./preImport');return _7.hasOwnProperty("preImport")?_7.preImport:_7.hasOwnProperty("default")?_7.default:_7}();
-var preVar=function(){var _8=require('./preVar');return _8.hasOwnProperty("preVar")?_8.preVar:_8.hasOwnProperty("default")?_8.default:_8}();
-var getVar=function(){var _9=require('./getVar');return _9.hasOwnProperty("getVar")?_9.getVar:_9.hasOwnProperty("default")?_9.default:_9}();
-var preFn=function(){var _10=require('./preFn');return _10.hasOwnProperty("preFn")?_10.preFn:_10.hasOwnProperty("default")?_10.default:_10}();
-var getFn=function(){var _11=require('./getFn');return _11.hasOwnProperty("getFn")?_11.getFn:_11.hasOwnProperty("default")?_11.default:_11}();
-var ignore=function(){var _12=require('./ignore');return _12.hasOwnProperty("ignore")?_12.ignore:_12.hasOwnProperty("default")?_12.default:_12}();
-var clone=function(){var _13=require('./clone');return _13.hasOwnProperty("clone")?_13.clone:_13.hasOwnProperty("default")?_13.default:_13}();
-var join=function(){var _14=require('./join');return _14.hasOwnProperty("join")?_14.join:_14.hasOwnProperty("default")?_14.default:_14}();
-var concatSelector=function(){var _15=require('./concatSelector');return _15.hasOwnProperty("concatSelector")?_15.concatSelector:_15.hasOwnProperty("default")?_15.default:_15}();
-var eventbus=function(){var _16=require('./eventbus');return _16.hasOwnProperty("eventbus")?_16.eventbus:_16.hasOwnProperty("default")?_16.default:_16}();
-var checkLevel=function(){var _17=require('./checkLevel');return _17.hasOwnProperty("checkLevel")?_17.checkLevel:_17.hasOwnProperty("default")?_17.default:_17}();
-var normalize=function(){var _18=require('./normalize');return _18.hasOwnProperty("normalize")?_18.normalize:_18.hasOwnProperty("default")?_18.default:_18}();
-var compress=function(){var _19=require('./compress');return _19.hasOwnProperty("compress")?_19.compress:_19.hasOwnProperty("default")?_19.default:_19}();
+var preImport=function(){var _8=require('./preImport');return _8.hasOwnProperty("preImport")?_8.preImport:_8.hasOwnProperty("default")?_8.default:_8}();
+var preVar=function(){var _9=require('./preVar');return _9.hasOwnProperty("preVar")?_9.preVar:_9.hasOwnProperty("default")?_9.default:_9}();
+var getVar=function(){var _10=require('./getVar');return _10.hasOwnProperty("getVar")?_10.getVar:_10.hasOwnProperty("default")?_10.default:_10}();
+var preFn=function(){var _11=require('./preFn');return _11.hasOwnProperty("preFn")?_11.preFn:_11.hasOwnProperty("default")?_11.default:_11}();
+var getFn=function(){var _12=require('./getFn');return _12.hasOwnProperty("getFn")?_12.getFn:_12.hasOwnProperty("default")?_12.default:_12}();
+var ignore=function(){var _13=require('./ignore');return _13.hasOwnProperty("ignore")?_13.ignore:_13.hasOwnProperty("default")?_13.default:_13}();
+var clone=function(){var _14=require('./clone');return _14.hasOwnProperty("clone")?_14.clone:_14.hasOwnProperty("default")?_14.default:_14}();
+var join=function(){var _15=require('./join');return _15.hasOwnProperty("join")?_15.join:_15.hasOwnProperty("default")?_15.default:_15}();
+var concatSelector=function(){var _16=require('./concatSelector');return _16.hasOwnProperty("concatSelector")?_16.concatSelector:_16.hasOwnProperty("default")?_16.default:_16}();
+var eventbus=function(){var _17=require('./eventbus');return _17.hasOwnProperty("eventbus")?_17.eventbus:_17.hasOwnProperty("default")?_17.default:_17}();
+var checkLevel=function(){var _18=require('./checkLevel');return _18.hasOwnProperty("checkLevel")?_18.checkLevel:_18.hasOwnProperty("default")?_18.default:_18}();
+var normalize=function(){var _19=require('./normalize');return _19.hasOwnProperty("normalize")?_19.normalize:_19.hasOwnProperty("default")?_19.default:_19}();
+var compress=function(){var _20=require('./compress');return _20.hasOwnProperty("compress")?_20.compress:_20.hasOwnProperty("default")?_20.default:_20}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
