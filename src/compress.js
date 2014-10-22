@@ -358,15 +358,13 @@ class Compress {
     var calArea = new CalArea(list, map, keys);
     var res;
     while(res = calArea.getMax()) {
-//      console.log(res);
-      this.insert[res.y1] = res.sel + '{' + res.val + '}';
+      var y = res.ys[0];
+      this.insert[y] = this.insert[y] || '';
+      this.insert[y] += res.sel + '{' + res.val + '}';
       res.xs.forEach(function(x) {
-        for(var i = res.y1; i <= res.y2; i++) {
-          //可能冲突表中连续的1为没有这个样式标明无冲突，检查其是否为-1
-          if(map[res.xs[0]][i] > -1) {
-            list[i].styles.splice(map[x][i], 1);
-          }
-        }
+        res.ys.forEach(function(y) {
+          list[y].styles[map[x][y]].ignore = true;
+        });
       });
     }
   }
@@ -378,20 +376,23 @@ class Compress {
       if(self.insert.hasOwnProperty(i)) {
         body += self.insert[i];
       }
-      //有可能为空
-      if(item.styles.length) {
-        body += item.s2s;
-        body += '{';
-        var len = item.styles.length;
-        item.styles.forEach(function(style, i) {
+      //有可能全部ignore为空
+      var first = true;
+      item.styles.forEach(function(style) {
+        if(!style.ignore) {
+          if(first) {
+            body += item.s2s;
+            body += '{';
+            first = false;
+          }
           body += style.key;
           body += ':';
           body += style.content;
-          if(i < len - 1) {
-            body += ';';
-          }
-        });
-        body += '}';
+          body += ';';
+        }
+      });
+      if(!first) {
+        body = body.slice(0, body.length - 1) + '}';
       }
     });
     return body;

@@ -161,8 +161,8 @@ describe('extract', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0}.c{margin:0}';
     expect(More.compress(s, true)).to.eql('.a,.b,.c{margin:0}.a{padding:0}');
   });
-  it.skip('multi 2', function() {
+  it('multi 2', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0;color:#FFF}.c{padding:0;color:#FFF}';
-    expect(More.compress(s, true)).to.eql('.a,.b{margin:0}.a,.c{padding:0}.b,.c{color:#FFF}');
+    expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a,.b{margin:0}.b,.c{color:#FFF}');
   });
 });
