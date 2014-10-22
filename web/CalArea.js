@@ -80,7 +80,7 @@ function equalArr(a, b) {
 //    console.log(3, this.area)
     //将面积从大到小排列
     sort(this.area, function(a, b) {
-      return (a.y2 - a.y1) * a.xs.length < (b.y2 - b.y1) * b.xs.length;
+      return a.area > b.area;
     });
 //    console.log(4, this.area)
   }
@@ -102,12 +102,14 @@ function equalArr(a, b) {
               area: temp.length
             };
             if(self.areaMap.hasOwnProperty(key)) {
-              self.areaMap.forEach(function(item) {
-                sefl.areaMap.push({
+              self.areaMap[key].forEach(function(item) {
+                var n = {
                   xs: item.xs.concat(col),
                   ys: item.ys,
                   area: item.area + item.ys.length
-                });
+                };
+                self.area.push(n);
+                self.areaMap[key].push(n);
               });
             }
             add.push(o);

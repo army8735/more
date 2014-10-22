@@ -153,6 +153,18 @@ describe('extract', function() {
     var s = '.a{margin:0;padding:0}.b{margin-top:0}.c{margin:0;padding:0}';
     expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a{margin:0}.b{margin-top:0}.c{margin:0}');
   });
+  it('confilct', function() {
+    var s = '.a{margin:0;padding:0}.b{margin:1}.c{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a{margin:0}.b{margin:1}.c{margin:0}');
+  });
+  it('important', function() {
+    var s = '.a{margin:0;padding:0}.b{margin:1!important}.c{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql('.a,.c{margin:0;padding:0}.b{margin:1!important}');
+  });
+  it('selector is longer than value', function() {
+    var s = '.aaaaaa{margin:0;padding:0}.b{margin:1}.ccccccc{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
   it('remove empty', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0}';
     expect(More.compress(s, true)).to.eql('.a,.b{margin:0}.a{padding:0}');
@@ -164,5 +176,13 @@ describe('extract', function() {
   it('multi 2', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0;color:#FFF}.c{padding:0;color:#FFF}';
     expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a,.b{margin:0}.b,.c{color:#FFF}');
+  });
+  it('multi 3', function() {
+    var s = '.a{margin:0;padding:0;width:0;height:0}.b{margin:0;padding:1;width:2;height:0}.c{margin:1;padding:1;width:3;height:0}';
+    expect(More.compress(s, true)).to.eql('.a,.b{height:0;margin:0}.a{padding:0;width:0}.b,.c{padding:1}.b{width:2}.c{height:0;margin:1;width:3}');
+  });
+  it('multi 4', function() {
+    var s = '.aaaaaaaa{margin:0;padding:0;width:0;height:0}.b{margin:0;padding:1;width:2;height:0}.cccccccc{margin:1;padding:1;width:3;height:0}';
+    expect(More.compress(s, true)).to.eql('.aaaaaaaa,.b{height:0;margin:0}.aaaaaaaa{padding:0;width:0}.b{padding:1;width:2}.cccccccc{height:0;margin:1;padding:1;width:3}');
   });
 });
