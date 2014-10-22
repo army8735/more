@@ -39,7 +39,7 @@ var tempValue;
       this.code = (new Clean(this.options)).minify(this.code);
     } catch(e) {
       return e.toString();
-    }
+    }//this.code = this.code.replace(/}/g, '}\n');
     if(!this.radical) {
       return this.code;
     }

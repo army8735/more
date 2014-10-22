@@ -97,7 +97,7 @@ define(function(require, exports, module){var KEY_HASH=function(){var _6=require
       var arr = key.split(',');
       if(arr[0] == index) {
         self.imCache[(index-1) + ',' + arr[1]] = self.imCache[key];
-        delete imCache[key];
+        delete self.imCache[key];
       }
       else if(arr[1] == index) {
         self.imCache[arr[0] + ',' + (index-1)] = self.imCache[key];
