@@ -1,18 +1,6 @@
 import ImpactChild from './ImpactChild';
 import sort from './sort';
 
-function equalArr(a, b) {
-  if(a.length == b.length) {
-    for(var i = 0, len = a.length; i < len; i++) {
-      if(a[i] !== b[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
-}
-
 class CalArea {
   constructor(list, map, keys) {
     this.list = list;

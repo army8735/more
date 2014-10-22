@@ -165,6 +165,10 @@ describe('extract', function() {
     var s = '.aaaaaa{margin:0;padding:0}.b{margin:1}.ccccccc{margin:0;padding:0}';
     expect(More.compress(s, true)).to.eql(s);
   });
+  it(':-ms-', function() {
+    var s = 'html{margin:0;padding:1}div:-ms-hover{margin:0;padding:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
   it('remove empty', function() {
     var s = '.a{margin:0;padding:0}.b{margin:0}';
     expect(More.compress(s, true)).to.eql('.a,.b{margin:0}.a{padding:0}');

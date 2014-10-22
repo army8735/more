@@ -1,18 +1,6 @@
 define(function(require, exports, module){var ImpactChild=function(){var _0=require('./ImpactChild');return _0.hasOwnProperty("ImpactChild")?_0.ImpactChild:_0.hasOwnProperty("default")?_0.default:_0}();
 var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1.sort:_1.hasOwnProperty("default")?_1.default:_1}();
 
-function equalArr(a, b) {
-  if(a.length == b.length) {
-    for(var i = 0, len = a.length; i < len; i++) {
-      if(a[i] !== b[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
-}
-
 
   function CalArea(list, map, keys) {
     this.list = list;
