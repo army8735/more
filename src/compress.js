@@ -55,8 +55,7 @@ class Compress {
       }
       return e.toString();
     }
-    var i = this.getHead();
-    var list = this.rebuild(i);
+    var list = this.rebuild();
     /* 获取新数据结构list后，处理以下5个步骤：
       1合并相同选择器（检测是否冲突）、
       2去除重复样式（合并后可能造成的重复，包括优先级重复）、
@@ -72,16 +71,6 @@ class Compress {
     this.preRelease(list);
     this.extract(list);
     return this.head + this.join(list);
-  }
-  getHead() {
-    var leaves = this.node.leaves();
-    for(var i = 0, len = leaves.length; i < len; i++) {
-      var leaf = leaves[i];
-      if(leaf.name() == Node.STYLESET) {
-        return i;
-      }
-      this.joinHead(leaf);
-    }
   }
   joinHead(node) {
     var self = this;
@@ -102,20 +91,25 @@ class Compress {
       });
     }
   }
-  rebuild(i) {
+  rebuild() {
     var list = [];
     var leaves = this.node.leaves();
-    for(var len = leaves.length; i < len; i++) {
+    for(var i = 0, len = leaves.length; i < len; i++) {
       var leaf = leaves[i];
-      var item = {
-        selectors: [],
-        styles: []
-      };
-      this.rb(leaf, item);
-      //将选择器排序，比较时可直接==比较
-      sort(item.selectors);
-      item.s2s = item.selectors.join(',');
-      list.push(item);
+      if(leaf.name() == Node.STYLESET) {
+        var item = {
+          selectors: [],
+          styles: []
+        };
+        this.rb(leaf, item);
+        //将选择器排序，比较时可直接==比较
+        sort(item.selectors);
+        item.s2s = item.selectors.join(',');
+        list.push(item);
+      }
+      else {
+        this.joinHead(leaf);
+      }
     }
     return list;
   }

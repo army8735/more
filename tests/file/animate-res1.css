@@ -278,9 +278,7 @@
 100%{opacity:1;-webkit-transform:none;transform:none}
 }
 .fadeInUpBig{-webkit-animation-name:fadeInUpBig;animation-name:fadeInUpBig}
-@-webkit-keyframes fadeOut{0%{opacity:1}
-100%{opacity:0}
-}
+@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}
 @keyframes fadeOut{0%{opacity:1}
 100%{opacity:0}
 }

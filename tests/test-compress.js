@@ -71,6 +71,10 @@ describe('ignore head', function() {
     var s = '@import "a.css";';
     expect(More.compress(s, true)).to.eql(s);
   });
+  it('cross', function() {
+    var s = '@import "a.css";.a{margin:0}@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}.b{padding:0}';
+    expect(More.compress(s, true)).to.eql('@import \"a.css\";@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}.a{margin:0}.b{padding:0}');
+  });
 });
 describe('merge', function() {
   it('same selector but confilct forward and ok backward', function() {
@@ -235,10 +239,10 @@ describe('file', function() {
   });
   it('gumby', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/gumby.css'), { encoding: 'utf-8' });
-//    var res1 = More.compress(s);
+    var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-//    fs.writeFileSync(path.join(__dirname, 'file/gumby-res1.css'), res1.replace(/}\n?/g, '}\n'), { encoding: 'utf-8' });
-//    fs.writeFileSync(path.join(__dirname, 'file/gumby-res2.css'), res2.replace(/}\n?/g, '}\n'), { encoding: 'utf-8' });
+    fs.writeFileSync(path.join(__dirname, 'file/gumby-res1.css'), res1.replace(/}\n?/g, '}\n'), { encoding: 'utf-8' });
+    fs.writeFileSync(path.join(__dirname, 'file/gumby-res2.css'), res2.replace(/}\n?/g, '}\n'), { encoding: 'utf-8' });
   });
   it('inuit', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/inuit.css'), { encoding: 'utf-8' });

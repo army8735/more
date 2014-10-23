@@ -1,3 +1,4 @@
+:focus{outline:0}
 html{border:0;margin:0;padding:0}
 a,abbr,acronym,address,article,aside,blockquote,body,caption,code,dd,del,dfn,dialog,div,dl,dt,em,fieldset,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,iframe,img,label,legend,li,nav,object,ol,p,pre,q,section,span,table,tbody,td,tfoot,th,thead,tr,ul{border:0;font:inherit;margin:0;padding:0;vertical-align:baseline}
 article,aside,details,dialog,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
