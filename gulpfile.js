@@ -52,13 +52,6 @@ gulp.task('default', ['clean-bulid', 'clean-web'], function() {
 
 gulp.task('watch', function() {
   gulp.watch('./src/**/*.js', function() {
-    var args = Array.prototype.slice.call(arguments);
-    args.forEach(function(arg) {
-      gulp.src(arg.path)
-        .pipe(through2.obj(cb))
-        .pipe(gulp.dest('./build/'))
-        .pipe(through2.obj(cb2))
-        .pipe(gulp.dest('./web/'));
-    });
+    gulp.run('default');
   });
 });
