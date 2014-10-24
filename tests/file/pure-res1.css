@@ -130,8 +130,7 @@ table{border-collapse:collapse;border-spacing:0}
 .pure-group input:not([type]),.pure-group input[type=color],.pure-group input[type=date],.pure-group input[type=datetime-local],.pure-group input[type=datetime],.pure-group input[type=email],.pure-group input[type=month],.pure-group input[type=number],.pure-group input[type=password],.pure-group input[type=search],.pure-group input[type=tel],.pure-group input[type=text],.pure-group input[type=time],.pure-group input[type=url],.pure-group input[type=week]{margin-bottom:0}
 .pure-form-aligned .pure-control-group label{margin-bottom:.3em;text-align:left;display:block;width:100%}
 .pure-form-aligned .pure-controls{margin:1.5em 0 0}
-.pure-form .pure-help-inline,.pure-form-message,.pure-form-message-inline{display:block;font-size:.75em;padding:.2em 0 .8em}
-}
+.pure-form .pure-help-inline,.pure-form-message,.pure-form-message-inline{display:block;font-size:.75em;padding:.2em 0 .8em}}
 .pure-menu ul{position:absolute;visibility:hidden}
 .pure-menu.pure-menu-open{visibility:visible;z-index:2;width:100%}
 .pure-menu ul{left:-10000px;list-style:none;margin:0;padding:0;top:-10000px;z-index:1}
@@ -176,8 +175,7 @@ table{border-collapse:collapse;border-spacing:0}
 .pure-paginator .prev{border-radius:2px 0 0 2px}
 .pure-paginator .next{border-radius:0 2px 2px 0}
 @media (max-width:480px){.pure-menu-horizontal{width:100%}
-.pure-menu-children li{display:block;border-bottom:1px solid #000}
-}
+.pure-menu-children li{display:block;border-bottom:1px solid #000}}
 .pure-table{border-collapse:collapse;border-spacing:0;empty-cells:show;border:1px solid #cbcbcb}
 .pure-table caption{color:#000;font:italic 85%/1 arial,sans-serif;padding:1em 0;text-align:center}
 .pure-table td,.pure-table th{border-left:1px solid #cbcbcb;border-width:0 0 0 1px;font-size:inherit;margin:0;overflow:visible;padding:.5em 1em}

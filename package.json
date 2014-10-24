@@ -1,6 +1,6 @@
 {
   "name": "more-css",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "a css pre-compiler & agressive compressor",
   "maintainers": [
     {

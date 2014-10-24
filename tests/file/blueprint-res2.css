@@ -14,7 +14,8 @@ h1{font-size:3em;line-height:1;margin-bottom:.5em}
 h2{font-size:2em;margin-bottom:.75em}
 h3{font-size:1.5em;line-height:1;margin-bottom:1em}
 h4{font-size:1.2em;line-height:1.25;margin-bottom:1.25em}
-h5,h6{font-size:1em;font-weight:700}
+h5,h6,dfn,dl dt,label,strong,th,legend{font-weight:700}
+h5,h6{font-size:1em}
 h5{margin-bottom:1.5em}
 h1 img,h2 img,h3 img,h4 img,h5 img,h6 img{margin:0}
 p{margin:0 0 1.5em}
@@ -26,7 +27,6 @@ a:focus,a:hover{color:#09f}
 a{color:#06c;text-decoration:underline}
 blockquote,dfn,em{font-style:italic}
 blockquote{color:#666;margin:1.5em}
-dfn,dl dt,label,strong,th,legend{font-weight:700}
 sub,sup{line-height:0}
 abbr,acronym{border-bottom:1px dotted #666}
 address{font-style:italic;margin:0 0 1.5em}
