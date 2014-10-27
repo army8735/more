@@ -81,12 +81,11 @@ class CalArea {
         ys.push(i);
       }
     }
-    var key = start + ',' + end;
+    var key = ys.join(',');
     var hasContain = false;
     //遍历寻找重叠区域
     self.area.forEach(function(area) {
-      if(area.start <= start && area.end >= end
-        && area.key.indexOf(key) > -1) {
+      if(area.key.indexOf(key) > -1) {
         hasContain = true;
       }
       if(area.start <= end && area.end >= start) {
@@ -95,13 +94,15 @@ class CalArea {
         if(newYs.length < 2) {
           return;
         }
-        var newKey = newYs[0] + ',' + newYs[newYs.length - 1];
+        var newKey = newYs.join(',');
         if(self.areaMap.hasOwnProperty(newKey)) {
           var exist = self.areaMap[newKey];
-          exist.xs.push(col);
-          exist.area += exist.xs.length;
+          if(exist.xs.indexOf(col) == -1) {
+            exist.xs.push(col);
+            exist.area += exist.xs.length;
+          }
         }
-        else {
+        else if(area.xs.indexOf(col) == -1) {
           var xs = area.xs.concat([col]);
           var o = {
             xs: xs,
@@ -212,6 +213,7 @@ class CalArea {
       //因为没有使用的话直接pass即可，无需处理冲突
       delete self.areaMap[res.key];
       //console.log(5, sel, val, reduce, increase);
+      //console.log(res);
       //比较增减
       if(reduce > increase) {
         self.conflict(res);
@@ -275,15 +277,14 @@ class CalArea {
     var self = this;
     var start = ys[0];
     var end = ys[ys.length - 1];
-    var key = start + ',' + end;
+    var key = ys.join(',');
     var hasContain = false;
     //类似record
     self.area.forEach(function(area) {
       if(area.ignore) {
         return;
       }
-      if(area.start <= start && area.end >= end
-        && area.key.indexOf(key) > -1) {
+      if(area.key.indexOf(key) > -1) {
         hasContain = true;
       }
       if(area.start <= end && area.end >= start) {
@@ -292,7 +293,7 @@ class CalArea {
         if(newYs.length < 2) {
           return;
         }
-        var newKey = newYs[0] + ',' + newYs[newYs.length - 1];
+        var newKey = newYs.join(',');
         if(self.areaMap.hasOwnProperty(newKey)) {
           var exist = self.areaMap[newKey];
           if(exist.xs.indexOf(col) == -1) {

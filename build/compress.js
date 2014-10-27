@@ -356,7 +356,7 @@ var tempValue;
       this.insert[y] = this.insert[y] || '';
       this.insert[y] += res.sel + '{' + res.val + '}';
       res.xs.forEach(function(x) {
-        res.ys.forEach(function(y) {
+        res.ys.forEach(function(y) {//console.log(x, y, keys[x], list[y].s2s)
           list[y].styles[map[x][y]].ignore = true;
         });
       });
