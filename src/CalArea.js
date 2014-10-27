@@ -14,8 +14,8 @@ class CalArea {
   }
   init() {
     var self = this;
-//    console.log(0, self.keys);
-//    console.log(1, self.map);
+    //console.log(0, self.keys);
+    //console.log(1, self.map);
     //初始化构建全部冲突表，横向表示一个选择器中的样式，纵向表示一个样式出现在不同的选择器中
     //只计算纵向，因为横向没必要
     //这个表不同于map表，连续的1表示无冲突可以合并，-1反之，0表示无此样式
@@ -50,7 +50,7 @@ class CalArea {
       }
       matrix.push(nrr);
     });
-//    console.log(2, matrix);
+    //console.log(2, matrix);
     //冒泡递归计算面积，每个节点可使用多次，具体去重在另外逻辑中做
     //纵列的标识不会单个出现，至少有2个，因为可合并样式至少会出现在2个选择器中
     matrix.forEach(function(arr, i) {
@@ -66,42 +66,105 @@ class CalArea {
         }
       }
     });
-//    console.log(3, this.area)
+    //console.log(3, this.area)
     //将面积从大到小排列
     sort(this.area, function(a, b) {
       return a.area > b.area;
     });
-//    console.log(4, this.area)
+    //console.log(4, this.area)
   }
   record(arr, col, start, end) {
     var self = this;
-    //冒泡组成若干个矩阵，进行横向增量扩充原有矩阵
-    for(var i = start; i < end; i++) {
+    var ys = [];
+    for(var i = start; i <= end; i++) {
       if(arr[i] == 1) {
-        var temp = [i];
-        for(var j = i + 1; j <= end; j++) {
-          if(arr[j] == 1) {
-            temp.push(j);
-            var key = temp.join(',');
-            if(self.areaMap.hasOwnProperty(key)) {
-              var exist = self.areaMap[key];
-              exist.xs.push(col);
-              exist.area += temp.length;
-            }
-            else {
-              var o = {
-                xs: [col],
-                ys: temp.concat([]),
-                key: key,
-                area: temp.length
-              };
-              self.area.push(o);
-              self.areaMap[key] = o;
-            }
-          }
-        }
+        ys.push(i);
       }
     }
+    var key = start + ',' + end;
+    var hasContain = false;
+    //遍历寻找重叠区域
+    self.area.forEach(function(area) {
+      if(area.start <= start && area.end >= end
+        && area.key.indexOf(key) > -1) {
+        hasContain = true;
+      }
+      if(area.start <= end && area.end >= start) {
+        var newYs = self.overlap(area.ys, ys);
+        //防止单行无效合并
+        if(newYs.length < 2) {
+          return;
+        }
+        var newKey = newYs[0] + ',' + newYs[newYs.length - 1];
+        if(self.areaMap.hasOwnProperty(newKey)) {
+          var exist = self.areaMap[newKey];
+          exist.xs.push(col);
+          exist.area += exist.xs.length;
+        }
+        else {
+          var xs = area.xs.concat([col]);
+          var o = {
+            xs: xs,
+            ys: newYs,
+            start: start,
+            end: end,
+            key: newKey,
+            area: xs.length * newYs.length
+          };
+          self.area.push(o);
+          self.areaMap[newKey] = o;
+        }
+      }
+    });
+    //本身没有被包含时需添加
+    if(!hasContain) {
+      var o = {
+        xs: [col],
+        ys: ys,
+        start: start,
+        end: end,
+        key: key,
+        area: ys.length
+      };
+      self.area.push(o);
+      self.areaMap[key] = o;
+    }
+    //冒泡组成若干个矩阵，进行横向增量扩充原有矩阵
+    //for(var i = start; i < end; i++) {
+    //  if(arr[i] == 1) {
+    //    var temp = [i];
+    //    for(var j = i + 1; j <= end; j++) {
+    //      if(arr[j] == 1) {
+    //        temp.push(j);
+    //        var key = temp.join(',');
+    //        if(self.areaMap.hasOwnProperty(key)) {
+    //          var exist = self.areaMap[key];
+    //          exist.xs.push(col);
+    //          exist.area += temp.length;
+    //        }
+    //        else {
+    //          var o = {
+    //            xs: [col],
+    //            ys: temp.concat([]),
+    //            key: key,
+    //            area: temp.length
+    //          };
+    //          self.area.push(o);
+    //          self.areaMap[key] = o;
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+  }
+  overlap(ys1, ys2) {
+    var arr = [];
+    ys1.forEach(function(y) {
+      if(ys2.indexOf(y) > -1) {
+        arr.push(y);
+      }
+    });
+    return arr;
   }
   getMax() {
     var self = this;
@@ -144,11 +207,14 @@ class CalArea {
         }
       });
       increase = sel.length + 2 + val.length;
-      //无论是否采用，此次结果的矩阵都要被清除，其它面积中和此矩阵冲突的要进行分割或裁减
+      //无论是否采用，此次结果的矩阵都要被清除
+      //然后根据是否使用，再处理其它面积中和此矩阵冲突的要进行分割或裁减
+      //因为没有使用的话直接pass即可，无需处理冲突
       delete self.areaMap[res.key];
-      self.conflict(res);
+      //console.log(5, sel, val, reduce, increase);
       //比较增减
       if(reduce > increase) {
+        self.conflict(res);
         res.val = val;
         res.sel = sel;
         return res;
@@ -158,21 +224,27 @@ class CalArea {
   }
   conflict(res) {
     var self = this;
+    //标记使用到的矩阵点
     var hash = {};
     res.xs.forEach(function(x) {
       res.ys.forEach(function(y) {
         hash[x + ',' + y] = true;
       });
     });
+    //遍历，发现冲突则重新计算
     self.area.forEach(function(area) {
       var cf = false;
-      area.xs.forEach(function(x) {
-        area.ys.forEach(function(y) {
+      outer:
+      for(var i = 0, len = area.xs.length; i < len; i++) {
+        var x = area.xs[i];
+        for(var j = 0, len2 = area.ys.length; j < len2; j++) {
+          var y = area.ys[j];
           if(hash.hasOwnProperty(x + ',' + y)) {
             cf = true;
+            break outer;
           }
-        });
-      });
+        }
+      }
       if(cf) {
         delete self.areaMap[area.key];
         area.ignore = true;
@@ -183,12 +255,13 @@ class CalArea {
               ys.push(y);
             }
           });
-          if(ys.length) {
+          if(ys.length > 1) {
             self.insert(x, ys);
           }
         });
       }
     });
+    //清除掉冲突的并重新排序
     for(var i = self.area.length - 1; i >= 0; i--) {
       if(self.area[i].ignore) {
         self.area.splice(i, 1);
@@ -200,31 +273,85 @@ class CalArea {
   }
   insert(col, ys) {
     var self = this;
-    //冒泡组成若干个矩阵，进行横向增量扩充原有矩阵
-    for(var i = 0, len = ys.length; i < len - 1; i++) {
-      var temp = [ys[i]];
-      for(var j = i + 1; j < len; j++) {
-        temp.push(ys[j]);
-        var key = temp.join(',');
-        if(self.areaMap.hasOwnProperty(key)) {
-          var exist = self.areaMap[key];
+    var start = ys[0];
+    var end = ys[ys.length - 1];
+    var key = start + ',' + end;
+    var hasContain = false;
+    //类似record
+    self.area.forEach(function(area) {
+      if(area.ignore) {
+        return;
+      }
+      if(area.start <= start && area.end >= end
+        && area.key.indexOf(key) > -1) {
+        hasContain = true;
+      }
+      if(area.start <= end && area.end >= start) {
+        var newYs = self.overlap(area.ys, ys);
+        //防止单行无效合并
+        if(newYs.length < 2) {
+          return;
+        }
+        var newKey = newYs[0] + ',' + newYs[newYs.length - 1];
+        if(self.areaMap.hasOwnProperty(newKey)) {
+          var exist = self.areaMap[newKey];
           if(exist.xs.indexOf(col) == -1) {
             exist.xs.push(col);
-            exist.area += temp.length;
+            exist.area += exist.xs.length;
           }
         }
-        else {
+        else if(area.xs.indexOf(col) == -1) {
+          var xs = area.xs.concat([col]);
           var o = {
-            xs: [col],
-            ys: temp.concat([]),
-            key: key,
-            area: temp.length
+            xs: xs,
+            ys: newYs,
+            start: start,
+            end: end,
+            key: newKey,
+            area: xs.length * newYs.length
           };
           self.area.push(o);
-          self.areaMap[key] = o;
+          self.areaMap[newKey] = o;
         }
       }
+    });
+    if(!hasContain) {
+      var o = {
+        xs: [col],
+        ys: ys,
+        start: start,
+        end: end,
+        key: key,
+        area: ys.length
+      };
+      self.area.push(o);
+      self.areaMap[key] = o;
     }
+    //冒泡组成若干个矩阵，进行横向增量扩充原有矩阵
+    //for(var i = 0, len = ys.length; i < len - 1; i++) {
+    //  var temp = [ys[i]];
+    //  for(var j = i + 1; j < len; j++) {
+    //    temp.push(ys[j]);
+    //    var key = temp.join(',');
+    //    if(self.areaMap.hasOwnProperty(key)) {
+    //      var exist = self.areaMap[key];
+    //      if(exist.xs.indexOf(col) == -1) {
+    //        exist.xs.push(col);
+    //        exist.area += temp.length;
+    //      }
+    //    }
+    //    else {
+    //      var o = {
+    //        xs: [col],
+    //        ys: temp.concat([]),
+    //        key: key,
+    //        area: temp.length
+    //      };
+    //      self.area.push(o);
+    //      self.areaMap[key] = o;
+    //    }
+    //  }
+    //}
   }
 }
 
