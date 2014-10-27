@@ -61,7 +61,6 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
             k = len;
           }
           self.record(arr, i, j, k - 1);
-//          self.record2(arr, i, j, k - 1);
           j = k + 1;
         }
       }
@@ -130,33 +129,6 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
       self.area.push(o);
       self.areaMap[key] = o;
     }
-    //冒泡组成若干个矩阵，进行横向增量扩充原有矩阵
-    //for(var i = start; i < end; i++) {
-    //  if(arr[i] == 1) {
-    //    var temp = [i];
-    //    for(var j = i + 1; j <= end; j++) {
-    //      if(arr[j] == 1) {
-    //        temp.push(j);
-    //        var key = temp.join(',');
-    //        if(self.areaMap.hasOwnProperty(key)) {
-    //          var exist = self.areaMap[key];
-    //          exist.xs.push(col);
-    //          exist.area += temp.length;
-    //        }
-    //        else {
-    //          var o = {
-    //            xs: [col],
-    //            ys: temp.concat([]),
-    //            key: key,
-    //            area: temp.length
-    //          };
-    //          self.area.push(o);
-    //          self.areaMap[key] = o;
-    //        }
-    //      }
-    //    }
-    //  }
-    //}
   }
   CalArea.prototype.overlap = function(ys1, ys2) {
     var arr = [];
@@ -328,31 +300,6 @@ var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1
       self.area.push(o);
       self.areaMap[key] = o;
     }
-    //冒泡组成若干个矩阵，进行横向增量扩充原有矩阵
-    //for(var i = 0, len = ys.length; i < len - 1; i++) {
-    //  var temp = [ys[i]];
-    //  for(var j = i + 1; j < len; j++) {
-    //    temp.push(ys[j]);
-    //    var key = temp.join(',');
-    //    if(self.areaMap.hasOwnProperty(key)) {
-    //      var exist = self.areaMap[key];
-    //      if(exist.xs.indexOf(col) == -1) {
-    //        exist.xs.push(col);
-    //        exist.area += temp.length;
-    //      }
-    //    }
-    //    else {
-    //      var o = {
-    //        xs: [col],
-    //        ys: temp.concat([]),
-    //        key: key,
-    //        area: temp.length
-    //      };
-    //      self.area.push(o);
-    //      self.areaMap[key] = o;
-    //    }
-    //  }
-    //}
   }
 
 
