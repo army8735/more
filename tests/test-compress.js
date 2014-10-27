@@ -157,7 +157,7 @@ describe('extract', function() {
     var s = '.a{margin:0;padding:0}.b{margin-top:0}.c{margin:0;padding:0}';
     expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a{margin:0}.b{margin-top:0}.c{margin:0}');
   });
-  it('confilct', function() {
+  it('conflict', function() {
     var s = '.a{margin:0;padding:0}.b{margin:1}.c{margin:0;padding:0}';
     expect(More.compress(s, true)).to.eql('.a,.c{padding:0}.a{margin:0}.b{margin:1}.c{margin:0}');
   });
