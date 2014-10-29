@@ -3,9 +3,11 @@
 .pure-group input:not([type]),.pure-group input[type=color],.pure-group input[type=date],.pure-group input[type=datetime-local],.pure-group input[type=datetime],.pure-group input[type=email],.pure-group input[type=month],.pure-group input[type=number],.pure-group input[type=password],.pure-group input[type=search],.pure-group input[type=tel],.pure-group input[type=text],.pure-group input[type=time],.pure-group input[type=url],.pure-group input[type=week]{margin-bottom:0}
 .pure-form-aligned .pure-control-group label{margin-bottom:.3em;text-align:left;display:block;width:100%}
 .pure-form-aligned .pure-controls{margin:1.5em 0 0}
-.pure-form .pure-help-inline,.pure-form-message,.pure-form-message-inline{display:block;font-size:.75em;padding:.2em 0 .8em}}
+.pure-form .pure-help-inline,.pure-form-message,.pure-form-message-inline{display:block;font-size:.75em;padding:.2em 0 .8em}
+}
 @media (max-width:480px){.pure-menu-horizontal{width:100%}
-.pure-menu-children li{display:block;border-bottom:1px solid #000}}
+.pure-menu-children li{display:block;border-bottom:1px solid #000}
+}
 article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}
 audio,canvas,video{display:inline-block}
 audio:not([controls]){display:none;height:0}

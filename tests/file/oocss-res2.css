@@ -15,7 +15,8 @@
 .lgCols9of12{width:75%!important}
 .lgCols10of12{width:83.33333%!important}
 .lgCols11of12{width:91.66667%!important}
-.lgCols12of12{width:100%!important}}
+.lgCols12of12{width:100%!important}
+}
 @media only screen and (max-width:41em){.medHide{display:none!important}
 .medShow{display:inherit!important}
 .medCollapse,.medCollapse>.col{width:auto!important;display:block!important;float:none!important}
@@ -33,7 +34,8 @@
 .medCols9of12{width:75%!important}
 .medCols10of12{width:83.33333%!important}
 .medCols11of12{width:91.66667%!important}
-.medCols12of12{width:100%!important}}
+.medCols12of12{width:100%!important}
+}
 @media only screen and (max-width:25em){.smHide{display:none!important}
 .smShow{display:inherit!important}
 .smCollapse,.smCollapse>.col{width:auto!important;display:block!important;float:none!important}
@@ -51,12 +53,14 @@
 .smCols9of12{width:75%!important}
 .smCols10of12{width:83.33333%!important}
 .smCols11of12{width:91.66667%!important}
-.smCols12of12{width:100%!important}}
+.smCols12of12{width:100%!important}
+}
 ::-webkit-input-placeholder{color:#999}
 :-moz-placeholder{color:#999}
 :-ms-input-placeholder{color:#999}
 @media screen and (-webkit-min-device-pixel-ratio:0){.form .checkbox input,.form .radio input{top:.35em}
-.form .checkbox input[type=radio],.form .radio input[type=radio]{left:1px}}
+.form .checkbox input[type=radio],.form .radio input[type=radio]{left:1px}
+}
 article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary{display:block}
 audio,canvas,video{display:inline-block}
 audio:not([controls]){display:none;height:0}

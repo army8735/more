@@ -109,6 +109,12 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('body{ margin: "\\$a"}');
   });
+  it('$中文', function() {
+    var more = new More();
+    var s = '$中文: background:url(xxx);\nbody{$中文}';
+    var res = more.parse(s);
+    expect(res).to.eql('\nbody{background:url(xxx)}');
+  });
   it('~ autoSplit', function() {
     var more = new More();
     var s = 'body{font-family:~"Arail, verdana"}';
