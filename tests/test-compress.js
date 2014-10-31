@@ -201,86 +201,86 @@ describe('extract', function() {
 describe('file', function() {
   it('960', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/960.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/960-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/960-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/960-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/960-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('animate', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/animate.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/animate-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/animate-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/animate-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/animate-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('blueprint', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/blueprint.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/blueprint-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/blueprint-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/blueprint-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/blueprint-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('bootstrap', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/bootstrap.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/bootstrap-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/bootstrap-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/bootstrap-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/bootstrap-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('font-awesome', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/font-awesome.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/font-awesome-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/font-awesome-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/font-awesome-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/font-awesome-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('foundation', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/foundation.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
-    fs.writeFileSync(path.join(__dirname, 'file/foundation-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/foundation-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/foundation-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/foundation-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('gumby', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/gumby.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/gumby-res1.css'), res1, { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/gumby-res2.css'), res2, { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/gumby-res1.css'), res1, { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/gumby-res2.css'), res2, { encoding: 'utf-8' });
   });
   it('inuit', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/inuit.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/inuit-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/inuit-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/inuit-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/inuit-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('normalize', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/normalize.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/normalize-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/normalize-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/normalize-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/normalize-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('oocss', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/oocss.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/oocss-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/oocss-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/oocss-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/oocss-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('pure', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/pure.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/pure-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/pure-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/pure-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/pure-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
   it('reset', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/reset.css'), { encoding: 'utf-8' });
-    var res1 = More.compress(s);
+    //var res1 = More.compress(s);
     var res2 = More.compress(s, true);
-    fs.writeFileSync(path.join(__dirname, 'file/reset-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
-    fs.writeFileSync(path.join(__dirname, 'file/reset-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/reset-res1.css'), res1.replace(/}/g, '}\n'), { encoding: 'utf-8' });
+    //fs.writeFileSync(path.join(__dirname, 'file/reset-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
 });
