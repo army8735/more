@@ -16,6 +16,7 @@ import eventbus from './eventbus';
 import checkLevel from './checkLevel';
 import normalize from './normalize';
 import compress from './compress';
+import operate from './operate';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -246,6 +247,14 @@ class More {
           break;
         case Node.IMPORT:
           self.impt(node);
+          break;
+        case Node.ADDEXPR:
+        case Node.MTPLEXPR:
+        case Node.PRMREXPR:
+          if(!node.ignore) {
+            self.res += operate(node, self.ignores, self.index, self.varHash, global.vars);
+            ignore(node, self.ignores, self.index);
+          }
           break;
       }
       //递归子节点

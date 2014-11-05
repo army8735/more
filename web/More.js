@@ -16,6 +16,7 @@ var eventbus=function(){var _17=require('./eventbus');return _17.hasOwnProperty(
 var checkLevel=function(){var _18=require('./checkLevel');return _18.hasOwnProperty("checkLevel")?_18.checkLevel:_18.hasOwnProperty("default")?_18.default:_18}();
 var normalize=function(){var _19=require('./normalize');return _19.hasOwnProperty("normalize")?_19.normalize:_19.hasOwnProperty("default")?_19.default:_19}();
 var compress=function(){var _20=require('./compress');return _20.hasOwnProperty("compress")?_20.compress:_20.hasOwnProperty("default")?_20.default:_20}();
+var operate=function(){var _21=require('./operate');return _21.hasOwnProperty("operate")?_21.operate:_21.hasOwnProperty("default")?_21.default:_21}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -246,6 +247,14 @@ var global = {
           break;
         case Node.IMPORT:
           self.impt(node);
+          break;
+        case Node.ADDEXPR:
+        case Node.MTPLEXPR:
+        case Node.PRMREXPR:
+          if(!node.ignore) {
+            self.res += operate(node, self.ignores, self.index, self.varHash, global.vars);
+            ignore(node, self.ignores, self.index);
+          }
           break;
       }
       //递归子节点
