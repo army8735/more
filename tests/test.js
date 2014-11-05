@@ -295,6 +295,12 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:0;}html body{margin:0;}html{padding:1;}html:hover{color:#000}a{line-height:2}a:hover{text-align:center}');
   });
+  it('@extend like less', function() {
+    var more = new More();
+    var s = 'html{margin:0;body{html}}';
+    var res = more.parse(s);
+    expect(res).to.eql('html{margin:0;}html body{margin:0;}');
+  });
   it('normalize selector 1', function() {
     var more = new More();
     var s = 'html :hover{margin:0}body{@extend html:hover}';
