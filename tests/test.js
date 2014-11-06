@@ -386,6 +386,38 @@ describe('simple test', function() {
     expect(more.ast()).to.eql(more.node);
   });
 });
+describe('operate', function() {
+  it('integer single add', function() {
+    var more = new More();
+    var s = 'a{margin:1+2}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3}');
+  });
+  it('integer multi add', function() {
+    var more = new More();
+    var s = 'a{margin:1+2+3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:6}');
+  });
+  it('decimal single add', function() {
+    var more = new More();
+    var s = 'a{margin:1.1+2.0}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3.1}');
+  });
+  it('decimal multi add', function() {
+    var more = new More();
+    var s = 'a{margin:1.1+2.0+3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:6.1}');
+  });
+  it('cross line', function() {
+    var more = new More();
+    var s = 'a{margin:1\n+2}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3\n}');
+  });
+});
 describe('config', function() {
   it('code', function() {
     var more = new More();

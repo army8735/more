@@ -252,7 +252,7 @@ class More {
         case Node.MTPLEXPR:
         case Node.PRMREXPR:
           if(!node.ignore) {
-            self.res += operate(node, self.ignores, self.index, self.varHash, global.vars);
+            self.res += operate(node, self.varHash, global.vars);
             ignore(node, self.ignores, self.index);
           }
           break;
