@@ -11,7 +11,8 @@ function recursion(node, ignores, res) {
   var isToken = node.name() == Node.TOKEN;
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(!isToken) {
-    if(node.name() == Node.VARDECL) {
+    if(node.name() == Node.VARDECL
+      && ['$', '@'].indexOf(node.first().token().content().charAt(0)) > -1) {
       var i = index;
       while(ignores[++i]) {}
       while(ignores[++i]) {}

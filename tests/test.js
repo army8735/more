@@ -373,6 +373,12 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('html{margin:"a"}');
   });
+  it('ignore css3 var', function() {
+    var more = new More();
+    var s = ':root{var-a:1;$b:2;margin:$a $b;}';
+    var res = more.parse(s);
+    expect(res).to.eql(':root{var-a:1;margin:$a 2;}');
+  });
   it('#ast', function() {
     var more = new More();
     var s = 'html{}';
