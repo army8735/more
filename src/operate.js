@@ -56,9 +56,13 @@ class Add {
         self.unit = temp.unit;
         break;
       default:
-        first = first.token().content();
-        first = first.indexOf('.') > -1 ? parseFloat(first) : parseInt(first);
-        self.res = first;
+        if(first.token().type() == Token.NUMBER) {
+          first = first.token().content();
+          self.res = first.indexOf('.') > -1 ? parseFloat(first) : parseInt(first);
+        }
+        else {
+          self.res = first.token().content();
+        }
     }
     while(opt && opt.token().type() == Token.SIGN) {
       var optValue = opt.token().content();
@@ -89,8 +93,13 @@ class Add {
           secondUnit = temp.unit;
           break;
         default:
-          second = second.token().content();
-          second = second.indexOf('.') > -1 ? parseFloat(second) : parseInt(second);
+          if(second.token().type() == Token.NUMBER) {
+            second = second.token().content();
+            second = second.indexOf('.') > -1 ? parseFloat(second) : parseInt(second);
+          }
+          else {
+            second = second.token().content();
+          }
       }
       switch(optValue) {
         case '+':

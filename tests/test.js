@@ -417,6 +417,66 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3\n}');
   });
+  it('integer single minus', function() {
+    var more = new More();
+    var s = 'a{margin:1 - 2}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:-1}');
+  });
+  it('integer multi minus', function() {
+    var more = new More();
+    var s = 'a{margin:1 - 2 - 3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:-4}');
+  });
+  it('decimal single minus', function() {
+    var more = new More();
+    var s = 'a{margin:1.5 - 2.0}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:-0.5}');
+  });
+  it('decimal multi minus', function() {
+    var more = new More();
+    var s = 'a{margin:1.5 - 2.0 - 3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:-3.5}');
+  });
+  it('integer single mtl', function() {
+    var more = new More();
+    var s = 'a{margin:1*2}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2}');
+  });
+  it('integer multi mtl', function() {
+    var more = new More();
+    var s = 'a{margin:1*2*3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:6}');
+  });
+  it('decimal single mtl', function() {
+    var more = new More();
+    var s = 'a{margin:1.5*2.0}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3}');
+  });
+  it('decimal multi mtl', function() {
+    var more = new More();
+    var s = 'a{margin:1.5*2.0/3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1}');
+  });
+  it('overload add', function() {
+    var more = new More();
+    var s = 'a{margin:1+"2"}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1"2"}');
+  });
+  it('overload mtl', function() {
+    var more = new More();
+    var s = 'a{margin:1*"2"}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:NaN}');
+  });
 });
 describe('config', function() {
   it('code', function() {
