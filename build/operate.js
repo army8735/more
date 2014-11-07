@@ -7,8 +7,6 @@ var Node = homunculus.getClass('node', 'css');
 exports.default=function(node, varHash, globalVar) {
   switch(node.name()) {
     case Node.ADDEXPR:
-      var temp = new Add(node, varHash, globalVar);
-      return temp.exec() + temp.unit;
     case Node.MTPLEXPR:
       var temp = new Add(node, varHash, globalVar);
       return temp.exec() + temp.unit;
@@ -41,10 +39,6 @@ exports.default=function(node, varHash, globalVar) {
     }
     switch(first.name()) {
       case Node.ADDEXPR:
-        var temp = new Add(first, self.varHash, self.globalVar);
-        self.res = temp.exec();
-        self.unit = temp.unit;
-        break;
       case Node.MTPLEXPR:
         var temp = new Add(first, self.varHash, self.globalVar);
         self.res = temp.exec();
@@ -78,10 +72,6 @@ exports.default=function(node, varHash, globalVar) {
       }
       switch(second.name()) {
         case Node.ADDEXPR:
-          var temp = new Add(second, self.varHash, self.globalVar);
-          second = temp.exec();
-          secondUnit = temp.unit;
-          break;
         case Node.MTPLEXPR:
           var temp = new Add(second, self.varHash, self.globalVar);
           second = temp.exec();
@@ -144,5 +134,22 @@ exports.default=function(node, varHash, globalVar) {
     this.unit = '';
   }
   Prmr.prototype.exec = function() {
-    return self.res;
+    var first = this.node.leaf(1);
+    switch(first.name()) {
+      case Node.ADDEXPR:
+      case Node.MTPLEXPR:
+        var temp = new Add(first, this.varHash, this.globalVar);
+        this.res = temp.exec();
+        break;
+      case Node.PRMREXPR:
+        var temp = new Prmr(first, this.varHash, this.globalVar);
+        this.res = temp.exec();
+      default:
+        var unit = first.next().token();
+        if(unit.type() == Token.UNITS) {
+          this.unit = unit.content();
+        }
+        this.res = first.token().content();
+    }
+    return this.res;
   }

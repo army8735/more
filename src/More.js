@@ -251,7 +251,8 @@ class More {
         case Node.ADDEXPR:
         case Node.MTPLEXPR:
         case Node.PRMREXPR:
-          if(!node.ignore) {
+          var parent = node.parent();
+          if([Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1) {
             self.res += operate(node, self.varHash, global.vars);
             ignore(node, self.ignores, self.index);
           }

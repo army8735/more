@@ -441,25 +441,25 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:-3.5}');
   });
-  it('integer single mtl', function() {
+  it('integer single mtpl', function() {
     var more = new More();
     var s = 'a{margin:1*2}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:2}');
   });
-  it('integer multi mtl', function() {
+  it('integer multi mtpl', function() {
     var more = new More();
     var s = 'a{margin:1*2*3}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:6}');
   });
-  it('decimal single mtl', function() {
+  it('decimal single mtpl', function() {
     var more = new More();
     var s = 'a{margin:1.5*2.0}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3}');
   });
-  it('decimal multi mtl', function() {
+  it('decimal multi mtpl', function() {
     var more = new More();
     var s = 'a{margin:1.5*2.0/3}';
     var res = more.parse(s);
@@ -471,11 +471,65 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:1"2"}');
   });
-  it('overload mtl', function() {
+  it('overload mtpl', function() {
     var more = new More();
     var s = 'a{margin:1*"2"}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:NaN}');
+  });
+  it('()', function() {
+    var more = new More();
+    var s = 'a{margin:(1)}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1}');
+  });
+  it('() with unit', function() {
+    var more = new More();
+    var s = 'a{margin:(1px)}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1px}');
+  });
+  it('() before unit', function() {
+    var more = new More();
+    var s = 'a{margin:(1)px}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1px}');
+  });
+  it('complex 1', function() {
+    var more = new More();
+    var s = 'a{margin:(1+2)*3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:9}');
+  });
+  it('complex 2', function() {
+    var more = new More();
+    var s = 'a{margin:1+2*3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:7}');
+  });
+  it('complex 3', function() {
+    var more = new More();
+    var s = 'a{margin:(1+2/2)*3+5}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:11}');
+  });
+  it.skip('complex 4', function() {
+    var more = new More();
+    var s = 'a{margin:1px+2px}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3px}');
+  });
+  it.skip('complex 5', function() {
+    var more = new More();
+    var s = 'a{margin:2px+2}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:4px}');
+  });
+  it.skip('complex 6', function() {
+    var more = new More();
+    var s = 'a{margin:2+3px}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:5px}');
   });
 });
 describe('config', function() {
