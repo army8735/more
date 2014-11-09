@@ -513,19 +513,19 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:11}');
   });
-  it.skip('complex 4', function() {
+  it('complex 4', function() {
     var more = new More();
     var s = 'a{margin:1px+2px}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3px}');
   });
-  it.skip('complex 5', function() {
+  it('complex 5', function() {
     var more = new More();
     var s = 'a{margin:2px+2}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:4px}');
   });
-  it.skip('complex 6', function() {
+  it('complex 6', function() {
     var more = new More();
     var s = 'a{margin:2+3px}';
     var res = more.parse(s);

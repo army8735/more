@@ -35,19 +35,19 @@ class Add {
     }
     else {
       opt = firstUnit;
-      firstUnit = null;
+      firstUnit = '';
     }
     switch(first.name()) {
       case Node.ADDEXPR:
       case Node.MTPLEXPR:
         var temp = new Add(first, self.varHash, self.globalVar);
         self.res = temp.exec();
-        self.unit = temp.unit;
+        self.unit = firstUnit || temp.unit;
         break;
       case Node.PRMREXPR:
         var temp = new Prmr(first, self.varHash, self.globalVar);
         self.res = temp.exec();
-        self.unit = temp.unit;
+        self.unit = firstUnit || temp.unit;
         break;
       default:
         if(first.token().type() == Token.NUMBER) {
@@ -57,6 +57,7 @@ class Add {
         else {
           self.res = first.token().content();
         }
+        self.unit = firstUnit
     }
     while(opt && opt.token().type() == Token.SIGN) {
       var optValue = opt.token().content();
@@ -64,10 +65,10 @@ class Add {
       var secondUnit = second.next();
       if(secondUnit && secondUnit.token().type() == Token.UNITS) {
         opt = secondUnit.next();
-        secondUnit = secondUnit.token();
+        secondUnit = secondUnit.token().content();
       }
       else {
-        secondUnit = null;
+        secondUnit = '';
         opt = second.next();
       }
       switch(second.name()) {
@@ -75,12 +76,12 @@ class Add {
         case Node.MTPLEXPR:
           var temp = new Add(second, self.varHash, self.globalVar);
           second = temp.exec();
-          secondUnit = temp.unit;
+          secondUnit = secondUnit || temp.unit;
           break;
         case Node.PRMREXPR:
           var temp = new Prmr(second, self.varHash, self.globalVar);
           second = temp.exec();
-          secondUnit = temp.unit;
+          secondUnit = secondUnit || temp.unit;
           break;
         default:
           if(second.token().type() == Token.NUMBER) {
