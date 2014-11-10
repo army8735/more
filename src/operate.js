@@ -57,7 +57,7 @@ class Add {
         else {
           self.res = first.token().content();
         }
-        self.unit = firstUnit
+        self.unit = firstUnit;
     }
     while(opt && opt.token().type() == Token.SIGN) {
       var optValue = opt.token().content();
@@ -92,33 +92,92 @@ class Add {
             second = second.token().content();
           }
       }
-      switch(optValue) {
-        case '+':
-          self.res += second;
-          break;
-        case '-':
-          self.res -= second;
-          break;
-        case '*':
-          self.res *= second;
-          break;
-        case '/':
-          self.res /= second;
-          break;
-      }
       //两个单位只有1个，或相等的情况下，无冲突，其中有一个为%无冲突，其余冲突取最后一个
-      if(!self.unit && secondUnit) {
-        self.unit = secondUnit;
+      if(self.unit == secondUnit && secondUnit == '%') {
+        switch(optValue) {
+          case '+':
+            self.res += second;
+            break;
+          case '-':
+            self.res -= second;
+            break;
+          case '*':
+            self.res *= second;
+            self.res /= 100;
+            break;
+          case '/':
+            self.res /= second;
+            self.res /= 100;
+            break;
+        }
       }
-      else if(self.unit && secondUnit && self.unit != secondUnit) {
-        if(firstUnit == '%') {
+      else if(self.unit != secondUnit) {
+        if(self.unit == '%') {
           self.unit = secondUnit;
+          switch(optValue) {
+            case '+':
+              self.res = self.res * second / 100 + second;
+              break;
+            case '-':
+              self.res = self.res * second / 100 - second;
+              break;
+            case '*':
+              self.res = self.res * second / 100;
+              break;
+            case '/':
+              self.res /= second;
+              break;
+          }
         }
         else if(secondUnit == '%') {
-          self.unit = firstUnit;
+          self.unit = self.unit;
+          switch(optValue) {
+            case '+':
+              self.res += self.res * second / 100;
+              break;
+            case '-':
+              self.res -= self.res * second / 100;
+              break;
+            case '*':
+              self.res = self.res * second / 100;
+              break;
+            case '/':
+              self.res = self.res * 100 / second;
+              break;
+          }
         }
         else {
-          self.unit = secondUnit;
+          self.unit = secondUnit || self.unit;
+          switch(optValue) {
+            case '+':
+              self.res += second;
+              break;
+            case '-':
+              self.res -= second;
+              break;
+            case '*':
+              self.res *= second;
+              break;
+            case '/':
+              self.res /= second;
+              break;
+          }
+        }
+      }
+      else {
+        switch(optValue) {
+          case '+':
+            self.res += second;
+            break;
+          case '-':
+            self.res -= second;
+            break;
+          case '*':
+            self.res *= second;
+            break;
+          case '/':
+            self.res /= second;
+            break;
         }
       }
     }
