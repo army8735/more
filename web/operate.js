@@ -200,10 +200,12 @@ exports.default=function(node, varHash, globalVar) {
       case Node.MTPLEXPR:
         var temp = new Add(first, this.varHash, this.globalVar);
         this.res = temp.exec();
+        this.unit = temp.unit;
         break;
       case Node.PRMREXPR:
         var temp = new Prmr(first, this.varHash, this.globalVar);
         this.res = temp.exec();
+        this.unit = temp.unit;
       default:
         var unit = first.next().token();
         if(unit.type() == Token.UNITS) {

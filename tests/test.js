@@ -513,6 +513,18 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:11}');
   });
+  it('complex 4', function() {
+    var more = new More();
+    var s = 'a{margin:(2px)*3}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:6px}');
+  });
+  it('complex 5', function() {
+    var more = new More();
+    var s = 'a{margin:(2px)*3em}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:6em}');
+  });
   it('unit 1', function() {
     var more = new More();
     var s = 'a{margin:1px+2px}';
