@@ -152,7 +152,7 @@ class More {
       return this.msg = e.toString();
     }
     this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
-    preVar(this.node, this.ignores, this.index, this.varHash);
+    preVar(this.node, this.ignores, this.index, this.varHash, global.varHash);
     preFn(this.node, this.ignores, this.index, this.fnHash);
   }
   parseOn() {

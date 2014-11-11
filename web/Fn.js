@@ -1,8 +1,9 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
-var join=function(){var _2=require('./join');return _2.hasOwnProperty("join")?_2.join:_2.hasOwnProperty("default")?_2.default:_2}();
-var ignore=function(){var _3=require('./ignore');return _3.hasOwnProperty("ignore")?_3.ignore:_3.hasOwnProperty("default")?_3.default:_3}();
-var getVar=function(){var _4=require('./getVar');return _4.hasOwnProperty("getVar")?_4.getVar:_4.hasOwnProperty("default")?_4.default:_4}();
-var clone=function(){var _5=require('./clone');return _5.hasOwnProperty("clone")?_5.clone:_5.hasOwnProperty("default")?_5.default:_5}();
+var join=function(){var _0=require('./join');return _0.hasOwnProperty("join")?_0.join:_0.hasOwnProperty("default")?_0.default:_0}();
+var ignore=function(){var _1=require('./ignore');return _1.hasOwnProperty("ignore")?_1.ignore:_1.hasOwnProperty("default")?_1.default:_1}();
+var getVar=function(){var _2=require('./getVar');return _2.hasOwnProperty("getVar")?_2.getVar:_2.hasOwnProperty("default")?_2.default:_2}();
+var clone=function(){var _3=require('./clone');return _3.hasOwnProperty("clone")?_3.clone:_3.hasOwnProperty("default")?_3.default:_3}();
+var varType=require('./varType');
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -31,13 +32,19 @@ var Node = homunculus.getClass('node', 'css');
     var newVarHash = clone(varHash);
     var leaves = cParams.leaves();
     leaves.slice(1, leaves.length - 1).forEach(function(leaf, i) {
-      if(i % 2 == 0) {
+      var value;var unit;var type;if(i % 2 == 0) {
         var idx = Math.floor(i / 2);
-        var k = join(leaf, self.ignores);
         if(idx < self.params.length) {
-          var v = self.params[idx];
-          v = v.replace(/^\${?/, '').replace(/}$/, '');
-          newVarHash[v] = k;
+          var k = self.params[idx];
+          k = k.replace(/^\$\{?/, '').replace(/}$/, '');
+          var v = join(leaf, self.ignores);
+          !function(){var _4= varType.getType(leaf, v);type=_4["type"];unit=_4["unit"];value=_4["value"]}();
+          newVarHash[k] = {
+            type: type,
+            unit: unit,
+            str: v,
+            value: value
+          };
         }
       }
     });

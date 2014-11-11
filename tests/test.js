@@ -389,31 +389,31 @@ describe('simple test', function() {
 describe('operate', function() {
   it('integer single add', function() {
     var more = new More();
-    var s = 'a{margin:1+2}';
+    var s = 'a{margin:1 + 2}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3}');
   });
   it('integer multi add', function() {
     var more = new More();
-    var s = 'a{margin:1+2+3}';
+    var s = 'a{margin:1 + 2 + 3}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:6}');
   });
   it('decimal single add', function() {
     var more = new More();
-    var s = 'a{margin:1.1+2.0}';
+    var s = 'a{margin:1.1 + 2.0}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3.1}');
   });
   it('decimal multi add', function() {
     var more = new More();
-    var s = 'a{margin:1.1+2.0+3}';
+    var s = 'a{margin:1.1 + 2.0 + 3}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:6.1}');
   });
   it('cross line', function() {
     var more = new More();
-    var s = 'a{margin:1\n+2}';
+    var s = 'a{margin:1\n+ 2}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3\n}');
   });
@@ -497,19 +497,19 @@ describe('operate', function() {
   });
   it('complex 1', function() {
     var more = new More();
-    var s = 'a{margin:(1+2)*3}';
+    var s = 'a{margin:(1 + 2)*3}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:9}');
   });
   it('complex 2', function() {
     var more = new More();
-    var s = 'a{margin:1+2*3}';
+    var s = 'a{margin:1 + 2*3}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:7}');
   });
   it('complex 3', function() {
     var more = new More();
-    var s = 'a{margin:(1+2/2)*3+5}';
+    var s = 'a{margin:(1 + 2/2)*3 + 5}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:11}');
   });
@@ -527,25 +527,25 @@ describe('operate', function() {
   });
   it('unit 1', function() {
     var more = new More();
-    var s = 'a{margin:1px+2px}';
+    var s = 'a{margin:1px + 2px}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3px}');
   });
   it('unit 2', function() {
     var more = new More();
-    var s = 'a{margin:2px+2}';
+    var s = 'a{margin:2px + 2}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:4px}');
   });
   it('unit 3', function() {
     var more = new More();
-    var s = 'a{margin:2+3px}';
+    var s = 'a{margin:2 + 3px}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:5px}');
   });
   it('unit % 1', function() {
     var more = new More();
-    var s = 'a{margin:2+50%}';
+    var s = 'a{margin:2 + 50%}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3}');
   });

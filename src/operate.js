@@ -50,7 +50,11 @@ class Add {
         self.unit = firstUnit || temp.unit;
         break;
       default:
-        if(first.token().type() == Token.NUMBER) {
+        var type = first.token().type();
+        if(type == Token.VARS) {
+          console.log(1)
+        }
+        else if(type == Token.NUMBER) {
           first = first.token().content();
           self.res = first.indexOf('.') > -1 ? parseFloat(first) : parseInt(first);
         }

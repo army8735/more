@@ -29,6 +29,7 @@ function cb(file, enc, cb) {
   var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'build' + path.sep);
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
   var content = file.contents.toString('utf-8');
+  jsdc.reset();
   content = jsdc.parse(content);
   file.contents = new Buffer(content);
   cb(null, file);
@@ -52,10 +53,14 @@ gulp.task('default', ['clean-bulid', 'clean-web'], function() {
 
 gulp.task('watch', function() {
   gulp.watch('./src/**/*.js', function(file) {
-    var to = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
+    var to = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'build' + path.sep);
     to = path.dirname(to);
+    var to2 = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
+    to2 = path.dirname(to2);
     gulp.src(file.path)
       .pipe(through2.obj(cb))
-      .pipe(gulp.dest(to));
+      .pipe(gulp.dest(to))
+      .pipe(through2.obj(cb2))
+      .pipe(gulp.dest(to2));
   });
 });

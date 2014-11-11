@@ -3,6 +3,7 @@ import join from './join';
 import ignore from './ignore';
 import getVar from './getVar';
 import clone from './clone';
+module varType from './varType';
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -33,11 +34,17 @@ class Fn {
     leaves.slice(1, leaves.length - 1).forEach(function(leaf, i) {
       if(i % 2 == 0) {
         var idx = Math.floor(i / 2);
-        var k = join(leaf, self.ignores);
         if(idx < self.params.length) {
-          var v = self.params[idx];
-          v = v.replace(/^\${?/, '').replace(/}$/, '');
-          newVarHash[v] = k;
+          var k = self.params[idx];
+          k = k.replace(/^\$\{?/, '').replace(/}$/, '');
+          var v = join(leaf, self.ignores);
+          var { type, unit, value } = varType.getType(leaf, v);
+          newVarHash[k] = {
+            type: type,
+            unit: unit,
+            str: v,
+            value: value
+          };
         }
       }
     });

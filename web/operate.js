@@ -1,5 +1,5 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
-var getVar=function(){var _30=require('./getVar');return _30.hasOwnProperty("getVar")?_30.getVar:_30.hasOwnProperty("default")?_30.default:_30}();
+var getVar=function(){var _0=require('./getVar');return _0.hasOwnProperty("getVar")?_0.getVar:_0.hasOwnProperty("default")?_0.default:_0}();
 
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
@@ -50,7 +50,11 @@ exports.default=function(node, varHash, globalVar) {
         self.unit = firstUnit || temp.unit;
         break;
       default:
-        if(first.token().type() == Token.NUMBER) {
+        var type = first.token().type();
+        if(type == Token.VARS) {
+          console.log(1)
+        }
+        else if(type == Token.NUMBER) {
           first = first.token().content();
           self.res = first.indexOf('.') > -1 ? parseFloat(first) : parseInt(first);
         }
