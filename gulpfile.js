@@ -51,7 +51,11 @@ gulp.task('default', ['clean-bulid', 'clean-web'], function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('./src/**/*.js', function() {
-    gulp.run('default');
+  gulp.watch('./src/**/*.js', function(file) {
+    var to = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
+    to = path.dirname(to);
+    gulp.src(file.path)
+      .pipe(through2.obj(cb))
+      .pipe(gulp.dest(to));
   });
 });
