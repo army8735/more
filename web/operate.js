@@ -52,7 +52,15 @@ exports.default=function(node, varHash, globalVar) {
       default:
         var type = first.token().type();
         if(type == Token.VARS) {
-          console.log(1)
+          var k = first.token().content().replace(/^\$\{?/, '').replace(/}$/, '');
+          var vara = self.varHash[k] || self.globalVar[k];
+          if(vara !== void 0) {
+            self.res = vara.value;
+            self.unit = vara.unit;
+          }
+          else if(typeof console != 'undefined') {
+            console.warn(k + ' is undefined');
+          }
         }
         else if(type == Token.NUMBER) {
           first = first.token().content();
@@ -61,7 +69,7 @@ exports.default=function(node, varHash, globalVar) {
         else {
           self.res = first.token().content();
         }
-        self.unit = firstUnit;
+        self.unit = self.unit || firstUnit;
     }
     while(opt && opt.token().type() == Token.SIGN) {
       var optValue = opt.token().content();
@@ -88,7 +96,19 @@ exports.default=function(node, varHash, globalVar) {
           secondUnit = secondUnit || temp.unit;
           break;
         default:
-          if(second.token().type() == Token.NUMBER) {
+          var type = second.token().type();
+          if(type == Token.VARS) {
+            var k = second.token().content().replace(/^\$\{?/, '').replace(/}$/, '');
+            var vara = self.varHash[k] || self.globalVar[k];
+            if(vara !== void 0) {
+              second = vara.value;
+              secondUnit = vara.unit || secondUnit;
+            }
+            else if(typeof console != 'undefined') {
+              console.warn(k + ' is undefined');
+            }
+          }
+          else if(type == Token.NUMBER) {
             second = second.token().content();
             second = second.indexOf('.') > -1 ? parseFloat(second) : parseInt(second);
           }

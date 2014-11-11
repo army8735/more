@@ -573,6 +573,96 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:10px}');
   });
+  it('var number +', function() {
+    var more = new More();
+    var s = '$a:1;a{margin:$a + 1}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2}');
+  });
+  it('var unit +', function() {
+    var more = new More();
+    var s = '$a:1px;a{margin:$a + 1}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2px}');
+  });
+  it('var unit + unit', function() {
+    var more = new More();
+    var s = '$a:1px;a{margin:$a + 50%}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1.5px}');
+  });
+  it('var % +', function() {
+    var more = new More();
+    var s = '$a:50%;a{margin:$a + 2px}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3px}');
+  });
+  it('var string +', function() {
+    var more = new More();
+    var s = '$a:"1";a{margin:$a + 1}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:"1"1}');
+  });
+  it('+ var number', function() {
+    var more = new More();
+    var s = '$a:1;a{margin:1 + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2}');
+  });
+  it('+ var unit', function() {
+    var more = new More();
+    var s = '$a:1px;a{margin:1 + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2px}');
+  });
+  it('unit + var unit', function() {
+    var more = new More();
+    var s = '$a:1px;a{margin:50% + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1.5px}');
+  });
+  it('+ var %', function() {
+    var more = new More();
+    var s = '$a:50%;a{margin:2px + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3px}');
+  });
+  it('+ var string', function() {
+    var more = new More();
+    var s = '$a:"1";a{margin:1 + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1"1"}');
+  });
+  it('var + var number', function() {
+    var more = new More();
+    var s = '$a:1;a{margin:$a + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2}');
+  });
+  it('var + var unit', function() {
+    var more = new More();
+    var s = '$a:1px;a{margin:$a + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2px}');
+  });
+  it('var unit + var unit', function() {
+    var more = new More();
+    var s = '$a:1px;a{margin:$a + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:2px}');
+  });
+  it('var + var %', function() {
+    var more = new More();
+    var s = '$a:50%;a{margin:$a + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:100%}');
+  });
+  it('var + var string', function() {
+    var more = new More();
+    var s = '$a:"1";a{margin:$a + $a}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:"1""1"}');
+  });
 });
 describe('config', function() {
   it('code', function() {
