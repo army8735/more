@@ -24,7 +24,7 @@ exports.default=function(token, varHash, globalVar) {
             c = s.slice(i + 2, j);
             var vara = varHash[c] || globalVar[c];
             if(vara !== void 0) {
-              vara = vara.str;
+              vara = vara.value + vara.unit;
               s = s.slice(0, i)
                 + (type == Token.STRING && /^['"]/.test(s)
                   ? vara.replace(/^(['"])(.*)\1$/, '$2')
@@ -40,7 +40,7 @@ exports.default=function(token, varHash, globalVar) {
           c = /^[\w\-\u4e00-\u9fa5]+/.exec(s.slice(i + 1))[0] || '$' + c;
           var vara = varHash[c] || globalVar[c];
           if(vara !== void 0) {
-            vara = vara.str;
+            vara = vara.value + vara.unit;
             s = s.slice(0, i)
               + (type == Token.STRING && /^['"]/.test(s)
                 ? vara.replace(/^(['"])(.*)\1$/, '$2')

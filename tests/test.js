@@ -85,6 +85,12 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('\nbody{ margin: background: url(xxx)}');
   });
+  it('$var = $var', function() {
+    var more = new More();
+    var s = '$a:1;$b:2px;$c:$a;$d:@b;a{margin:$c $d}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1 2px}');
+  });
   it('undefined var', function() {
     var more = new More();
     var s = 'body{ margin: $a}';
@@ -156,6 +162,24 @@ describe('simple test', function() {
     var s = 'fn($a){$a}body{fn(background:url(xxx))}';
     var res = more.parse(s);
     expect(res).to.eql('body{background:url(xxx)}');
+  });
+  it('fncall repeat', function() {
+    var more = new More();
+    var s = 'fn($a){margin:0 $a 1px}body{fn(2%);fn(3%)}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{margin:0 2% 1px;margin:0 3% 1px}');
+  });
+  it('fncall params with operate', function() {
+    var more = new More();
+    var s = 'fn($a){margin:0 $a 1px}body{fn(2px + 5)}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{margin:0 7px 1px}');
+  });
+  it('fncall with operate', function() {
+    var more = new More();
+    var s = 'fn($a){margin:0 $a 1px + 2}body{fn(3%)}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{margin:0 3% 3px}');
   });
   it('level', function() {
     var more = new More();
@@ -662,6 +686,18 @@ describe('operate', function() {
     var s = '$a:"1";a{margin:$a + $a}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:"1""1"}');
+  });
+  it('vardecl', function() {
+    var more = new More();
+    var s = '$a:1;$b=$a + 2;a{margin:$b}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3}');
+  });
+  it('vardecl with unit', function() {
+    var more = new More();
+    var s = '$a:1;$b=$a + 2px;@c:$b * 2;a{margin:$b $c}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3px 6px}');
   });
 });
 describe('config', function() {

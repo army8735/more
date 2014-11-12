@@ -152,7 +152,7 @@ var global = {
       return this.msg = e.toString();
     }
     this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
-    preVar(this.node, this.ignores, this.index, this.varHash, global.varHash);
+    preVar(this.node, this.ignores, this.index, this.varHash, global.vars);
     preFn(this.node, this.ignores, this.index, this.fnHash);
   }
   More.prototype.parseOn = function() {
@@ -252,8 +252,11 @@ var global = {
         case Node.MTPLEXPR:
         case Node.PRMREXPR:
           var parent = node.parent();
-          if([Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1) {
-            self.res += operate(node, self.varHash, global.vars);
+          if([Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1
+            && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
+            && !inFn(parent)) {
+            var opt = operate(node, self.varHash, global.vars);
+            self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);
           }
           break;
@@ -573,4 +576,13 @@ var global = {
   }
 
 
-exports.default=More;});
+exports.default=More;
+
+function inFn(node, res) {
+  if(res===void 0)res={res:false};while(node = node.parent()) {
+    if(node.name() == Node.FN) {
+      return true;
+    }
+  }
+  return false;
+}});

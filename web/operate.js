@@ -4,23 +4,29 @@ var getVar=function(){var _0=require('./getVar');return _0.hasOwnProperty("getVa
 var Token = homunculus.getClass('token');
 var Node = homunculus.getClass('node', 'css');
 
-exports.default=function(node, varHash, globalVar) {
+exports.default=function(node, varHash, globalHash) {
   switch(node.name()) {
     case Node.ADDEXPR:
     case Node.MTPLEXPR:
-      var temp = new Add(node, varHash, globalVar);
-      return temp.exec() + temp.unit;
+      var temp = new Add(node, varHash, globalHash);
+      return {
+          value: temp.exec(),
+          unit: temp.unit
+        };
     case Node.PRMREXPR:
-      var temp = new Prmr(node, varHash, globalVar);
-      return temp.exec() + temp.unit;
+      var temp = new Prmr(node, varHash, globalHash);
+      return {
+        value: temp.exec(),
+        unit: temp.unit
+      };
   }
 };
 
 
-  function Add(node, varHash, globalVar) {
+  function Add(node, varHash, globalHash) {
     this.node = node;
     this.varHash = varHash;
-    this.globalVar = globalVar;
+    this.globalHash = globalHash;
     this.res = '';
     this.unit = '';
   }
@@ -40,12 +46,12 @@ exports.default=function(node, varHash, globalVar) {
     switch(first.name()) {
       case Node.ADDEXPR:
       case Node.MTPLEXPR:
-        var temp = new Add(first, self.varHash, self.globalVar);
+        var temp = new Add(first, self.varHash, self.globalHash);
         self.res = temp.exec();
         self.unit = firstUnit || temp.unit;
         break;
       case Node.PRMREXPR:
-        var temp = new Prmr(first, self.varHash, self.globalVar);
+        var temp = new Prmr(first, self.varHash, self.globalHash);
         self.res = temp.exec();
         self.unit = firstUnit || temp.unit;
         break;
@@ -53,7 +59,7 @@ exports.default=function(node, varHash, globalVar) {
         var type = first.token().type();
         if(type == Token.VARS) {
           var k = first.token().content().replace(/^\$\{?/, '').replace(/}$/, '');
-          var vara = self.varHash[k] || self.globalVar[k];
+          var vara = self.varHash[k] || self.globalHash[k];
           if(vara !== void 0) {
             self.res = vara.value;
             self.unit = vara.unit;
@@ -86,12 +92,12 @@ exports.default=function(node, varHash, globalVar) {
       switch(second.name()) {
         case Node.ADDEXPR:
         case Node.MTPLEXPR:
-          var temp = new Add(second, self.varHash, self.globalVar);
+          var temp = new Add(second, self.varHash, self.globalHash);
           second = temp.exec();
           secondUnit = secondUnit || temp.unit;
           break;
         case Node.PRMREXPR:
-          var temp = new Prmr(second, self.varHash, self.globalVar);
+          var temp = new Prmr(second, self.varHash, self.globalHash);
           second = temp.exec();
           secondUnit = secondUnit || temp.unit;
           break;
@@ -99,7 +105,7 @@ exports.default=function(node, varHash, globalVar) {
           var type = second.token().type();
           if(type == Token.VARS) {
             var k = second.token().content().replace(/^\$\{?/, '').replace(/}$/, '');
-            var vara = self.varHash[k] || self.globalVar[k];
+            var vara = self.varHash[k] || self.globalHash[k];
             if(vara !== void 0) {
               second = vara.value;
               secondUnit = vara.unit || secondUnit;
@@ -210,10 +216,10 @@ exports.default=function(node, varHash, globalVar) {
 
 
 
-  function Prmr(node, varHash, globalVar) {
+  function Prmr(node, varHash, globalHash) {
     this.node = node;
     this.varHash = varHash;
-    this.globalVar = globalVar;
+    this.globalHash = globalHash;
     this.res = '';
     this.unit = '';
   }
@@ -222,12 +228,12 @@ exports.default=function(node, varHash, globalVar) {
     switch(first.name()) {
       case Node.ADDEXPR:
       case Node.MTPLEXPR:
-        var temp = new Add(first, this.varHash, this.globalVar);
+        var temp = new Add(first, this.varHash, this.globalHash);
         this.res = temp.exec();
         this.unit = temp.unit;
         break;
       case Node.PRMREXPR:
-        var temp = new Prmr(first, this.varHash, this.globalVar);
+        var temp = new Prmr(first, this.varHash, this.globalHash);
         this.res = temp.exec();
         this.unit = temp.unit;
       default:
