@@ -10,7 +10,7 @@ A css pre-compiler & radical-compressor
 
 more定位于普通产品简化开发位置，而非广义CSS下游框架重量级功能。more的设计严格遵循css标准规范并进行扩展。
 
-目前提供层级功能、子文件拆分（实际上就是原标准的@import语法）、层级变量、自动拆分字符串、@extend深继承；还有css激进压缩器。
+目前提供层级功能、子文件拆分（实际上就是原标准的@import语法）、层级变量、自动拆分字符串、@extend深继承、函数混入、四则运算；还有css激进压缩器。
 
 详细见：https://github.com/army8735/more/wiki/document
 
