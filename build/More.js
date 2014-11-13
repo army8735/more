@@ -185,7 +185,7 @@ var global = {
         eventbus.emit(node.nid());
         var token = node.token();
         //标识下一个string是否自动拆分
-        if(token.content() == '~') {
+        if(token.content() == '~' && token.type() != Token.HACK) {
           self.autoSplit = true;
           ignore(token, self.ignores, self.index);
         }
