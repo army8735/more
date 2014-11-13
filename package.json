@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "clean-css": "^2.2.16",
-    "homunculus": "^0.6.4"
+    "homunculus": "^0.6.5"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
