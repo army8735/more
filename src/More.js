@@ -336,14 +336,14 @@ class More {
     var last = node.last();
     var prev = last.prev();
     //当多级block的最后一个是styleset或}，会造成空白样式
-    if(prev.name() == Node.STYLESET) {
+    if(prev.name() == Node.STYLESET && node.parent().name() == Node.STYLESET) {
       eventbus.on(last.nid(), function() {
         ignore(last, self.ignores, self.index);
       });
     }
     var s = concatSelector(this.selectorStack);
     var first = node.leaf(1);
-    if(first.name() == Node.STYLESET) {
+    if(first.name() == Node.STYLESET && node.parent().name() == Node.STYLESET) {
       eventbus.on(first.prev().nid(), function() {
         ignore(first.prev(), self.ignores, self.index);
       });

@@ -380,11 +380,11 @@ describe('simple test', function() {
     expect(res.indexOf('Error:')).to.eql(0);
   });
   it('new kw', function() {
-    More.addKeyword('dd');
+    More.addKeyword('armyarmyarmy');
     var more = new More();
-    var s = 'html{dd:1}body{@extend html}';
+    var s = 'html{armyarmyarmy:1}body{@extend html}';
     var res = more.parse(s);
-    expect(res).to.eql('html{dd:1}body{dd:1;}');
+    expect(res).to.eql('html{armyarmyarmy:1}body{armyarmyarmy:1;}');
   });
   it('#parseFile when error', function() {
     var more = new More();
@@ -767,10 +767,57 @@ describe('ignore source css', function() {
     var res = more.parse(s);
     expect(res).to.eql(s);
   });
+  it('~hack', function() {
+    var more = new More();
+    var s = '~a{}';
+    var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
+  it.skip('/ in font', function() {
+    var more = new More();
+    var s = 'a{font:0/0 a}';
+    var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
   it(':hover', function() {
     var more = new More();
     var s = 'html :hover { margin: 1px; }';
     var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('960', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'file/960.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    //fs.writeFileSync(path.join(__dirname, 'file/960-res.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(s);
+  });
+  it('animate', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'file/animate.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    //fs.writeFileSync(path.join(__dirname, 'file/960-res.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(s);
+  });
+  it('blueprint', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'file/blueprint.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    //fs.writeFileSync(path.join(__dirname, 'file/blueprint-res.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(s);
+  });
+  it.skip('bootstrap', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'file/bootstrap.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    fs.writeFileSync(path.join(__dirname, 'file/bootstrap-res.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(s);
+  });
+  it.skip('font-awesome', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'file/font-awesome.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    //fs.writeFileSync(path.join(__dirname, 'file/font-awesome-res.css'), res, { encoding: 'utf-8' });
     expect(res).to.eql(s);
   });
 });
