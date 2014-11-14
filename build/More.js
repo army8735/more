@@ -580,8 +580,8 @@ var global = {
 
 exports.default=More;
 
-function inFn(node, res) {
-  if(res===void 0)res={res:false};while(node = node.parent()) {
+function inFn(node) {
+  while(node = node.parent()) {
     if(node.name() == Node.FN) {
       return true;
     }

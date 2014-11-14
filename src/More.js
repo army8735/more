@@ -580,7 +580,7 @@ class More {
 
 export default More;
 
-function inFn(node, res = { res: false }) {
+function inFn(node) {
   while(node = node.parent()) {
     if(node.name() == Node.FN) {
       return true;
