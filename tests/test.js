@@ -791,6 +791,12 @@ describe('ignore source css', function() {
     var res = more.parse(s);
     expect(res).to.eql(s);
   });
+  it('@import .css?', function() {
+    var more = new More();
+    var s = '@import url(a.css?123);';
+    var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
   it('960', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/960.css'), { encoding: 'utf-8' });
     var more = new More();
@@ -833,7 +839,7 @@ describe('ignore source css', function() {
     //fs.writeFileSync(path.join(__dirname, 'file/foundation-res.css'), res, { encoding: 'utf-8' });
     expect(res).to.eql(s);
   });
-  it.skip('gumby', function() {
+  it('gumby', function() {
     var s = fs.readFileSync(path.join(__dirname, 'file/gumby.css'), { encoding: 'utf-8' });
     var more = new More();
     var res = more.parse(s);

@@ -207,7 +207,9 @@ class More {
           }
           else {
             var str = getVar(token, self.varHash, global.vars);
-            if(token.import) {
+            //有@import url(xxx.css?xxx)的写法，需忽略
+            if(token.import && str.indexOf('.css?') == -1) {
+              //非.xxx结尾加上.css，非.css结尾替换掉.xxx为.css
               if(!/\.\w+['"]?$/.test(str)) {
                 str = str.replace(/(['"]?)$/, '.css$1');
               }
