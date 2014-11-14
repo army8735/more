@@ -1,7 +1,7 @@
 A css pre-compiler & radical-compressor
 ====
 
-相对于less，more的命名意思是比原本的css多做了一点点
+相对于less，more的命名意思是比原本的css多做了一点点。
 
 [![NPM version](https://badge.fury.io/js/more-css.png)](https://npmjs.org/package/more-css)
 [![Build Status](https://travis-ci.org/army8735/more.svg?branch=master)](https://travis-ci.org/army8735/more)
@@ -10,7 +10,8 @@ A css pre-compiler & radical-compressor
 
 more定位于普通产品简化开发位置，而非广义CSS下游框架重量级功能。more的设计严格遵循css标准规范并进行扩展。
 
-目前提供层级功能、子文件拆分（实际上就是原标准的@import语法）、层级变量、自动拆分字符串、@extend深继承、函数混入、四则运算；还有css激进压缩器。
+目前提供层级功能、子文件拆分（实际上就是原标准的@import语法）、层级变量、自动拆分字符串、深继承、函数混入、四则运算；还有css激进压缩器。
+对于没用到这些功能的css代码，more会智能识别不变更。more不会动普通的css代码。
 
 详细见：https://github.com/army8735/more/wiki/document
 
@@ -59,6 +60,7 @@ npm install more-css
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
 * 依赖的语法解析器来自于`homunculus`：https://github.com/army8735/homunculus
 * 在线地址：http://army8735.me/more/demo/
+* 压缩率对比：http://goalsmashers.github.io/css-minification-benchmark/
 
 # License
 [MIT License]
