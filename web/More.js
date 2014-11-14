@@ -252,9 +252,10 @@ var global = {
         case Node.MTPLEXPR:
         case Node.PRMREXPR:
           var parent = node.parent();
-          if([Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1
+          if([Node.CALC, Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1
             && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
-            && !inFn(parent)) {
+            && !inFn(parent)
+            && parent.parent().name() != Node.EXPR) {
             var opt = operate(node, self.varHash, global.vars);
             self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);

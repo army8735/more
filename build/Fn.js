@@ -76,10 +76,14 @@ var Node = homunculus.getClass('node', 'css');
         case Node.ADDEXPR:
         case Node.MTPLEXPR:
         case Node.PRMREXPR:
-          var opt = operate(node, newVarHash, globalHash);
-          self.res += opt.value + opt.unit;
-          self.index2 = ignore(node, ignores, self.index2);
-          return;
+          var parent = node.parent();
+          if(parent.name() != Node.CALC && parent.parent().name() != Node.EXPR) {
+            var opt = operate(node, newVarHash, globalHash);
+            self.res += opt.value + opt.unit;
+            self.index2 = ignore(node, ignores, self.index2);
+            return;
+          }
+          break;
       }
       node.leaves().forEach(function(leaf) {
         self.recursion(leaf, ignores, newVarHash, globalHash);
