@@ -759,6 +759,13 @@ describe('config', function() {
     var res = more.parseFile(path.join(__dirname, './root.css'), true);
     expect(res).to.eql('html{margin:0}');
   });
+  it('global mix', function() {
+    More.config('$a = 1;fn1(){padding:0}.test{color:#000}');
+    More.config('$b = 2;fn2(){padding:1}.test2{color:#f00}', true);
+    var s = 'html{margin:$a $b;fn1();fn2();@extend .test;@extend .test2}';
+    var res = More.parse(s);
+    expect(res).to.eql('html{margin:1 2;padding:0;padding:1;color:#000;color:#f00;}');
+  });
 });
 describe('ignore source css', function() {
   it('normal', function() {
@@ -782,6 +789,12 @@ describe('ignore source css', function() {
   it('+-*/ in calc', function() {
     var more = new More();
     var s = 'a{margin:calc(1 + 2/3);}';
+    var res = more.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('+-*/ in expression', function() {
+    var more = new More();
+    var s = '@media (min--moz-device-pixel-ratio: 2/1){p{background:url(x)}}';
     var res = more.parse(s);
     expect(res).to.eql(s);
   });

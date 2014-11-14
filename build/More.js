@@ -513,7 +513,7 @@ var global = {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.var[k] = o[k];
+          global.vars[k] = o[k];
         });
       }
       else {
@@ -550,6 +550,9 @@ var global = {
   }
   More.config=function(str, mix) {
     if(str) {
+      if(!mix) {
+        More.clean();
+      }
       var more = new More();
       more.parse(str);
       More.vars(more.vars(), mix);
@@ -562,13 +565,9 @@ var global = {
     return More.config(fs.readFileSync(file, { encoding: 'utf-8' }), mix);
   }
   More.clean=function() {
-    global = {
-      vars: {},
-      fns: {},
-      styles: {},
-      suffix: 'css',
-      root: ''
-    };
+    global.vars = {};
+    global.fns = {};
+    global.styles = {};
     return global;
   }
   More.addKeyword=function(kw) {
