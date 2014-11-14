@@ -127,6 +127,12 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('body{font-family:"Arail","verdana"}');
   });
+  it('~ autoSplit in fn', function() {
+    var more = new More();
+    var s = '$fn(){~font-family:~"Arail, verdana"}body{$fn()}';
+    var res = more.parse(s);
+    expect(res).to.eql('body{~font-family:"Arail","verdana"}');
+  });
   it('fndecl', function() {
     var more = new More();
     var s = 'fn(){margin:0}\nbody{margin:0}';
