@@ -1,7 +1,7 @@
 var homunculus=require('homunculus');
 var operate=function(){var _0=require('./operate');return _0.hasOwnProperty("operate")?_0.operate:_0.hasOwnProperty("default")?_0.default:_0}();
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 var index;

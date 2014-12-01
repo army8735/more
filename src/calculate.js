@@ -1,7 +1,7 @@
 module homunculus from 'homunculus';
 import operate from './operate';
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 var index;

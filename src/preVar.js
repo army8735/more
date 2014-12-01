@@ -2,7 +2,7 @@ module homunculus from 'homunculus';
 import ignore from './ignore';
 import calculate from './calculate';
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 var index;

@@ -2,7 +2,7 @@ var homunculus=require('homunculus');
 var ignore=function(){var _0=require('./ignore');return _0.hasOwnProperty("ignore")?_0.ignore:_0.hasOwnProperty("default")?_0.default:_0}();
 var calculate=function(){var _1=require('./calculate');return _1.hasOwnProperty("calculate")?_1.calculate:_1.hasOwnProperty("default")?_1.default:_1}();
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 var index;

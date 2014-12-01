@@ -1,6 +1,6 @@
 module homunculus from 'homunculus';
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 function concat(arr, res = [], index = 0, temp = '') {

@@ -6,7 +6,7 @@ var clone=function(){var _3=require('./clone');return _3.hasOwnProperty("clone")
 var calculate=function(){var _4=require('./calculate');return _4.hasOwnProperty("calculate")?_4.calculate:_4.hasOwnProperty("default")?_4.default:_4}();
 var operate=function(){var _5=require('./operate');return _5.hasOwnProperty("operate")?_5.operate:_5.hasOwnProperty("default")?_5.default:_5}();
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 

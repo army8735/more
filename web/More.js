@@ -18,7 +18,7 @@ var normalize=function(){var _11=require('./normalize');return _11.hasOwnPropert
 var compress=function(){var _12=require('./compress');return _12.hasOwnProperty("compress")?_12.compress:_12.hasOwnProperty("default")?_12.default:_12}();
 var operate=function(){var _13=require('./operate');return _13.hasOwnProperty("operate")?_13.operate:_13.hasOwnProperty("default")?_13.default:_13}();
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 var global = {

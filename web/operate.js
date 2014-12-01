@@ -1,7 +1,7 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
 var getVar=function(){var _0=require('./getVar');return _0.hasOwnProperty("getVar")?_0.getVar:_0.hasOwnProperty("default")?_0.default:_0}();
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 exports.default=function(node, varHash, globalHash) {

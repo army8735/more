@@ -6,7 +6,7 @@ import clone from './clone';
 import calculate from './calculate';
 import operate from './operate';
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 class Fn {

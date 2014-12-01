@@ -6,7 +6,7 @@ import Impact from './Impact';
 
 module homunculus from 'homunculus';
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 export default function(code, options, radical) {

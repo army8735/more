@@ -1,7 +1,7 @@
 module homunculus from 'homunculus';
 import getVar from './getVar';
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 export default function(node, varHash, globalHash) {

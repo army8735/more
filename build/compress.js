@@ -6,7 +6,7 @@ var Impact=function(){var _4=require('./Impact');return _4.hasOwnProperty("Impac
 
 var homunculus=require('homunculus');
 
-var Token = homunculus.getClass('token');
+var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 exports.default=function(code, options, radical) {
