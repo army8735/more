@@ -74,10 +74,9 @@ var tempValue;
   }
   Compress.prototype.joinHead = function(node) {
     var self = this;
-    var isToken = node.name() == Node.TOKEN;
-    if(isToken) {
+    if(node.isToken()) {
       var token = node.token();
-      if(token.type() != Token.VIRTUAL) {
+      if(!token.isVirtual()) {
         self.head += token.content();
         while(self.ignores[++self.index]) {
           var ig = self.ignores[self.index];
@@ -115,10 +114,9 @@ var tempValue;
   }
   Compress.prototype.rb = function(node, item, isSelector, isStyle, isKey, isValue) {
     var self = this;
-    var isToken = node.name() == Node.TOKEN;
-    if(isToken) {
+    if(node.isToken()) {
       var token = node.token();
-      if(token.type() != Token.VIRTUAL) {
+      if(!token.isVirtual()) {
         var s = token.content();
         if(isSelector) {
           tempSelector += s;

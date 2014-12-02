@@ -178,12 +178,10 @@ class More {
   }
   join(node) {
     var self = this;
-    var isToken = node.name() == Node.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(isToken) {
-      if(!isVirtual) {
+    if(node.isToken()) {
+      var token = node.token();
+      if(!token.isVirtual()) {
         eventbus.emit(node.nid());
-        var token = node.token();
         //标识下一个string是否自动拆分
         if(token.content() == '~' && token.type() != Token.HACK) {
           self.autoSplit = true;

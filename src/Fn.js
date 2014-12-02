@@ -54,12 +54,10 @@ class Fn {
   }
   recursion(node, ignores, newVarHash, globalHash) {
     var self = this;
-    var isToken = node.name() == Node.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(isToken) {
-      if(!isVirtual) {
+    if(node.isToken()) {
+      var token = node.token();
+      if(!token.isVirtual()) {
         if(self.flag) {
-          var token = node.token();
           if(token.content() == '~' && token.type() != Token.HACK) {
             self.autoSplit = true;
           }
