@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-	var Token = require('lexer/Token');
+	var Token = require('lexer/CssToken');
 	function escapeHtml(str) {
 		var xmlchar = {
 			"&": "&amp;",
