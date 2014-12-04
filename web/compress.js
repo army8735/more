@@ -1,8 +1,6 @@
 define(function(require, exports, module){var Clean=function(){var _0=require('clean-css');return _0.hasOwnProperty("Clean")?_0.Clean:_0.hasOwnProperty("default")?_0.default:_0}();
 var sort=function(){var _1=require('./sort');return _1.hasOwnProperty("sort")?_1.sort:_1.hasOwnProperty("default")?_1.default:_1}();
-var CalArea=function(){var _2=require('./CalArea.js');return _2.hasOwnProperty("CalArea")?_2.CalArea:_2.hasOwnProperty("default")?_2.default:_2}();
-var Impact=function(){var _3=require('./Impact');return _3.hasOwnProperty("Impact")?_3.Impact:_3.hasOwnProperty("default")?_3.default:_3}();
-var RegionCompress=function(){var _4=require('./RegionCompress');return _4.hasOwnProperty("RegionCompress")?_4.RegionCompress:_4.hasOwnProperty("default")?_4.default:_4}();
+var RegionCompress=function(){var _2=require('./RegionCompress');return _2.hasOwnProperty("RegionCompress")?_2.RegionCompress:_2.hasOwnProperty("default")?_2.default:_2}();
 
 var homunculus=require('homunculus');
 
@@ -31,8 +29,6 @@ var tempValue;
     this.options = options;
     this.radical = radical;
     this.head = '';
-    this.insert = {};
-    this.impact = new Impact();
   }
   Compress.prototype.compress = function() {
     try {

@@ -1,7 +1,5 @@
 import Clean from 'clean-css';
 import sort from './sort';
-import CalArea from './CalArea.js';
-import Impact from './Impact';
 import RegionCompress from './RegionCompress';
 
 module homunculus from 'homunculus';
@@ -31,8 +29,6 @@ class Compress {
     this.options = options;
     this.radical = radical;
     this.head = '';
-    this.insert = {};
-    this.impact = new Impact();
   }
   compress() {
     try {
