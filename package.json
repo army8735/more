@@ -1,6 +1,6 @@
 {
   "name": "more-css",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "a css pre-compiler & agressive compressor",
   "maintainers": [
     {
@@ -35,7 +35,7 @@
     }
   },
   "dependencies": {
-    "clean-css": "^2.2.19",
+    "clean-css": "^2.2.20",
     "homunculus": "^0.7.0"
   },
   "devDependencies": {

@@ -61,6 +61,10 @@ describe('cleanCss', function() {
     var s = '*(#(*{{{';
     expect(More.compress(s).indexOf('Error') > -1).to.be.ok();
   });
+  it('in @media', function() {
+    var s = '@media all and (width:1024px){body{color:#f33}body{margin:0}}';
+    expect(More.compress(s, true)).to.eql('@media all and (width:1024px){body{color:#f33;margin:0}}');
+  });
 });
 describe('ignore head', function() {
   it('normal', function() {
@@ -196,6 +200,32 @@ describe('extract', function() {
   it('multi 5', function() {
     var s = '.a{margin:0;padding:0;width:0;height:0;color:#FFF}.b{margin:1;padding:2;width:0;height:3;color:#000}.c{margin:0;padding:1;width:2;height:2;color:#FFF}.d{margin:3;padding:1;width:3;height:0;color:#FFF}.e{margin:1;padding:1;width:0;height:0;color:#000}.f{margin:1;padding:0;width:0;height:3;color:#000}.g{margin:0;padding:0;width:2;height:1color:#FFF}';
     expect(More.compress(s, true)).to.eql('.a,.b{width:0}.a{color:#FFF;height:0;margin:0;padding:0}.b{color:#000;height:3;margin:1;padding:2}.c,.d{color:#FFF;padding:1}.c{height:2;margin:0;width:2}.d,.e{height:0}.d{margin:3;width:3}.e,.f{width:0;color:#000;margin:1}.e{padding:1}.f,.g{padding:0}.f{height:3}.g{height:1color:#FFF;margin:0;width:2}');
+  });
+});
+describe('@media', function() {
+  it('single', function() {
+    var s = '@media all and (width:1024px){body{color:#f33}}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
+  it('multi same', function() {
+    var s = '@media all and (width:1024px){body{color:#f33}}@media all and (width:1024px){div{color:#f33}}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
+  it('merge', function() {
+    var s = '@media all and (width:1024px){html{margin:0}div{padding:1}html{padding:0}}';
+    expect(More.compress(s, true)).to.eql('@media all and (width:1024px){div{padding:1}html{margin:0;padding:0}}');
+  });
+  it('union', function() {
+    var s = '@media all and (width:1024px){html{margin:0;padding:0}div{margin:0}body{margin:0;padding:0}}';
+    expect(More.compress(s, true)).to.eql('@media all and (width:1024px){body,html{margin:0;padding:0}div{margin:0}}');
+  });
+  it('extract', function() {
+    var s = '@media all and (width:1024px){.a{margin:0;padding:0}.b{margin:0;border:none}}';
+    expect(More.compress(s, true)).to.eql('@media all and (width:1024px){.a,.b{margin:0}.a{padding:0}.b{border:none}}');
+  });
+  it('multi cross', function() {
+    var s = '@media all{.a{margin:0;padding:0}.b{margin:0;border:none}}body{margin:0}@media (width:1024px){body{color:#f33}}html{padding:0}';
+    expect(More.compress(s, true)).to.eql('@media all{.a,.b{margin:0}.a{padding:0}.b{border:none}}body{margin:0}@media (width:1024px){body{color:#f33}}html{padding:0}');
   });
 });
 describe('file', function() {
