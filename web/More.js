@@ -571,8 +571,8 @@ var global = {
   More.addKeyword=function(kw) {
     homunculus.getClass('rule', 'css').addKeyWord(kw);
   }
-  More.compress=function(code, radical) {
-    return compress(code, radical);
+  More.compress=function(code, options, radical) {
+    return compress(code, options, radical);
   }
 
 

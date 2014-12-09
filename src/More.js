@@ -571,8 +571,8 @@ class More {
   static addKeyword(kw) {
     homunculus.getClass('rule', 'css').addKeyWord(kw);
   }
-  static compress(code, radical) {
-    return compress(code, radical);
+  static compress(code, options, radical) {
+    return compress(code, options, radical);
   }
 }
 

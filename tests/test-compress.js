@@ -314,3 +314,9 @@ describe('file', function() {
     //fs.writeFileSync(path.join(__dirname, 'file/reset-res2.css'), res2.replace(/}/g, '}\n'), { encoding: 'utf-8' });
   });
 });
+describe('options', function() {
+  it('has', function() {
+    var s = '.a{margin:0;padding:0}.b{margin:0;border:none}';
+    expect(More.compress(s, {}, true)).to.eql('.a,.b{margin:0}.a{padding:0}.b{border:none}');
+  });
+});
