@@ -129,6 +129,18 @@ describe('merge', function() {
     var s = 'html{margin:0}div{padding:1\\0}html{padding:0}';
     expect(More.compress(s, true)).to.eql('div{padding:1\\0}html{margin:0;padding:0}');
   });
+  it('split by child selector', function() {
+    var s = 'html{margin:0}html body{margin:1;padding:1}html{padding:0}';
+    expect(More.compress(s, true)).to.eql('html{margin:0;padding:0}html body{margin:1;padding:1}');
+  });
+  it('split by children selector fail', function() {
+    var s = 'html{margin:0}div,html body{margin:1;padding:1}html{padding:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
+  it('split by father selector', function() {
+    var s = 'html body{margin:0}html{margin:1;padding:1}html body{padding:0}';
+    expect(More.compress(s, true)).to.eql('html body{margin:0;padding:0}html{margin:1;padding:1}');
+  });
 });
 describe('union', function() {
   it('confilct', function() {

@@ -40,6 +40,10 @@ define(function(require, exports, module){var KEY_HASH=function(){var _0=require
       if(first < last) {
         for(var i = first + 1; i < last; i++) {
           var item = list[i];
+          if(this.isChildren(item, list[last])) {
+            this.imCache[i + ',' + last] = true;
+            continue;
+          }
           var styles = item.styles;
           for(var j = 0, len = styles.length; j < len; j++) {
             var style = styles[j];
@@ -66,6 +70,10 @@ define(function(require, exports, module){var KEY_HASH=function(){var _0=require
       else {
         for(var i = first - 1; i > last; i--) {
           var item = list[i];
+          if(this.isChildren(item, list[last])) {
+            this.imCache[i + ',' + last] = true;
+            continue;
+          }
           var styles = item.styles;
           for(var j = 0, len = styles.length; j < len; j++) {
             var style = styles[j];
@@ -104,6 +112,20 @@ define(function(require, exports, module){var KEY_HASH=function(){var _0=require
         delete self.imCache[key];
       }
     });
+  }
+  Impact.prototype.isChildren = function(first, last) {
+    //两个选择器完全互为对方的子选择器则返回true
+    for(var i = 0, len = first.selectors.length; i < len; i++) {
+      var selector1 = first.selectors[i];
+      for(var j = 0, len2 = last.selectors.length; j < len2; j++) {
+        var selector2 = last.selectors[j];
+        if(selector1.indexOf(selector2) > -1 || selector2.indexOf(selector1) > -1) {
+          continue;
+        }
+        return false;
+      }
+    }
+    return true;
   }
 
 
