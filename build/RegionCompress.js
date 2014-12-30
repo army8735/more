@@ -26,6 +26,7 @@ var Node = homunculus.getClass('node', 'css');
     this.merge(this.list, true);
     this.preJoin(this.list);
     this.union(this.list);
+    this.union(this.list, true);
     this.preRelease(this.list);
     this.extract(this.list);
     return this.join(this.list);
@@ -103,29 +104,53 @@ var Node = homunculus.getClass('node', 'css');
     });
   }
   //聚合相同样式的选择器
-  RegionCompress.prototype.union = function(list) {
+  RegionCompress.prototype.union = function(list, direction) {
     var res = false;
-    outer:
-      for(var i = 0; i < list.length - 1; i++) {
-        for(var j = i + 1; j < list.length; j++) {
-          if(list[i].value == list[j].value) {
-            if(this.impact.noImpact(list, i, j)) {
-              list[i].selectors = list[i].selectors.concat(list[j].selectors);
-              sort(list[i].selectors);
-              list[i].s2s = list[i].selectors.join(',');
-              list.splice(j, 1);
-              this.impact.upCache(j);
-              j--;
-              res = true;
-            }
-            else {
-              continue outer;
+    if(direction) {
+      outer:
+        for(var i = list.length - 1; i > 0; i--) {
+          for(var j = i - 1; j >= 0; j--) {
+            if(list[i].value == list[j].value) {
+              if(this.impact.noImpact(list, i, j)) {
+                list[i].selectors = list[i].selectors.concat(list[j].selectors);
+                sort(list[i].selectors);
+                list[i].s2s = list[i].selectors.join(',');
+                list.splice(j, 1);
+                this.impact.upCache(j);
+                i--;
+                j--;
+                res = true;
+              }
+              else {
+                continue outer;
+              }
             }
           }
         }
-      }
+    }
+    else {
+      outer:
+        for(var i = 0; i < list.length - 1; i++) {
+          for(var j = i + 1; j < list.length; j++) {
+            if(list[i].value == list[j].value) {
+              if(this.impact.noImpact(list, i, j)) {
+                list[i].selectors = list[i].selectors.concat(list[j].selectors);
+                sort(list[i].selectors);
+                list[i].s2s = list[i].selectors.join(',');
+                list.splice(j, 1);
+                this.impact.upCache(j);
+                j--;
+                res = true;
+              }
+              else {
+                continue outer;
+              }
+            }
+          }
+        }
+    }
     if(res) {
-      this.union(list);
+      this.union(list, direction);
     }
   }
   //提取公因子

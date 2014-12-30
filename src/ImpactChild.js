@@ -32,6 +32,10 @@ class ImpactChild {
       };
       for(var i = first + 1; i < last; i++) {
         var item = list[i];
+        if(this.isChildren(item, list[last])) {
+          this.imCache[i + ',' + last + ',' + child] = true;
+          continue;
+        }
         var styles = item.styles;
         for(var j = 0, len = styles.length; j < len; j++) {
           var style = styles[j];
@@ -56,6 +60,20 @@ class ImpactChild {
       }
     }
     this.imCache[first + ',' + last + ',' + child] = true;
+    return true;
+  }
+  isChildren(first, last) {
+    //两个选择器完全互为对方的子选择器则返回true
+    for(var i = 0, len = first.selectors.length; i < len; i++) {
+      var selector1 = first.selectors[i];
+      for(var j = 0, len2 = last.selectors.length; j < len2; j++) {
+        var selector2 = last.selectors[j];
+        if(selector1.indexOf(selector2) > -1 || selector2.indexOf(selector1) > -1) {
+          continue;
+        }
+        return false;
+      }
+    }
     return true;
   }
 }
