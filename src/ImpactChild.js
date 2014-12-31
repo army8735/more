@@ -32,7 +32,7 @@ class ImpactChild {
       };
       for(var i = first + 1; i < last; i++) {
         var item = list[i];
-        if(this.isChildren(item, list[last])) {
+        if(this.isChildren(item, list[last]) || this.isChildren(item, list[first])) {
           this.imCache[i + ',' + last + ',' + child] = true;
           continue;
         }

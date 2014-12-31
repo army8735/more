@@ -225,18 +225,18 @@ describe('extract', function() {
     var s = '.a{margin:0;padding:0;width:0;height:0;color:#FFF}.b{margin:1;padding:2;width:0;height:3;color:#000}.c{margin:0;padding:1;width:2;height:2;color:#FFF}.d{margin:3;padding:1;width:3;height:0;color:#FFF}.e{margin:1;padding:1;width:0;height:0;color:#000}.f{margin:1;padding:0;width:0;height:3;color:#000}.g{margin:0;padding:0;width:2;height:1color:#FFF}';
     expect(More.compress(s, true)).to.eql('.a,.b{width:0}.a{color:#FFF;height:0;margin:0;padding:0}.b{color:#000;height:3;margin:1;padding:2}.c,.d{color:#FFF;padding:1}.c{height:2;margin:0;width:2}.d,.e{height:0}.d{margin:3;width:3}.e,.f{width:0;color:#000;margin:1}.e{padding:1}.f,.g{padding:0}.f{height:3}.g{height:1color:#FFF;margin:0;width:2}');
   });
-  //it.only('split by child selector', function() {
-  //  var s = '.a{margin:0;padding:0}.a .b{margin:1;padding:1}.c{margin:0;padding:0}';
-  //  expect(More.compress(s, true)).to.eql(s);
-  //});
-  //it('split by children selector fail', function() {
-  //  var s = '.a{margin:0;padding:0}.d{margin:1}.c{margin:0;padding:0}';
-  //  expect(More.compress(s, true)).to.eql(s);
-  //});
-  //it('split by father selector', function() {
-  //  var s = 'html body{margin:0}html{margin:1;padding:1}html body{padding:0}';
-  //  expect(More.compress(s, true)).to.eql('html body{margin:0;padding:0}html{margin:1;padding:1}');
-  //});
+  it('split by child selector', function() {
+    var s = '.a{margin:0;padding:0}.a .b{margin:1}.c{margin:0}';
+    expect(More.compress(s, true)).to.eql('.a,.c{margin:0}.a{padding:0}.a .b{margin:1}');
+  });
+  it('split by children selector fail', function() {
+    var s = '.a{margin:0;padding:0}.a .b,.d{margin:1}.c{margin:0}';
+    expect(More.compress(s, true)).to.eql(s);
+  });
+  it('split by father selector', function() {
+    var s = '.a{margin:0;padding:0}.a .b{margin:1}.c{margin:0}';
+    expect(More.compress(s, true)).to.eql('.a,.c{margin:0}.a{padding:0}.a .b{margin:1}');
+  });
 });
 describe('@media', function() {
   it('single', function() {
