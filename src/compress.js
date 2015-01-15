@@ -31,11 +31,7 @@ class Compress {
     this.head = '';
   }
   compress() {
-    try {
-      this.code = (new Clean(this.options)).minify(this.code);
-    } catch(e) {
-      return e.toString();
-    }
+    this.code = (new Clean(this.options)).minify(this.code).styles;
     if(!this.radical) {
       return this.code;
     }

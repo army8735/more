@@ -59,7 +59,7 @@ describe('cleanCss', function() {
   });
   it('error', function() {
     var s = '*(#(*{{{';
-    expect(More.compress(s).indexOf('Error') > -1).to.be.ok();
+    expect(More.compress(s)).to.not.eql(s);
   });
   it('in @media', function() {
     var s = '@media all and (width:1024px){body{color:#f33}body{margin:0}}';
