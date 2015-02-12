@@ -901,7 +901,7 @@ describe('ignore source css', function() {
     expect(res).to.eql(s);
   });
 });
-describe.only('map', function() {
+describe('map', function() {
   it('hash', function() {
     More.map({
       'a.css': 'b"\'.css'
