@@ -901,3 +901,39 @@ describe('ignore source css', function() {
     expect(res).to.eql(s);
   });
 });
+describe.only('map', function() {
+  it('hash', function() {
+    More.map({
+      'a.css': 'b"\'.css'
+    });
+    var more = new More();
+    var s = '@import url(a.css);';
+    var res = more.parse(s);
+    expect(res).to.eql('@import url(b"\'.css);');
+  });
+  it('function', function() {
+    More.map(function(url) {
+      return '1' + url;
+    });
+    var more = new More();
+    var s = '@import "a.less";';
+    var res = more.parse(s);
+    expect(res).to.eql('@import "1a.css";');
+  });
+  it('file hash', function() {
+    More.map({
+      'x.css': 'b.css'
+    });
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './a.css'), true);
+    expect(res).to.eql('a{}');
+  });
+  it('file function', function() {
+    More.map(function() {
+      return 'c.css';
+    });
+    var more = new More();
+    var res = more.parseFile(path.join(__dirname, './a.css'), true);
+    expect(res).to.eql('b{}');
+  });
+});

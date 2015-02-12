@@ -26,7 +26,8 @@ var global = {
   fns: {},
   styles: {},
   suffix: 'css',
-  root: ''
+  root: '',
+  map: null
 };
 
 
@@ -74,6 +75,15 @@ var global = {
       };
       var list = [];
       self.imports().forEach(function(im) {
+        if(global.map) {
+          //映射类型可能是回调
+          if(typeof global.map == 'function') {
+            im = global.map(im);
+          }
+          else if(global.map.hasOwnProperty(im)){
+            im = global.map[im];
+          }
+        }
         if(global.suffix != 'css') {
           im = im.replace(/\.\w+$/, '.' + global.suffix);
         }
@@ -205,6 +215,25 @@ var global = {
           }
           else {
             var str = getVar(token, self.varHash, global.vars);
+            //map映射url
+            if(token.import && global.map) {
+              var quote = /^['"']/.test(str) ? str.charAt(0) : '';
+              var val = quote ? str.slice(1, str.length - 1) : str;
+              //映射类型可能是回调
+              if(typeof global.map == 'function') {
+                str = global.map(val);
+                //如有引号，需处理转义
+                if(quote) {
+                  str = quote + str + quote;
+                }
+              }
+              else if(global.map.hasOwnProperty(token.val())){
+                str = global.map[val];
+                if(quote) {
+                  str = quote + str + quote;
+                }
+              }
+            }
             //有@import url(xxx.css?xxx)的写法，需忽略
             if(token.import && str.indexOf('.css?') == -1) {
               //非.xxx结尾加上.css，非.css结尾替换掉.xxx为.css
@@ -573,6 +602,12 @@ var global = {
   }
   More.compress=function(code, options, radical) {
     return compress(code, options, radical);
+  }
+  More.map=function(data) {
+    if(typeof data != 'undefined') {
+      global.map = data;
+    }
+    return global.map;
   }
 
 

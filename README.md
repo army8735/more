@@ -55,6 +55,7 @@ npm install more-css
 * addKeyWord(kw:String/Array<String>):void 添加未知的css属性关键字以支持分析
 * compress(code:String, radical:Boolean = false):String 基于clean-css压缩css代码，radical表明是否使用激进安全算法
 * compress(code:String, options:Object = { processImport: false }, radical:Boolean = false):String 同上，增加options选项，传给clean-css
+* map(data:Object/Function):Object/Function 全局设置/读取映射表，用以将@import的文件名作匹配替换处理
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
