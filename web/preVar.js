@@ -18,6 +18,7 @@ function recursion(node, ignores, varHash, globalHash) {
       var k = leaves[0].token().content().slice(1);
       varHash[k] = calculate(leaves[2], ignores, i, varHash, globalHash);
       index = ignore(node, ignores, index);
+      index = ignore(node.next(), ignores, index);
     }
     else {
       node.leaves().forEach(function(leaf) {
