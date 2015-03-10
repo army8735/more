@@ -17,6 +17,8 @@ import checkLevel from './checkLevel';
 import normalize from './normalize';
 import compress from './compress';
 import operate from './operate';
+import ifstmt from './ifstmt';
+import forstmt from './forstmt';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -290,6 +292,12 @@ class More {
             ignore(node, self.ignores, self.index);
           }
           break;
+        case Node.IFSTMT:
+          self.res += ifstmt(node, self.ignores, self.index, self.fnHash, global.fns, self.varHash, global.vars);
+          break;
+        case Node.FORSTMT:
+          self.res += forstmt(node, self.ignores, self.index, self.fnHash, global.fns, self.varHash, global.vars);
+          break;
       }
       //递归子节点
       var leaves = node.leaves();
@@ -331,7 +339,7 @@ class More {
         }
       }
       //存储当前层级父选择器集合
-      var s = join(node.first(), self.ignores, self.index, true);
+      var s = join(node.first(), self.ignores, self.index, true).str;
       self.selectorStack.push(s.split(','));
     }
     else {
@@ -392,7 +400,7 @@ class More {
     ignore(node, self.ignores, self.index);
     var i = self.index;
     while(self.ignores[++i]) {}
-    var s = normalize(join(node.leaf(1), self.ignores, i));
+    var s = normalize(join(node.leaf(1), self.ignores, i).str);
     var targets = s.split(',');
     targets.forEach(function(se) {
       self.res += self.styleHash[se] || '';

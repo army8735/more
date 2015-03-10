@@ -17,6 +17,8 @@ var checkLevel=function(){var _10=require('./checkLevel');return _10.hasOwnPrope
 var normalize=function(){var _11=require('./normalize');return _11.hasOwnProperty("normalize")?_11.normalize:_11.hasOwnProperty("default")?_11.default:_11}();
 var compress=function(){var _12=require('./compress');return _12.hasOwnProperty("compress")?_12.compress:_12.hasOwnProperty("default")?_12.default:_12}();
 var operate=function(){var _13=require('./operate');return _13.hasOwnProperty("operate")?_13.operate:_13.hasOwnProperty("default")?_13.default:_13}();
+var ifstmt=function(){var _14=require('./ifstmt');return _14.hasOwnProperty("ifstmt")?_14.ifstmt:_14.hasOwnProperty("default")?_14.default:_14}();
+var forstmt=function(){var _15=require('./forstmt');return _15.hasOwnProperty("forstmt")?_15.forstmt:_15.hasOwnProperty("default")?_15.default:_15}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -290,6 +292,12 @@ var global = {
             ignore(node, self.ignores, self.index);
           }
           break;
+        case Node.IFSTMT:
+          self.res += ifstmt(node, self.ignores, self.index, self.fnHash, global.fns, self.varHash, global.vars);
+          break;
+        case Node.FORSTMT:
+          self.res += forstmt(node, self.ignores, self.index, self.fnHash, global.fns, self.varHash, global.vars);
+          break;
       }
       //递归子节点
       var leaves = node.leaves();
@@ -331,7 +339,7 @@ var global = {
         }
       }
       //存储当前层级父选择器集合
-      var s = join(node.first(), self.ignores, self.index, true);
+      var s = join(node.first(), self.ignores, self.index, true).str;
       self.selectorStack.push(s.split(','));
     }
     else {
@@ -392,7 +400,7 @@ var global = {
     ignore(node, self.ignores, self.index);
     var i = self.index;
     while(self.ignores[++i]) {}
-    var s = normalize(join(node.leaf(1), self.ignores, i));
+    var s = normalize(join(node.leaf(1), self.ignores, i).str);
     var targets = s.split(',');
     targets.forEach(function(se) {
       self.res += self.styleHash[se] || '';

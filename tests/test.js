@@ -173,7 +173,7 @@ describe('simple test', function() {
     var more = new More();
     var s = 'fn($a){margin:0 $a 1px}body{fn(2%);fn(3%)}';
     var res = more.parse(s);
-    expect(res).to.eql('body{margin:0 2% 1px;;margin:0 3% 1px}');
+    expect(res).to.eql('body{margin:0 2% 1px;margin:0 3% 1px}');
   });
   it('fncall params with operate', function() {
     var more = new More();
@@ -363,7 +363,7 @@ describe('simple test', function() {
   it('#parseFile true', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'), true);
-    expect(res).to.eql('\n\n\n.test1{line-height:1}\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;;line-height:1;}\n.test2{background:#f00}');
+    expect(res).to.eql('\n\n\n.test1{line-height:1}\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
   });
   it('suffix', function() {
     More.suffix('less');
@@ -706,6 +706,14 @@ describe('operate', function() {
     expect(res).to.eql('a{margin:3px 6px}');
   });
 });
+describe('ifstmt', function() {
+  it.skip('only if', function() {
+    var more = new More();
+    var s = '$a:1;@if($a){div{margin:0}}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:0}');
+  });
+});
 describe('config', function() {
   it('code', function() {
     var more = new More();
@@ -726,7 +734,7 @@ describe('config', function() {
     more.config('$a = 1;fn1(){padding:0}.test{color:#000}');
     var s = 'html{margin:$a;fn1();@extend .test}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:1;padding:0;;color:#000;}');
+    expect(res).to.eql('html{margin:1;padding:0;color:#000;}');
   });
   it('overwrite #vars,#fns,#styles', function() {
     var more = new More();
@@ -734,7 +742,7 @@ describe('config', function() {
     more.config('$a = 2;fn1(){padding:1}.test{color:#f00}');
     var s = 'html{margin:$a;fn1();@extend .test}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:2;padding:1;;color:#f00;}');
+    expect(res).to.eql('html{margin:2;padding:1;color:#f00;}');
   });
   it('mix #vars,#fns,#styles', function() {
     var more = new More();
@@ -742,7 +750,7 @@ describe('config', function() {
     more.config('$a = 2;fn1(){padding:1}.test{color:#f00}', true);
     var s = 'html{margin:$a;padding:$b;fn1();fn2();@extend .test;@extend .test2}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:2;padding:2;padding:1;;padding:1;;color:#f00;color:#fff;}');
+    expect(res).to.eql('html{margin:2;padding:2;padding:1;padding:1;color:#f00;color:#fff;}');
   });
   it('#clean', function() {
     var more = new More();
@@ -757,7 +765,7 @@ describe('config', function() {
     var more = new More();
     var s = 'html{margin:$a;fn1();@extend .test}';
     var res = more.parse(s);
-    expect(res).to.eql('html{margin:1;padding:0;;color:#000;}');
+    expect(res).to.eql('html{margin:1;padding:0;color:#000;}');
   });
   it('root', function() {
     More.root(path.join(__dirname, './file'));
@@ -770,7 +778,7 @@ describe('config', function() {
     More.config('$b = 2;fn2(){padding:1}.test2{color:#f00}', true);
     var s = 'html{margin:$a $b;fn1();fn2();@extend .test;@extend .test2}';
     var res = More.parse(s);
-    expect(res).to.eql('html{margin:1 2;padding:0;;padding:1;;color:#000;color:#f00;}');
+    expect(res).to.eql('html{margin:1 2;padding:0;padding:1;color:#000;color:#f00;}');
   });
 });
 describe('ignore source css', function() {

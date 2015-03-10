@@ -30,5 +30,8 @@ export default function(node, ignores, i, excludeLine) {
   str = '';
   index = i;
   recursion(node, ignores, excludeLine);
-  return str;
+  return {
+    str,
+    index
+  };
 }
