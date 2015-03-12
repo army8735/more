@@ -14,7 +14,7 @@ function recursion(node, ignores, res) {
       var leaves = node.leaves();
       var k = leaves[0].token().content();
       res[k] = new Fn(node, ignores, index);
-      index = ignore(node, ignores, index);
+      index = ignore(node, ignores, index).index;
     }
     else {
       node.leaves().forEach(function(leaf) {

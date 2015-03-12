@@ -16,7 +16,7 @@ var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 class Tree {
-  constructor(ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map) {
+  constructor(ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, focus) {
     this.ignores = ignores;
     this.index = index;
     this.varHash = varHash;
@@ -27,6 +27,7 @@ class Tree {
     this.styleTemp = styleTemp;
     this.selectorStack = selectorStack;
     this.map = map;
+    this.focus = focus;
 
     this.res = '';
     this.autoSplit = false;
@@ -45,7 +46,7 @@ class Tree {
         else if(token.type() != Token.STRING) {
           self.autoSplit = false;
         }
-        if(!token.ignore) {
+        if(!token.ignore || self.focus) {
           //~String拆分语法
           if(self.autoSplit && token.type() == Token.STRING) {
             var s = getVar(token, self.varHash, self.globalVar);
@@ -98,7 +99,7 @@ class Tree {
           if(ig.type() == Token.COMMENT && s.indexOf('//') == 0) {
             s = '/*' + s.slice(2) + '*/';
           }
-          if(!ig.ignore) {
+          if(!ig.ignore || self.focus) {
             self.res += s;
           }
         }
@@ -135,18 +136,36 @@ class Tree {
             ignore(node, self.ignores, self.index);
           }
           break;
-        //case Node.IFSTMT:
-        //  self.res += ifstmt(node, self.ignores, self.index, self.fnHash, self.fns, self.varHash, self.vars);
-        //  break;
-        //case Node.FORSTMT:
-        //  self.res += forstmt(node, self.ignores, self.index, self.fnHash, self.fns, self.varHash, self.vars);
-        //  break;
+        case Node.IFSTMT:
+          var temp = ifstmt(
+            node,
+            self.ignores,
+            self.index,
+            self.varHash,
+            self.globalVar,
+            self.fnHash,
+            self.globalFn,
+            self.styleHash,
+            self.styleTemp,
+            self.selectorStack,
+            self.map
+          );
+          self.res += temp.res;
+          self.index = temp.index;
+          break;
+        case Node.FORSTMT:
+          var temp = forstmt(node, self.ignores, self.index, self.fnHash, self.globalFn, self.varHash, self.globalVar);
+          self.res += temp.res;
+          self.index = temp.index;
+          break;
       }
-      //递归子节点
-      var leaves = node.leaves();
-      leaves.forEach(function(leaf) {
-        self.join(leaf);
-      });
+      //递归子节点，if和for忽略
+      if([Node.IFSTMT, Node.FORSTMT].indexOf(node.name()) == -1) {
+        var leaves = node.leaves();
+        leaves.forEach(function(leaf) {
+          self.join(leaf);
+        });
+      }
       eventbus.emit(node.nid(), false);
       switch(node.name()) {
         case Node.STYLESET:
@@ -154,7 +173,7 @@ class Tree {
           break;
       }
     }
-    return { res: this.res, index: this.index };
+    return { res: self.res, index: self.index };
   }
   styleset(start, node) {
     var self = this;

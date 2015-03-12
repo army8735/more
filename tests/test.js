@@ -707,11 +707,17 @@ describe('operate', function() {
   });
 });
 describe('ifstmt', function() {
-  it.skip('only if', function() {
+  it('only if', function() {
     var more = new More();
-    var s = '$a:1;@if($a){div{margin:0}}';
+    var s = '$a:1;@if($a){div{margin:$a}}';
     var res = more.parse(s);
-    expect(res).to.eql('div{margin:0}');
+    expect(res).to.eql('div{margin:1}');
+  });
+  it('else', function() {
+    var more = new More();
+    var s = '@if(0){/*no*/div{margin:0}}@else{div{margin:1}}';
+    var res = more.parse(s);
+    expect(res).to.eql('/*no*/div{margin:1}');
   });
 });
 describe('config', function() {

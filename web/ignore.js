@@ -3,13 +3,20 @@ define(function(require, exports, module){var homunculus=require('homunculus');
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
+var res;
 var index;
 
 function ignore(node, ignores, includeLine) {
   if(node instanceof Token) {
     node.ignore = true;
     while(ignores[++index]) {
-      if(includeLine || ignores[index].content() != '\n') {
+      var ig = ignores[index];
+      var s = ig.content();
+      if(ig.type() == Node.COMMENT && s.indexOf('//') == 0) {
+        s = '/*' + s.slice(2) + '*/';
+      }
+      res += s;
+      if(includeLine || s != '\n') {
         ignores[index].ignore = true;
       }
     }
@@ -25,7 +32,8 @@ function ignore(node, ignores, includeLine) {
 }
 
 exports.default=function(node, ignores, i, includeLine) {
+  res = '';
   index = i;
   ignore(node, ignores, includeLine);
-  return index;
+  return { res:res, index:index };
 };});

@@ -3,27 +3,115 @@ module homunculus from 'homunculus';
 import join from './join';
 import ignore from './ignore';
 import exprstmt from './exprstmt';
+import Tree from './Tree';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-export default function(node, ignores, index, fnHash, globalFn, varHash, globalVar) {
+export default function(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map) {
+  //循环引用fix
+  if(Tree.hasOwnProperty('default')) {
+    Tree = Tree.default;
+  }
+  //忽略掉整个if节点
   ignore(node, ignores, index);
-  //保存索引
-  var i = ignore(node.first(), ignores, index);
-  i = ignore(node.leaf(1), ignores, i);
-  i = ignore(node.leaf(2), ignores, i);
-  i = ignore(node.leaf(3), ignores, i);
+  //保存索引，存储空白符
+  var temp = ignore(node.first(), ignores, index);
+  var s = temp.res;
+  index = temp.index;
+  temp = ignore(node.leaf(1), ignores, index);
+  s += temp.res;
+  index = temp.index;
+  temp = ignore(node.leaf(2), ignores, index);
+  s += temp.res;
+  index = temp.index;
+  temp = ignore(node.leaf(3), ignores, index);
+  s += temp.res;
+  index = temp.index;
   var block = node.leaf(4);
-  i = ignore(block.first(), ignores, i);
   //计算if的表达式
   var expr = node.leaf(2);
-  var res = exprstmt(expr, fnHash, globalFn, varHash, globalVar);console.warn(res)
+  temp = exprstmt(expr, ignores, index, fnHash, globalFn, varHash, globalVar);
+  var res = temp.res;
+  index = temp.index;
   if(res) {
-    var s = '';
+    //block的{
+    temp = ignore(block.first(), ignores, index);
+    s += temp.res;
+    index = temp.index;
+    //block内容
+    res = s;
     for(var j = 1, len = block.size(); j < len - 1; j++) {
-      s += '';
+      var tree = new Tree(
+        ignores,
+        index,
+        varHash,
+        globalVar,
+        fnHash,
+        globalFn,
+        styleHash,
+        styleTemp,
+        selectorStack,
+        map,
+        true
+      );
+      temp = tree.join(block.leaf(j));
+      res += temp.res;
+      index = temp.index;
+    }
+    //block的}
+    temp = ignore(block.last(), ignores, index);
+    res += temp.res;
+    index = temp.index;
+    //忽略掉后面的@else内容
+    var next = block.next();
+    while(next) {
+      temp = ignore(next, ignores, index);
+      res += temp.res;
+      index = temp.index;
+      next = next.next();
     }
   }
-  return '';
+  else if(block.next()) {
+    //if中没进入的block
+    temp = ignore(block, ignores, index);
+    s += temp.res;
+    index = temp.index;
+
+    var next = block.next();
+    //@else
+    if(next.name() == Node.TOKEN && next.token().content() == '@else') {
+      temp = ignore(next, ignores, index);
+      s += temp.res;
+      index = temp.index;
+      block = next.next();
+      temp = ignore(block.first(), ignores, index);
+      s += temp.res;
+      index = temp.index;
+      res = s;
+      for(var j = 1, len = block.size(); j < len - 1; j++) {
+        var tree = new Tree(
+          ignores,
+          index,
+          varHash,
+          globalVar,
+          fnHash,
+          globalFn,
+          styleHash,
+          styleTemp,
+          selectorStack,
+          map,
+          true
+        );
+        temp = tree.join(block.leaf(j));
+        res += temp.res;
+        index = temp.index;
+      }
+      temp = ignore(block.last(), ignores, index);
+      res += temp.res;
+      index = temp.index;
+    }
+    //@elseif
+  }
+  return { res, index };
 };

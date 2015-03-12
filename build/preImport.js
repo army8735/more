@@ -13,7 +13,7 @@ function recursion(node, ignores) {
       return;
     }
     else if(node.name() == Node.IMPORT) {
-      index = ignore(node, ignores, index);
+      index = ignore(node, ignores, index).index;
     }
     else {
       node.leaves().forEach(function(leaf) {
