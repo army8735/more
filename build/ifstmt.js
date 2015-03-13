@@ -8,7 +8,7 @@ var Tree=function(){var _3=require('./Tree');return _3.hasOwnProperty("Tree")?_3
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-exports.default=function(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map) {
+exports.default=function ifstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map) {
   //循环引用fix
   if(Tree.hasOwnProperty('default')) {
     Tree = Tree.default;
@@ -112,6 +112,12 @@ exports.default=function(node, ignores, index, varHash, globalVar, fnHash, globa
       index = temp.index;
     }
     //@elseif
+    else {
+      res = s;
+      temp = ifstmt(next, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map);
+      res += temp.res;
+      index = temp.index;
+    }
   }
   return { res:res, index:index };
 };
