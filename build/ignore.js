@@ -8,6 +8,9 @@ var index;
 
 function ignore(node, ignores, includeLine) {
   if(node instanceof Token) {
+    if(node.isVirtual()) {
+      return;
+    }
     node.ignore = true;
     while(ignores[++index]) {
       var ig = ignores[index];
