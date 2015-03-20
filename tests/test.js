@@ -719,6 +719,12 @@ describe('ifstmt', function() {
     var res = more.parse(s);
     expect(res).to.eql('/*no*/div{margin:1}');
   });
+  it('elseif', function() {
+    var more = new More();
+    var s = '@if(0){}@elseif(2){a{margin:0}}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:0}');
+  });
 });
 describe('config', function() {
   it('code', function() {

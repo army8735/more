@@ -155,7 +155,19 @@ var Node = homunculus.getClass('node', 'css');
           self.index = temp.index;
           break;
         case Node.FORSTMT:
-          var temp = forstmt(node, self.ignores, self.index, self.fnHash, self.globalFn, self.varHash, self.globalVar);
+          var temp = forstmt(
+            node,
+            self.ignores,
+            self.index,
+            self.varHash,
+            self.globalVar,
+            self.fnHash,
+            self.globalFn,
+            self.styleHash,
+            self.styleTemp,
+            self.selectorStack,
+            self.map
+          );
           self.res += temp.res;
           self.index = temp.index;
           break;

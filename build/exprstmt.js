@@ -7,11 +7,9 @@ var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 var res = '';
-var index = 0;
 
-function exprstmt(node, ignores, i, fnHash, globalFn, varHash, globalVar) {
+function exprstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
   res = '';
-  index = i;
   switch(node.name()) {
     case Node.RELSTMT:
     case Node.EQSTMT:
@@ -21,7 +19,7 @@ function exprstmt(node, ignores, i, fnHash, globalFn, varHash, globalVar) {
       res = prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar);
       break;
   }
-  return { res:res, index:index };
+  return res;
 }
 
 function relstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
@@ -63,9 +61,6 @@ function prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
       res = content;
       break;
   }
-  //while(ignores[++index]) {
-  //  res += ignores[index].content();
-  //}
   return res;
 }
 
