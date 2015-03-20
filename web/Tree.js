@@ -36,72 +36,73 @@ var Node = homunculus.getClass('node', 'css');
     var self = this;
     if(node.isToken()) {
       var token = node.token();
-      if(!token.isVirtual()) {
-        eventbus.emit(node.nid());
-        //标识下一个string是否自动拆分
-        if(token.content() == '~' && token.type() != Token.HACK) {
-          self.autoSplit = true;
-          ignore(token, self.ignores, self.index);
-        }
-        else if(token.type() != Token.STRING) {
+      if(token.isVirtual()) {
+        return;
+      }
+      eventbus.emit(node.nid());
+      //标识下一个string是否自动拆分
+      if(token.content() == '~' && token.type() != Token.HACK) {
+        self.autoSplit = true;
+        ignore(token, self.ignores, self.index);
+      }
+      else if(token.type() != Token.STRING) {
+        self.autoSplit = false;
+      }
+      if(!token.ignore || self.focus) {
+        //~String拆分语法
+        if(self.autoSplit && token.type() == Token.STRING) {
+          var s = getVar(token, self.varHash, self.globalVar);
+          var c = s.charAt(0);
+          if(c != "'" && c != '"') {
+            c = '"';
+            s = c + s + c;
+          }
+          s = s.replace(/,\s*/g, c + ',' + c);
+          self.res += s;
           self.autoSplit = false;
         }
-        if(!token.ignore || self.focus) {
-          //~String拆分语法
-          if(self.autoSplit && token.type() == Token.STRING) {
-            var s = getVar(token, self.varHash, self.globalVar);
-            var c = s.charAt(0);
-            if(c != "'" && c != '"') {
-              c = '"';
-              s = c + s + c;
+        else {
+          var str = getVar(token, self.varHash, self.globalVar);
+          //map映射url
+          if(token.import && self.map) {
+            var quote = /^['"']/.test(str) ? str.charAt(0) : '';
+            var val = quote ? str.slice(1, str.length - 1) : str;
+            //映射类型可能是回调
+            if(typeof self.map == 'function') {
+              str = self.map(val);
+              //如有引号，需处理转义
+              if(quote) {
+                str = quote + str + quote;
+              }
             }
-            s = s.replace(/,\s*/g, c + ',' + c);
-            self.res += s;
-            self.autoSplit = false;
+            else if(self.map.hasOwnProperty(token.val())){
+              str = self.map[val];
+              if(quote) {
+                str = quote + str + quote;
+              }
+            }
           }
-          else {
-            var str = getVar(token, self.varHash, self.globalVar);
-            //map映射url
-            if(token.import && self.map) {
-              var quote = /^['"']/.test(str) ? str.charAt(0) : '';
-              var val = quote ? str.slice(1, str.length - 1) : str;
-              //映射类型可能是回调
-              if(typeof self.map == 'function') {
-                str = self.map(val);
-                //如有引号，需处理转义
-                if(quote) {
-                  str = quote + str + quote;
-                }
-              }
-              else if(self.map.hasOwnProperty(token.val())){
-                str = self.map[val];
-                if(quote) {
-                  str = quote + str + quote;
-                }
-              }
+          //有@import url(xxx.css?xxx)的写法，需忽略
+          if(token.import && str.indexOf('.css?') == -1) {
+            //非.xxx结尾加上.css，非.css结尾替换掉.xxx为.css
+            if(!/\.\w+['"]?$/.test(str)) {
+              str = str.replace(/(['"]?)$/, '.css$1');
             }
-            //有@import url(xxx.css?xxx)的写法，需忽略
-            if(token.import && str.indexOf('.css?') == -1) {
-              //非.xxx结尾加上.css，非.css结尾替换掉.xxx为.css
-              if(!/\.\w+['"]?$/.test(str)) {
-                str = str.replace(/(['"]?)$/, '.css$1');
-              }
-              else if(!/\.css+['"]?$/.test(str)) {
-                str = str.replace(/\.\w+(['"]?)$/, '.css$1');
-              }
+            else if(!/\.css+['"]?$/.test(str)) {
+              str = str.replace(/\.\w+(['"]?)$/, '.css$1');
             }
-            self.res += str;
           }
+          self.res += str;
         }
-        while(self.ignores[++self.index]) {
-          var ig = self.ignores[self.index];
-          var s = ig.type() == Token.ignores ? ig.content().replace(/\S/g, ' ') : ig.content();
-          if(ig.type() == Token.COMMENT && s.indexOf('//') == 0) {
-            s = '/*' + s.slice(2) + '*/';
-          }
-          if(!ig.ignore || self.focus) {
-            self.res += s;
-          }
+      }
+      while(self.ignores[++self.index]) {
+        var ig = self.ignores[self.index];
+        var s = ig.type() == Token.ignores ? ig.content().replace(/\S/g, ' ') : ig.content();
+        if(ig.type() == Token.COMMENT && s.indexOf('//') == 0) {
+          s = '/*' + s.slice(2) + '*/';
+        }
+        if(!ig.ignore || self.focus) {
+          self.res += s;
         }
       }
     }
