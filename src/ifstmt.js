@@ -37,8 +37,8 @@ export default function ifstmt(node, ignores, index, varHash, globalVar, fnHash,
     temp = ignore(block.first(), ignores, index);
     s += temp.res;
     index = temp.index;
-    //block内容
     res = s;
+    //block内容
     for(var j = 1, len = block.size(); j < len - 1; j++) {
       var tree = new Tree(
         ignores,

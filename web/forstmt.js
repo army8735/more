@@ -61,6 +61,29 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
       s += temp.res;
       index = temp.index;
       res = s;
+      //block内容
+      for(var j = 1, len = block.size(); j < len - 1; j++) {
+        var tree = new Tree(
+          ignores,
+          index,
+          varHash,
+          globalVar,
+          fnHash,
+          globalFn,
+          styleHash,
+          styleTemp,
+          selectorStack,
+          map,
+          true
+        );
+        temp = tree.join(block.leaf(j));
+        res += temp.res;
+        index = temp.index;
+      }
+      //block的}
+      temp = ignore(block.last(), ignores, index);
+      res += temp.res;
+      index = temp.index;
     }
   }
   return { res:res, index:index };
