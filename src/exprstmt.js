@@ -81,7 +81,7 @@ function poststmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
         o = globalVar[k];
       }
       else {
-        throw new Error(k + ' is undefined');
+        throw new Error(k + ' is undefined: line ' + token.line() + ', col ' + token.col());
       }
       var next = node.last().token();
       content = next.content();
