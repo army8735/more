@@ -18,6 +18,9 @@ function exprstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
     case Node.PRMRSTMT:
       res = prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar);
       break;
+    case Node.POSTFIXSTMT:
+      res = poststmt(node, ignores, fnHash, globalFn, varHash, globalVar);
+      break;
   }
   return res;
 }
@@ -43,7 +46,7 @@ function relstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
 }
 
 function prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
-  var token = node.leaf(0).token();
+  var token = node.first().token();
   var content = token.content();
   var res;
   switch(token.type()) {
@@ -62,6 +65,36 @@ function prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
       break;
   }
   return res;
+}
+
+function poststmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
+  var token = node.first().first().token();
+  var content = token.content();
+  switch(token.type()) {
+    case Token.VARS:
+      var k = content.replace(/^[$@]\{?/, '').replace(/}$/, '');
+      var o;
+      if(varHash[k]) {
+        o = varHash[k];
+      }
+      else if(globalVar[k]) {
+        o = globalVar[k];
+      }
+      else {
+        throw new Error(k + ' is undefined');
+      }
+      var next = node.last().token();
+      content = next.content();
+      switch(content) {
+        case '++':
+          o.value++;
+          break;
+        case '--':
+          o.value--;
+          break;
+      }
+      break;
+  }
 }
 
 exports.default=exprstmt;

@@ -40,14 +40,13 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
     temp = ignore(node.leaf(2), ignores, index);
     s += temp.res;
     index = temp.index;
-    res = exprstmt(node.leaf(3), ignores, fnHash, globalFn, varHash, globalVar);
+    var loop = exprstmt(node.leaf(3), ignores, fnHash, globalFn, varHash, globalVar);
     temp = ignore(node.leaf(3), ignores, index);
     s += temp.res;
     index = temp.index;
     temp = ignore(node.leaf(4), ignores, index);
     s += temp.res;
     index = temp.index;
-    exprstmt(node.leaf(5), ignores, fnHash, globalFn, varHash, globalVar);
     temp = ignore(node.leaf(5), ignores, index);
     s += temp.res;
     index = temp.index;
@@ -55,12 +54,16 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
     s += temp.res;
     index = temp.index;
     block = node.leaf(7);
-    if(res) {
-      //block的{
-      temp = ignore(block.first(), ignores, index);
-      s += temp.res;
-      index = temp.index;
-      res = s;
+    //区分首次循环，后续忽略换行和初始化
+    var first = true;
+    while(loop) {
+      if(first) {
+        //block的{
+        temp = ignore(block.first(), ignores, index);
+        s += temp.res;
+        index = temp.index;
+        res = s;
+      }
       //block内容
       for(var j = 1, len = block.size(); j < len - 1; j++) {
         var tree = new Tree(
@@ -84,6 +87,10 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
       temp = ignore(block.last(), ignores, index);
       res += temp.res;
       index = temp.index;
+      //判断循环是否继续
+      exprstmt(node.leaf(5), ignores, fnHash, globalFn, varHash, globalVar);
+      loop = exprstmt(node.leaf(3), ignores, fnHash, globalFn, varHash, globalVar);
+      first = false;
     }
   }
   return { res:res, index:index };
