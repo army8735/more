@@ -81,7 +81,7 @@ function poststmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
         o = globalVar[k];
       }
       else {
-        throw new Error(k + ' is undefined');
+        throw new Error(k + ' is undefined: line ' + token.line() + ', col ' + token.col());
       }
       var next = node.last().token();
       content = next.content();
@@ -93,7 +93,11 @@ function poststmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
           o.value--;
           break;
       }
-      break;
+      return o.value - 1;
+    case Token.NUMBER:
+      return parseFloat(content);
+    case Token.STRING:
+      throw new Error('Invalid left-hand side expression in postfix operation: line ' + token.line() + ', col ' + token.col());
   }
 }
 
