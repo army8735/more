@@ -6,98 +6,123 @@ import ignore from './ignore';
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-var res = '';
-
-function exprstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
-  res = '';
-  switch(node.name()) {
-    case Node.RELSTMT:
-    case Node.EQSTMT:
-      res = relstmt(node, ignores, fnHash, globalFn, varHash, globalVar);
-      break;
-    case Node.PRMRSTMT:
-      res = prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar);
-      break;
-    case Node.POSTFIXSTMT:
-      res = poststmt(node, ignores, fnHash, globalFn, varHash, globalVar);
-      break;
-  }
-  return res;
+function exprstmt(node, fnHash, globalFn, varHash, globalVar) {
+  return eqstmt(node, fnHash, globalFn, varHash, globalVar);
 }
 
-function relstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
-  var left = exprstmt(node.leaf(0), ignores, fnHash, globalFn, varHash, globalVar);
-  var right = exprstmt(node.leaf(2), ignores, fnHash, globalFn, varHash, globalVar);
-  var opt = node.leaf(1).token().content();
-  switch(opt) {
-    case '>':
-      return left > right;
-    case '<':
-      return left < right;
-    case '>=':
-      return left >= right;
-    case '<=':
-      return left <= right;
-    case '!=':
-      return left != right;
-    case '==':
-      return left == right;
+function eqstmt(node, fnHash, globalFn, varHash, globalVar) {
+  if(node.name() == Node.EQSTMT) {
+    var rel = relstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var next = node.leaf(1);
+    var token = next.token();
+    switch(token.content()) {
+      case '==':
+        return rel == relstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+      case '!=':
+        return rel != relstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+    }
   }
+  return relstmt(node, fnHash, globalFn, varHash, globalVar);
 }
 
-function prmrstmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
+function relstmt(node, fnHash, globalFn, varHash, globalVar) {
+  if(node.name() == Node.RELSTMT) {
+    var add = addstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var next = node.leaf(1);
+    var token = next.token();
+    switch(token.content()) {
+      case '>':
+        return add > addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+      case '>=':
+        return add >= addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+      case '<':
+        return add < addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+      case '<=':
+        return add <= addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+    }
+  }
+  return addstmt(node, fnHash, globalFn, varHash, globalVar);
+}
+
+function addstmt(node, fnHash, globalFn, varHash, globalVar) {
+  if(node.name() == Node.ADDSTMT) {
+    var mtpl = mtplstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var next = node.leaf(1);
+    var token = next.token();
+    switch(token.content()) {
+      case '+':
+        return mtpl + mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+      case '-':
+        return mtpl + mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+    }
+  }
+  return mtplstmt(node, fnHash, globalFn, varHash, globalVar);
+}
+
+function mtplstmt(node, fnHash, globalFn, varHash, globalVar) {
+  if(node.name() == Node.MTPLSTMT) {
+    var postfix = postfixstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var next = node.leaf(1);
+    var token = next.token();
+    switch(token.content()) {
+      case '*':
+        return postfix * mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+      case '/':
+        return postfix / mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+    }
+  }
+  return postfixstmt(node, fnHash, globalFn, varHash, globalVar);
+}
+
+function postfixstmt(node, fnHash, globalFn, varHash, globalVar) {
+  if(node.name() == Node.POSTFIXSTMT) {
+    var prmr = prmrstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var next = node.leaf(1);
+    var token = next.token();
+    switch(token.content()) {
+      case '++':
+        return prmr.value++;
+      case '--':
+        return prmr.value--;
+    }
+  }
+  return prmrstmt(node, fnHash, globalFn, varHash, globalVar).value;
+}
+
+function prmrstmt(node, fnHash, globalFn, varHash, globalVar) {
   var token = node.first().token();
-  var content = token.content();
-  var res;
+  var s = token.content();
   switch(token.type()) {
     case Token.VARS:
-      var k = content.replace(/^[$@]\{?/, '').replace(/}$/, '');
-      res = (varHash[k] || globalVar[k] || {}).value;
-      break;
+      var k = s.replace(/^[$@]\{?/, '').replace(/}$/, '');
+      return varHash[k] || globalVar[k] || {};
     case Token.NUMBER:
-      res = parseFloat(content);
-      break;
+      return { value: parseFloat(s) };
     case Token.STRING:
-      res = token.val();
-      break;
+      return { value: s };
     default:
-      res = content;
-      break;
-  }
-  return res;
-}
-
-function poststmt(node, ignores, fnHash, globalFn, varHash, globalVar) {
-  var token = node.first().first().token();
-  var content = token.content();
-  switch(token.type()) {
-    case Token.VARS:
-      var k = content.replace(/^[$@]\{?/, '').replace(/}$/, '');
-      var o;
-      if(varHash[k]) {
-        o = varHash[k];
+      if(s == '(') {
+        return { value: exprstmt(node.leaf(1), fnHash, globalFn, varHash, globalVar) };
       }
-      else if(globalVar[k]) {
-        o = globalVar[k];
+      else if(s == '[') {
+        var arr = [];
+        node.leaves().forEach(function(item) {
+          if(item.name() == Node.VALUE) {
+            var token = item.first().token();
+            var s = token.content();
+            if(token.tpye() == Token.VARS) {
+              arr.push(varHash[k] || globalVar[k] || {}).value;
+            }
+            else if(token.type() == Token.NUMBER) {
+              arr.push(parseFloat(s));
+            }
+            else {
+              arr.push(s);
+            }
+          }
+        });
+        return { value: arr };
       }
-      else {
-        throw new Error(k + ' is undefined: line ' + token.line() + ', col ' + token.col());
-      }
-      var next = node.last().token();
-      content = next.content();
-      switch(content) {
-        case '++':
-          o.value++;
-          break;
-        case '--':
-          o.value--;
-          break;
-      }
-      return o.value - 1;
-    case Token.NUMBER:
-      return parseFloat(content);
-    case Token.STRING:
-      throw new Error('Invalid left-hand side expression in postfix operation: line ' + token.line() + ', col ' + token.col());
   }
 }
 

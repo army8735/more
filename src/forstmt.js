@@ -36,11 +36,11 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
     s += temp.res;
     index = temp.index;
     //执行for的3个语句，判断是否循环用最后一个
-    exprstmt(node.leaf(2), ignores, fnHash, globalFn, varHash, globalVar);
+    exprstmt(node.leaf(2), fnHash, globalFn, varHash, globalVar);
     temp = ignore(node.leaf(2), ignores, index);
     s += temp.res;
     index = temp.index;
-    var loop = exprstmt(node.leaf(3), ignores, fnHash, globalFn, varHash, globalVar);
+    var loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
     temp = ignore(node.leaf(3), ignores, index);
     s += temp.res;
     index = temp.index;
@@ -88,8 +88,8 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
       res += temp.res;
       index = temp.index;
       //判断循环是否继续
-      exprstmt(node.leaf(5), ignores, fnHash, globalFn, varHash, globalVar);
-      loop = exprstmt(node.leaf(3), ignores, fnHash, globalFn, varHash, globalVar);
+      exprstmt(node.leaf(5), fnHash, globalFn, varHash, globalVar);
+      loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
       first = false;
     }
   }
