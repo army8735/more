@@ -44,36 +44,24 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
     temp = ignore(node.leaf(2), ignores, index);
     s += temp.res;
     index = temp.index;
-    //第2个判断语句可能为空，默认条件true
+    //第2个判断语句
     temp = ignore(node.leaf(3), ignores, index);
     s += temp.res;
     index = temp.index;
-    var loop = true;
-    var lindex = 4;
-    var no2 = true;
-    if(node.leaf(3).name() != Node.TOKEN) {
-      loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
-      lindex = 5;
-      temp = ignore(node.leaf(4), ignores, index);
-      s += temp.res;
-      index = temp.index;
-      no2 = false;
-    }
-    //第3个循环执行语句也可能为空
-    temp = ignore(node.leaf(lindex), ignores, index);
+    var loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
+    temp = ignore(node.leaf(4), ignores, index);
     s += temp.res;
     index = temp.index;
-    var no3 = true;
-    if(node.leaf(lindex).name() != Node.TOKEN) {
-      lindex++;
-      no3 = false;
-    }
+    //第3个循环执行
+    temp = ignore(node.leaf(5), ignores, index);
+    s += temp.res;
+    index = temp.index;
     //)
-    temp = ignore(node.leaf(lindex), ignores, index);
+    temp = ignore(node.leaf(6), ignores, index);
     s += temp.res;
     index = temp.index;
     //{block}
-    block = node.leaf(lindex + 1);
+    block = node.leaf(7);
     //区分首次循环，后续忽略换行和初始化
     var first = true;
     while(loop) {
@@ -107,9 +95,9 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
       temp = ignore(block.last(), ignores, index);
       res += temp.res;
       index = temp.index;
-      //判断循环是否继续
-      no3 || exprstmt(node.leaf(lindex - 1), fnHash, globalFn, varHash, globalVar);
-      no2 || (loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar));
+      //执行循环exprstmt2，判断循环是否继续
+      exprstmt(node.leaf(5), fnHash, globalFn, varHash, globalVar);
+      loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
       first = false;
     }
   }

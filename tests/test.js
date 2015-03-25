@@ -726,6 +726,27 @@ describe('ifstmt', function() {
     expect(res).to.eql('a{margin:0}');
   });
 });
+describe('forstmt', function() {
+  it('for var', function() {
+    var more = new More();
+    var s = '@for($a=1;$a<3;$a++){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:1}div{margin:2}');
+  });
+  it('no var', function() {
+    var more = new More();
+    var s = '$a=1;@for(;$a<3;$a++){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:1}div{margin:2}');
+  });
+  it('config', function() {
+    var more = new More();
+    more.config('$a = 1;');
+    var s = '@for(;$a<3;$a++){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:1}div{margin:2}');
+  });
+});
 describe('config', function() {
   it('code', function() {
     var more = new More();
