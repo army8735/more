@@ -44,7 +44,17 @@ class Fn {
         if(idx < self.params.length) {
           var k = self.params[idx];
           k = k.replace(/^[$@]\{?/, '').replace(/}$/, '');
-          newVarHash[k] = calculate(leaf, ignores, index, varHash, globalHash);
+          switch(leaf.name()) {
+            case Node.UNBOX:
+              newVarHash[k] = {
+                value: leaf.last().token().val(),
+                unit: ''
+              };
+              break;
+            default:
+              newVarHash[k] = calculate(leaf, ignores, index, varHash, globalHash);
+              break;
+          }
         }
       }
       index = ignore(leaf, ignores, index).index;

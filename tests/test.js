@@ -758,13 +758,27 @@ describe('forstmt', function() {
     var res = more.parse(s);
     expect(res).to.eql('  div{margin:1}div{margin:2}');
   });
-  it.only('for in for', function() {
+  it('for in for', function() {
     var s = fs.readFileSync(path.join(__dirname, 'for.css'), { encoding: 'utf-8' });
     var more = new More();
     var res = more.parse(s);
     //fs.writeFileSync(path.join(__dirname, 'for2.css'), res, { encoding: 'utf-8' });
     var s2 = fs.readFileSync(path.join(__dirname, 'for2.css'), { encoding: 'utf-8' });
     expect(res).to.eql(s2);
+  });
+});
+describe('unbox', function() {
+  it('var', function() {
+    var more = new More();
+    var s = '$a:~"test";div{margin:$a}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:test}');
+  });
+  it('fn call', function() {
+    var more = new More();
+    var s = '$fn($a){margin:$a}div{$fn(~"test")}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:test}');
   });
 });
 describe('config', function() {
