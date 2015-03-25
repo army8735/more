@@ -110,7 +110,7 @@ function prmrstmt(node, fnHash, globalFn, varHash, globalVar) {
           if(item.name() == Node.VALUE) {
             var token = item.first().token();
             var s = token.content();
-            if(token.tpye() == Token.VARS) {
+            if(token.type() == Token.VARS) {
               arr.push(varHash[k] || globalVar[k] || {}).value;
             }
             else if(token.type() == Token.NUMBER) {

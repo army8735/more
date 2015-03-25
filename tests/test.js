@@ -746,6 +746,18 @@ describe('forstmt', function() {
     var res = more.parse(s);
     expect(res).to.eql('div{margin:1}div{margin:2}');
   });
+  it('for in', function() {
+    var more = new More();
+    var s = '@for($a in [1,2]){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('  div{margin:0}div{margin:1}');
+  });
+  it('for of', function() {
+    var more = new More();
+    var s = '@for($a of [1,2]){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('  div{margin:1}div{margin:2}');
+  });
 });
 describe('config', function() {
   it('code', function() {
