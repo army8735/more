@@ -758,6 +758,14 @@ describe('forstmt', function() {
     var res = more.parse(s);
     expect(res).to.eql('  div{margin:1}div{margin:2}');
   });
+  it.only('for in for', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'for.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    //fs.writeFileSync(path.join(__dirname, 'for2.css'), res, { encoding: 'utf-8' });
+    var s2 = fs.readFileSync(path.join(__dirname, 'for2.css'), { encoding: 'utf-8' });
+    expect(res).to.eql(s2);
+  });
 });
 describe('config', function() {
   it('code', function() {

@@ -16,7 +16,7 @@ var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 class Tree {
-  constructor(ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, focus) {
+  constructor(ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, focus, first) {
     this.ignores = ignores;
     this.index = index;
     this.varHash = varHash;
@@ -28,6 +28,7 @@ class Tree {
     this.selectorStack = selectorStack;
     this.map = map;
     this.focus = focus;
+    this.first = first;
 
     this.res = '';
     this.autoSplit = false;
@@ -149,7 +150,8 @@ class Tree {
             self.styleHash,
             self.styleTemp,
             self.selectorStack,
-            self.map
+            self.map,
+            self.first
           );
           self.res += temp.res;
           self.index = temp.index;
@@ -166,7 +168,8 @@ class Tree {
             self.styleHash,
             self.styleTemp,
             self.selectorStack,
-            self.map
+            self.map,
+            self.first
           );
           self.res += temp.res;
           self.index = temp.index;

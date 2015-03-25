@@ -9,52 +9,57 @@ var preVar=function(){var _4=require('./preVar');return _4.hasOwnProperty("preVa
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map) {
+function checkLine(s, first) {
+  return first ? s : s.replace(/\n/g, '');
+}
+
+exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, first) {
   //循环引用fix
   if(Tree.hasOwnProperty('default')) {
     Tree = Tree.default;
   }
+  //标明首次循环
+  var first2 = true;
   //忽略掉整个for节点
   ignore(node, ignores, index);
   var temp = node.leaf(3);
   var isIn = temp && temp.isToken() && temp.token().content() == 'in';
   var isOf = !isIn && temp && temp.isToken() && temp.token().content() == 'of';
   var block;
-  var res;
+  var res = '';
   //保存索引，存储空白符
   var temp = ignore(node.first(), ignores, index);
-  var s = temp.res;
+  var s = checkLine(temp.res, first && first2);
   index = temp.index;
   temp = ignore(node.leaf(1), ignores, index);
-  s += temp.res;
+  s += checkLine(temp.res, first && first2);
   index = temp.index;
   if(isIn) {
     //忽略3个语句
     temp = ignore(node.leaf(2), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     temp = ignore(node.leaf(3), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     temp = ignore(node.leaf(4), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //)
     temp = ignore(node.leaf(5), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //block
     block = node.leaf(6);
     //区分首次循环，后续忽略换行和初始化
     var k = node.leaf(2).token().content().replace(/^[$@]\{?/, '').replace(/}$/, '');
     var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar);
-    var first = true;
     var tIndex;
     for(var i = 0, lens = arr.length; i < lens; i++) {
       //block的{
-      if(first) {
+      if(first2) {
         temp = ignore(block.first(), ignores, index);
-        s += temp.res;
+        s += checkLine(temp.res, first && first2);
         index = temp.index;
         res = s;
         tIndex = index;
@@ -77,46 +82,46 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
           styleTemp,
           selectorStack,
           map,
-          true
+          true,
+          first
         );
         temp = tree.join(block.leaf(j));
-        res += first ? temp.res : temp.res.replace(/\n/g, '');
+        res += checkLine(temp.res, first && first2);
         index = temp.index;
       }
       //block的}
       temp = ignore(block.last(), ignores, index);
-      res += first ? temp.res : temp.res.replace(/\n/g, '');
+      res += checkLine(temp.res, first && first2);
       index = temp.index;
-      first = false;
+      first = first2 = false;
     }
   }
   else if(isOf) {
     //忽略3个语句
     temp = ignore(node.leaf(2), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     temp = ignore(node.leaf(3), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     temp = ignore(node.leaf(4), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //)
     temp = ignore(node.leaf(5), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //block
     block = node.leaf(6);
     //区分首次循环，后续忽略换行和初始化
     var k = node.leaf(2).token().content().replace(/^[$@]\{?/, '').replace(/}$/, '');
     var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar);
-    var first = true;
     var tIndex;
     for(var i = 0, lens = arr.length; i < lens; i++) {
       //block的{
-      if(first) {
+      if(first2) {
         temp = ignore(block.first(), ignores, index);
-        s += temp.res;
+        s += checkLine(temp.res, first && first2);
         index = temp.index;
         res = s;
         tIndex = index;
@@ -139,17 +144,18 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
           styleTemp,
           selectorStack,
           map,
-          true
+          true,
+          first
         );
         temp = tree.join(block.leaf(j));
-        res += first ? temp.res : temp.res.replace(/\n/g, '');
+        res += checkLine(temp.res, first && first2);
         index = temp.index;
       }
       //block的}
       temp = ignore(block.last(), ignores, index);
-      res += first ? temp.res : temp.res.replace(/\n/g, '');
+      res += checkLine(temp.res, first && first2);
       index = temp.index;
-      first = false;
+      first = first2 = false;
     }
   }
   else {
@@ -159,34 +165,33 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
       preVar(node.leaf(2), ignores, index, varHash, globalVar);
     }
     temp = ignore(node.leaf(2), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //第2个判断语句
     temp = ignore(node.leaf(3), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     var loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
     temp = ignore(node.leaf(4), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //第3个循环执行
     temp = ignore(node.leaf(5), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //)
     temp = ignore(node.leaf(6), ignores, index);
-    s += temp.res;
+    s += checkLine(temp.res, first && first2);
     index = temp.index;
     //{block}
     block = node.leaf(7);
     //区分首次循环，后续忽略换行和初始化
-    var first = true;
     var tIndex;
     while(loop) {
-      if(first) {
+      if(first2) {
         //block的{
         temp = ignore(block.first(), ignores, index);
-        s += temp.res;
+        s += checkLine(temp.res, first && first2);
         index = temp.index;
         res = s;
         tIndex = index;
@@ -204,10 +209,11 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
           styleTemp,
           selectorStack,
           map,
-          true
+          true,
+          first
         );
         temp = tree.join(block.leaf(j));
-        res += temp.res;
+        res += checkLine(temp.res, first && first2);
         index = temp.index;
       }
       //block的}
@@ -218,7 +224,7 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
       //执行循环exprstmt2，判断循环是否继续
       exprstmt(node.leaf(5), fnHash, globalFn, varHash, globalVar);
       loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
-      first = false;
+      first = first2 = false;
     }
   }
   return { res:res, index:index };

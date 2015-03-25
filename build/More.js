@@ -170,7 +170,9 @@ var global = {
       this.styleHash,
       this.styleTemp,
       this.selectorStack,
-      global.map
+      global.map,
+      false,
+      true
     );
     var temp = tree.join(this.node);
     this.res += temp.res;
