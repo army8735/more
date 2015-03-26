@@ -20,6 +20,7 @@ function exprstmt(node, fnHash, globalFn, varHash, globalVar, file) {
 function dir(node, fnHash, globalFn, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
+  var onlyBase = false;
   if(cparam.size() > 2) {
     var p = cparam.leaf(1).first();
     if(p.isToken()) {
@@ -28,6 +29,7 @@ function dir(node, fnHash, globalFn, varHash, globalVar, file) {
         s = token.val();
       }
     }
+    onlyBase = !!cparam.leaf(3);
   }
   s = path.resolve(file, s);
   if(!fs.existsSync(s)) {
@@ -46,7 +48,7 @@ function dir(node, fnHash, globalFn, varHash, globalVar, file) {
     var s2 = path.join(s, item);
     state = fs.lstatSync(s2);
     if(state.isFile()) {
-      res.push(path.relative(file, s2));
+      onlyBase ? res.push(path.relative(file, s2)) : res.push(s2);
     }
   });
   return res;

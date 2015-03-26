@@ -793,14 +793,21 @@ describe('dir', function() {
     more.path(path.join(__dirname, './img'));
     var s = '$a = @dir();div{margin:$a}';
     var res = more.parse(s);
-    expect(res).to.eql('div{margin:000.png,FFF.png}');
+    expect(res).to.eql('div{margin:/Users/army/Sites/more/tests/img/000.png,/Users/army/Sites/more/tests/img/FFF.png}');
   });
   it('in for', function() {
     var more = new More();
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){div{margin:$a}}';
     var res = more.parse(s);
-    expect(res).to.eql('  div{margin:000.png}div{margin:FFF.png}');
+    expect(res).to.eql('  div{margin:/Users/army/Sites/more/tests/img/000.png}div{margin:/Users/army/Sites/more/tests/img/FFF.png}');
+  });
+  it('with 2nd param', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./", true)){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('   div{margin:000.png}div{margin:FFF.png}');
   });
 });
 describe('config', function() {
