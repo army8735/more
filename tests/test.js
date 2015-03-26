@@ -766,6 +766,12 @@ describe('forstmt', function() {
     var s2 = fs.readFileSync(path.join(__dirname, 'for2.css'), { encoding: 'utf-8' });
     expect(res).to.eql(s2);
   });
+  it('for in selector', function() {
+    var more = new More();
+    var s = '@for($a of [1,2]){.c$a{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('  .c1{margin:1}.c2{margin:2}');
+  });
 });
 describe('unbox', function() {
   it('var', function() {
