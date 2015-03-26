@@ -8,7 +8,7 @@ var Node = homunculus.getClass('node', 'css');
 
 var index;
 
-function recursion(node, ignores, varHash, globalVar) {
+function recursion(node, ignores, varHash, globalVar, file) {
   if(!node.isToken()) {
     if(node.name() == Node.VARDECL
       && ['$', '@'].indexOf(node.first().token().content().charAt(0)) > -1) {
@@ -26,8 +26,9 @@ function recursion(node, ignores, varHash, globalVar) {
           };
           break;
         case Node.ARRLTR:
+        case Node.DIR:
           varHash[k] = {
-            value: exprstmt(v, null, null, varHash, globalVar),
+            value: exprstmt(v, null, null, varHash, globalVar, file),
             unit: ''
           };
           break;
@@ -39,7 +40,7 @@ function recursion(node, ignores, varHash, globalVar) {
     }
     else {
       node.leaves().forEach(function(leaf) {
-        recursion(leaf, ignores, varHash, globalVar);
+        recursion(leaf, ignores, varHash, globalVar, file);
       });
     }
   }
@@ -48,7 +49,7 @@ function recursion(node, ignores, varHash, globalVar) {
   }
 }
 
-exports.default=function(node, ignores, i, varHash, globalVar) {
+exports.default=function(node, ignores, i, varHash, globalVar, file) {
   index = i;
-  recursion(node, ignores, varHash, globalVar);
+  recursion(node, ignores, varHash, globalVar, file);
 }});

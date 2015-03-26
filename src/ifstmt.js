@@ -8,7 +8,7 @@ import Tree from './Tree';
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-export default function ifstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, first) {
+export default function ifstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, first, file) {
   //循环引用fix
   if(Tree.hasOwnProperty('default')) {
     Tree = Tree.default;
@@ -52,7 +52,8 @@ export default function ifstmt(node, ignores, index, varHash, globalVar, fnHash,
         selectorStack,
         map,
         true,
-        first
+        first,
+        file
       );
       temp = tree.join(block.leaf(j));
       res += temp.res;
@@ -101,7 +102,8 @@ export default function ifstmt(node, ignores, index, varHash, globalVar, fnHash,
           selectorStack,
           map,
           true,
-          first
+          first,
+          file
         );
         temp = tree.join(block.leaf(j));
         res += temp.res;

@@ -19,7 +19,8 @@ var global = {
   styles: {},
   suffix: 'css',
   root: '',
-  map: null
+  map: null,
+  file: ''
 };
 
 class More {
@@ -37,6 +38,7 @@ class More {
     this.autoSplit = false;
     this.selectorStack = [];
     this.importStack = [];
+    this.file = '';
   }
   parse(code, ignoreImport) {
     if(code) {
@@ -53,6 +55,7 @@ class More {
   //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
   parseFile(file, combo) {
     var self = this;
+    self.file = file;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
     self.code = code;
     self.preParse(combo);
@@ -155,7 +158,7 @@ class More {
       return this.msg = e.toString();
     }
     this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
-    preVar(this.node, this.ignores, this.index, this.varHash, global.vars);
+    preVar(this.node, this.ignores, this.index, this.varHash, global.vars, this.file || global.file);
     preFn(this.node, this.ignores, this.index, this.fnHash);
   }
   parseOn() {
@@ -172,7 +175,8 @@ class More {
       this.selectorStack,
       global.map,
       false,
-      true
+      true,
+      this.file || global.file
     );
     var temp = tree.join(this.node);
     this.res += temp.res;
@@ -270,6 +274,12 @@ class More {
     this.fnHash = {};
     this.styleHash = {};
   }
+  path(file) {
+    if(file) {
+      this.file = file;
+    }
+    return this.file;
+  }
 
   static parse(code) {
     return (new More()).parse(code);
@@ -353,6 +363,13 @@ class More {
     global.styles = {};
     return global;
   }
+  static path(file) {
+    if(file) {
+      global.file = file;
+    }
+    return global.file;
+  }
+
   static addKeyword(kw) {
     homunculus.getClass('rule', 'css').addKeyWord(kw);
   }
@@ -368,12 +385,3 @@ class More {
 }
 
 export default More;
-
-function inFn(node) {
-  while(node = node.parent()) {
-    if(node.name() == Node.FN) {
-      return true;
-    }
-  }
-  return false;
-}

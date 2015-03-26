@@ -13,7 +13,7 @@ function checkLine(s, first) {
   return first ? s : s.replace(/\n/g, '');
 }
 
-exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, first) {
+exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, first, file) {
   //循环引用fix
   if(Tree.hasOwnProperty('default')) {
     Tree = Tree.default;
@@ -53,7 +53,7 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
     block = node.leaf(6);
     //区分首次循环，后续忽略换行和初始化
     var k = node.leaf(2).token().content().replace(/^[$@]\{?/, '').replace(/}$/, '');
-    var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar);
+    var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar, file);
     var tIndex;
     for(var i = 0, lens = arr.length; i < lens; i++) {
       //block的{
@@ -83,7 +83,8 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
           selectorStack,
           map,
           true,
-          first
+          first,
+          file
         );
         temp = tree.join(block.leaf(j));
         res += checkLine(temp.res, first && first2);
@@ -115,7 +116,7 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
     block = node.leaf(6);
     //区分首次循环，后续忽略换行和初始化
     var k = node.leaf(2).token().content().replace(/^[$@]\{?/, '').replace(/}$/, '');
-    var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar);
+    var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar, file);
     var tIndex;
     for(var i = 0, lens = arr.length; i < lens; i++) {
       //block的{
@@ -145,7 +146,8 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
           selectorStack,
           map,
           true,
-          first
+          first,
+          file
         );
         temp = tree.join(block.leaf(j));
         res += checkLine(temp.res, first && first2);
@@ -171,7 +173,7 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
     temp = ignore(node.leaf(3), ignores, index);
     s += checkLine(temp.res, first && first2);
     index = temp.index;
-    var loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
+    var loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar, file);
     temp = ignore(node.leaf(4), ignores, index);
     s += checkLine(temp.res, first && first2);
     index = temp.index;
@@ -210,7 +212,8 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
           selectorStack,
           map,
           true,
-          first
+          first,
+          file
         );
         temp = tree.join(block.leaf(j));
         res += checkLine(temp.res, first && first2);
@@ -222,8 +225,8 @@ exports.default=function forstmt(node, ignores, index, varHash, globalVar, fnHas
       res += first ? temp.res : temp.res.replace(/\n/g, '');
       index = temp.index;
       //执行循环exprstmt2，判断循环是否继续
-      exprstmt(node.leaf(5), fnHash, globalFn, varHash, globalVar);
-      loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar);
+      exprstmt(node.leaf(5), fnHash, globalFn, varHash, globalVar, file);
+      loop = exprstmt(node.leaf(3), fnHash, globalFn, varHash, globalVar, file);
       first = first2 = false;
     }
   }

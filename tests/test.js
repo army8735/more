@@ -781,6 +781,22 @@ describe('unbox', function() {
     expect(res).to.eql('div{margin:test}');
   });
 });
+describe('dir', function() {
+  it('normal', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '$a = @dir();div{margin:$a}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:000.png,FFF.png}');
+  });
+  it('in for', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){div{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('  div{margin:000.png}div{margin:FFF.png}');
+  });
+});
 describe('config', function() {
   it('code', function() {
     var more = new More();
