@@ -816,7 +816,14 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @basename($a);div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('    div{margin:img}  div{margin:img}');
+    expect(res).to.eql('    div{margin:000.png}  div{margin:FFF.png}');
+  });
+  it('basename with ext', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){$b = @basename($a, ".png");div{margin:$b}}';
+    var res = more.parse(s);
+    expect(res).to.eql('     div{margin:000}   div{margin:FFF}');
   });
   it('extname', function() {
     var more = new More();

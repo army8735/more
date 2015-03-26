@@ -64,6 +64,37 @@ function dir(node, fnHash, globalFn, varHash, globalVar, file) {
   return res;
 }
 
+function basename(node, fnHash, globalFn, varHash, globalVar, file) {
+  var cparam = node.last();
+  var s = '';
+  if(cparam.size() == 0) {
+    throw new Error('@basename requires a param: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
+  }
+  var p = cparam.leaf(1).first();
+  if(p.isToken()) {
+    var token = p.token();
+    switch(token.type()) {
+      case Token.STRING:
+        s = token.val();
+        break;
+      case Token.VARS:
+        s = token.content();
+        var k = s.replace(/^[$@]\{?/, '').replace(/}$/, '');
+        s = (varHash[k] || globalVar[k] || {}).value;
+        break;
+    }
+  }
+  var ext = cparam.leaf(3);
+  if(ext) {
+    ext = ext.first().token().val();
+  }
+  else {
+    ext = undefined;
+  }
+  s = path.resolve(file, s);
+  return path.basename(s, ext);
+}
+
 function extname(node, fnHash, globalFn, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
@@ -120,23 +151,6 @@ function height(node, fnHash, globalFn, varHash, globalVar, file) {
   }
   s = path.resolve(file, s);
   return images(s).height();
-}
-
-function basename(node, fnHash, globalFn, varHash, globalVar, file) {
-  var cparam = node.last();
-  var s = '';
-  if(cparam.size() == 0) {
-    throw new Error('@basename requires a param: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
-  }
-  var p = cparam.leaf(1).first();
-  if(p.isToken()) {
-    var token = p.token();
-    if(token.type() == Token.STRING) {
-      s = token.val();
-    }
-  }
-  s = path.resolve(file, s);
-  return path.basename(s);
 }
 
 function eqstmt(node, fnHash, globalFn, varHash, globalVar) {
