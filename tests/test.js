@@ -818,6 +818,13 @@ describe('global fn', function() {
     var res = more.parse(s);
     expect(res).to.eql('    div{margin:img}  div{margin:img}');
   });
+  it('extname', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){$b = @extname($a);div{margin:$b}}';
+    var res = more.parse(s);
+    expect(res).to.eql('    div{margin:.png}  div{margin:.png}');
+  });
 });
 describe('config', function() {
   it('code', function() {
