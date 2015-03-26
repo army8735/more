@@ -11,6 +11,7 @@ import operate from './operate';
 import ifstmt from './ifstmt';
 import forstmt from './forstmt';
 import eventbus from './eventbus';
+import preVar from './preVar';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -33,6 +34,7 @@ class Tree {
 
     this.res = '';
     this.autoSplit = false;
+    this.inVar = false;
   }
   join(node) {
     var self = this;
@@ -50,7 +52,9 @@ class Tree {
       else if(token.type() != Token.STRING) {
         self.autoSplit = false;
       }
-      if(!token.ignore || self.focus) {
+      if(!token.ignore
+        || self.focus
+          && !self.inVar) {
         //~String拆分语法
         if(self.autoSplit && token.type() == Token.STRING) {
           var s = getVar(token, self.varHash, self.globalVar);
@@ -134,7 +138,7 @@ class Tree {
             && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
             && !inFn(parent)
             && parent.parent().name() != Node.EXPR) {
-            var opt = operate(node, self.varHash, self.vars);
+            var opt = operate(node, self.varHash, self.globalVar);
             self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);
           }
@@ -177,6 +181,12 @@ class Tree {
           self.res += temp.res;
           self.index = temp.index;
           break;
+        case Node.VARDECL:
+          preVar(node, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
+          break;
+        case Node.VARSTMT:
+          self.inVar = true;
+          break;
       }
       //递归子节点，if和for忽略
       if([Node.IFSTMT, Node.FORSTMT].indexOf(node.name()) == -1) {
@@ -189,6 +199,9 @@ class Tree {
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(false, node);
+          break;
+        case Node.VARSTMT:
+          self.inVar = false;
           break;
       }
     }

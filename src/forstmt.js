@@ -54,16 +54,16 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
     //区分首次循环，后续忽略换行和初始化
     var k = node.leaf(2).token().content().replace(/^[$@]\{?/, '').replace(/}$/, '');
     var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar, file);
-    var tIndex;
+    var tIndex = index;
     for(var i = 0, lens = arr.length; i < lens; i++) {
+      index = tIndex;
+      temp = ignore(block.first(), ignores, index);
       //block的{
       if(first2) {
-        temp = ignore(block.first(), ignores, index);
         s += checkLine(temp.res, first && first2);
-        index = temp.index;
         res = s;
-        tIndex = index;
       }
+      index = temp.index;
       //for in中每次赋值给健变量
       varHash[k] = {
         value: i,
@@ -73,7 +73,7 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
       for(var j = 1, len = block.size(); j < len - 1; j++) {
         var tree = new Tree(
           ignores,
-          tIndex,
+          index,
           varHash,
           globalVar,
           fnHash,
@@ -117,16 +117,16 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
     //区分首次循环，后续忽略换行和初始化
     var k = node.leaf(2).token().content().replace(/^[$@]\{?/, '').replace(/}$/, '');
     var arr = exprstmt(node.leaf(4), fnHash, globalFn, varHash, globalVar, file);
-    var tIndex;
+    var tIndex = index;
     for(var i = 0, lens = arr.length; i < lens; i++) {
+      index = tIndex;
+      temp = ignore(block.first(), ignores, index);
       //block的{
       if(first2) {
-        temp = ignore(block.first(), ignores, index);
         s += checkLine(temp.res, first && first2);
-        index = temp.index;
         res = s;
-        tIndex = index;
       }
+      index = temp.index;
       //for in中每次赋值给健变量
       varHash[k] = {
         value: arr[i],
@@ -136,7 +136,7 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
       for(var j = 1, len = block.size(); j < len - 1; j++) {
         var tree = new Tree(
           ignores,
-          tIndex,
+          index,
           varHash,
           globalVar,
           fnHash,
@@ -164,7 +164,7 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
     //执行for的3个语句，判断是否循环用最后1个
     //先进行第1个赋值语句，可能为空
     if(node.leaf(2).name() == Node.VARSTMT) {
-      preVar(node.leaf(2), ignores, index, varHash, globalVar);
+      preVar(node.leaf(2), ignores, index, varHash, globalVar, true);
     }
     temp = ignore(node.leaf(2), ignores, index);
     s += checkLine(temp.res, first && first2);
@@ -188,21 +188,21 @@ export default function forstmt(node, ignores, index, varHash, globalVar, fnHash
     //{block}
     block = node.leaf(7);
     //区分首次循环，后续忽略换行和初始化
-    var tIndex;
+    var tIndex = index;
     while(loop) {
+      index = tIndex;
+      temp = ignore(block.first(), ignores, index);
       if(first2) {
         //block的{
-        temp = ignore(block.first(), ignores, index);
         s += checkLine(temp.res, first && first2);
-        index = temp.index;
         res = s;
-        tIndex = index;
       }
+      index = temp.index;
       //block内容
       for(var j = 1, len = block.size(); j < len - 1; j++) {
         var tree = new Tree(
           ignores,
-          tIndex,
+          index,
           varHash,
           globalVar,
           fnHash,

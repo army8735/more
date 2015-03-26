@@ -11,6 +11,7 @@ var operate=function(){var _7=require('./operate');return _7.hasOwnProperty("ope
 var ifstmt=function(){var _8=require('./ifstmt');return _8.hasOwnProperty("ifstmt")?_8.ifstmt:_8.hasOwnProperty("default")?_8.default:_8}();
 var forstmt=function(){var _9=require('./forstmt');return _9.hasOwnProperty("forstmt")?_9.forstmt:_9.hasOwnProperty("default")?_9.default:_9}();
 var eventbus=function(){var _10=require('./eventbus');return _10.hasOwnProperty("eventbus")?_10.eventbus:_10.hasOwnProperty("default")?_10.default:_10}();
+var preVar=function(){var _11=require('./preVar');return _11.hasOwnProperty("preVar")?_11.preVar:_11.hasOwnProperty("default")?_11.default:_11}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -33,6 +34,7 @@ var Node = homunculus.getClass('node', 'css');
 
     this.res = '';
     this.autoSplit = false;
+    this.inVar = false;
   }
   Tree.prototype.join = function(node) {
     var self = this;
@@ -50,7 +52,9 @@ var Node = homunculus.getClass('node', 'css');
       else if(token.type() != Token.STRING) {
         self.autoSplit = false;
       }
-      if(!token.ignore || self.focus) {
+      if(!token.ignore
+        || self.focus
+          && !self.inVar) {
         //~String拆分语法
         if(self.autoSplit && token.type() == Token.STRING) {
           var s = getVar(token, self.varHash, self.globalVar);
@@ -134,7 +138,7 @@ var Node = homunculus.getClass('node', 'css');
             && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
             && !inFn(parent)
             && parent.parent().name() != Node.EXPR) {
-            var opt = operate(node, self.varHash, self.vars);
+            var opt = operate(node, self.varHash, self.globalVar);
             self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);
           }
@@ -177,6 +181,12 @@ var Node = homunculus.getClass('node', 'css');
           self.res += temp.res;
           self.index = temp.index;
           break;
+        case Node.VARDECL:
+          preVar(node, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
+          break;
+        case Node.VARSTMT:
+          self.inVar = true;
+          break;
       }
       //递归子节点，if和for忽略
       if([Node.IFSTMT, Node.FORSTMT].indexOf(node.name()) == -1) {
@@ -189,6 +199,9 @@ var Node = homunculus.getClass('node', 'css');
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(false, node);
+          break;
+        case Node.VARSTMT:
+          self.inVar = false;
           break;
       }
     }

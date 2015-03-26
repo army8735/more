@@ -8,7 +8,7 @@ var Node = homunculus.getClass('node', 'css');
 
 var index;
 
-function recursion(node, ignores, varHash, globalVar, file) {
+function recursion(node, ignores, varHash, globalVar, file, focus) {
   if(!node.isToken()) {
     if(node.name() == Node.VARDECL
       && ['$', '@'].indexOf(node.first().token().content().charAt(0)) > -1) {
@@ -27,6 +27,10 @@ function recursion(node, ignores, varHash, globalVar, file) {
           break;
         case Node.ARRLTR:
         case Node.DIR:
+        case Node.BASENAME:
+        case Node.EXTNAME:
+        case Node.WIDTH:
+        case Node.HEIGHT:
           varHash[k] = {
             value: exprstmt(v, null, null, varHash, globalVar, file),
             unit: ''
@@ -40,7 +44,10 @@ function recursion(node, ignores, varHash, globalVar, file) {
     }
     else {
       node.leaves().forEach(function(leaf) {
-        recursion(leaf, ignores, varHash, globalVar, file);
+        //if和for和fn的在执行到时方运算
+        if(focus || [Node.IFSTMT, Node.FORSTMT, Node.FN].indexOf(leaf.name()) == -1) {
+          recursion(leaf, ignores, varHash, globalVar, file, focus);
+        }
       });
     }
   }
@@ -49,7 +56,7 @@ function recursion(node, ignores, varHash, globalVar, file) {
   }
 }
 
-exports.default=function(node, ignores, i, varHash, globalVar, file) {
+exports.default=function(node, ignores, i, varHash, globalVar, file, focus) {
   index = i;
-  recursion(node, ignores, varHash, globalVar, file);
+  recursion(node, ignores, varHash, globalVar, file, focus);
 }});

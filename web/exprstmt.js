@@ -1,4 +1,6 @@
 define(function(require, exports, module){var homunculus=require('homunculus');
+var images=require('images');
+
 var fs=require('fs');
 var path=require('path');
 
@@ -12,6 +14,14 @@ function exprstmt(node, fnHash, globalFn, varHash, globalVar, file) {
   switch(node.name()) {
     case Node.DIR:
       return dir(node, fnHash, globalFn, varHash, globalVar, file);
+    case Node.BASENAME:
+      return basename(node, fnHash, globalFn, varHash, globalVar, file);
+    case Node.EXTNAME:
+      return extname(node, fnHash, globalFn, varHash, globalVar, file);
+    case Node.WIDTH:
+      return width(node, fnHash, globalFn, varHash, globalVar, file);
+    case Node.HEIGHT:
+      return height(node, fnHash, globalFn, varHash, globalVar, file);
     default:
       return eqstmt(node, fnHash, globalFn, varHash, globalVar);
   }
@@ -52,6 +62,74 @@ function dir(node, fnHash, globalFn, varHash, globalVar, file) {
     }
   });
   return res;
+}
+
+function extname(node, fnHash, globalFn, varHash, globalVar, file) {
+  var cparam = node.last();
+  var s = '';
+  if(cparam.size() == 0) {
+    throw new Error('@extname requires a param: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
+  }
+  var p = cparam.leaf(1).first();
+  if(p.isToken()) {
+    var token = p.token();
+    if(token.type() == Token.STRING) {
+      s = token.val();
+    }
+  }
+  s = path.resolve(file, s);
+  return path.extname(s);
+}
+
+function width(node, fnHash, globalFn, varHash, globalVar, file) {
+  var cparam = node.last();
+  var s = '';
+  if(cparam.size() == 0) {
+    throw new Error('@width requires a param: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
+  }
+  var p = cparam.leaf(1).first();
+  if(p.isToken()) {
+    var token = p.token();
+    if(token.type() == Token.STRING) {
+      s = token.val();
+    }
+  }
+  s = path.resolve(file, s);
+  return images(s).width();
+}
+
+function height(node, fnHash, globalFn, varHash, globalVar, file) {
+  var cparam = node.last();
+  var s = '';
+  if(cparam.size() == 0) {
+    throw new Error('@height requires a param: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
+  }
+  var p = cparam.leaf(1).first();
+  if(p.isToken()) {
+    var token = p.token();
+    if(token.type() == Token.STRING) {
+      s = token.val();
+    }
+  }
+  s = path.resolve(file, s);
+  return images(s).height();
+}
+
+function basename(node, fnHash, globalFn, varHash, globalVar, file) {
+  var cparam = node.last();
+  var s = '';
+  if(cparam.size() == 0) {
+    throw new Error('@basename requires a param: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
+  }
+  var p = cparam.leaf(1).first();
+  if(p.isToken()) {
+    var token = p.token();
+    if(token.type() == Token.STRING) {
+      s = token.val();
+    }
+  }
+  s = path.resolve(file, s);
+  return path.basename(s);
 }
 
 function eqstmt(node, fnHash, globalFn, varHash, globalVar) {

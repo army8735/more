@@ -136,7 +136,14 @@
     }]
   });
   define('fs', {});
-  define('path', {});
+  define('path', {
+    'resolve': function() {
+      return '"path.resolve"';
+    },
+    'basename': function() {
+      return '"path.basename"';
+    }
+  });
   define('clean-css', {});
   seajs.use(['../index', './jssc'], function(More, jssc) {
     function init() {
