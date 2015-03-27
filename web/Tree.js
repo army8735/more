@@ -36,6 +36,7 @@ var Node = homunculus.getClass('node', 'css');
     this.res = '';
     this.autoSplit = false;
     this.inVar = false;
+    this.inOpt = false;
   }
   Tree.prototype.join = function(node) {
     var self = this;
@@ -53,9 +54,9 @@ var Node = homunculus.getClass('node', 'css');
       else if(token.type() != Token.STRING) {
         self.autoSplit = false;
       }
-      if(!token.ignore
+      if(!self.inOpt && (!token.ignore
         || self.focus
-          && !self.inVar) {
+          && !self.inVar)) {
         //~String拆分语法
         if(self.autoSplit && token.type() == Token.STRING) {
           var s = getVar(token, self.varHash, self.globalVar);
@@ -142,6 +143,7 @@ var Node = homunculus.getClass('node', 'css');
             var opt = operate(node, self.varHash, self.globalVar, self.file);
             self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);
+            self.inOpt = true;
           }
           break;
         case Node.IFSTMT:
@@ -199,12 +201,12 @@ var Node = homunculus.getClass('node', 'css');
         case Node.EXTNAME:
         case Node.WIDTH:
         case Node.HEIGHT:
-          if(!self.inVar) {
+          if(!self.inVar && !self.inOpt) {
             self.res += exprstmt(node, self.varHash, self.globalVar, self.file);
           }
-            var temp = ignore(node, self.ignores, self.index);
-            self.res += temp.res;
-            self.index = temp.index;
+          var temp = ignore(node, self.ignores, self.index);
+          self.res += temp.res;
+          self.index = temp.index;
           break;
       }
       //递归子节点，if和for忽略
@@ -221,6 +223,17 @@ var Node = homunculus.getClass('node', 'css');
           break;
         case Node.VARSTMT:
           self.inVar = false;
+          break;
+        case Node.ADDEXPR:
+        case Node.MTPLEXPR:
+        case Node.PRMREXPR:
+          var parent = node.parent();
+          if([Node.CALC, Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1
+            && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
+            && !inFn(parent)
+            && parent.parent().name() != Node.EXPR) {
+            self.inOpt = false;
+          }
           break;
       }
     }

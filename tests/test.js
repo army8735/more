@@ -872,6 +872,20 @@ describe('global fn', function() {
     var res = more.parse(s);
     expect(res).to.eql('  div{margin:16}div{margin:16}');
   });
+  it('width in expr', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){div{margin:1 + @width($a)}}';
+    var res = more.parse(s);
+    expect(res).to.eql('  div{margin:17  }div{margin:17  }');
+  });
+  it('width in prmrexpr', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){div{margin:(@width($a))}}';
+    var res = more.parse(s);
+    expect(res).to.eql('  div{margin:16}div{margin:16}');
+  });
   it('height', function() {
     var more = new More();
     more.path(path.join(__dirname, './img'));
@@ -886,12 +900,12 @@ describe('global fn', function() {
     var res = more.parse(s);
     expect(res).to.eql('  div{margin:16}div{margin:16}');
   });
-  it.skip('height in expr', function() {
+  it('height in expr', function() {
     var more = new More();
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){div{margin:@height($a) + 1}}';
     var res = more.parse(s);
-    expect(res).to.eql('  div{margin:16}div{margin:16}');
+    expect(res).to.eql('  div{margin:17  }div{margin:17  }');
   });
 });
 describe('config', function() {
