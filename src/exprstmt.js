@@ -1,5 +1,6 @@
 module homunculus from 'homunculus';
 module images from 'images';
+module glob from 'glob';
 
 module fs from 'fs';
 module path from 'path';
@@ -49,25 +50,33 @@ function dir(node, varHash, globalVar, file) {
     onlyBase = !!cparam.leaf(3);
   }
   s = path.resolve(file, s);
-  if(!fs.existsSync(s)) {
-    throw new Error('no such file or directory: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
-  };
-  var state = fs.lstatSync(s);
-  if(state.isFile()) {
-    s = path.dirname(s);
-  }
-  else if(!state.isDirectory()) {
-    throw new Error('no such file or directory: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
-  }
-  var arr = fs.readdirSync(s);
-  var res = [];
-  arr.forEach(function(item) {
-    var s2 = path.join(s, item);
-    state = fs.lstatSync(s2);
+  var res;
+  if(fs.existsSync(s)) {
+    var state = fs.lstatSync(s);
     if(state.isFile()) {
-      onlyBase ? res.push(path.relative(file, s2)) : res.push(s2);
+      s = path.dirname(s);
     }
-  });
+    else if(!state.isDirectory()) {
+      throw new Error('no such file or directory: ' + s + '\nline ' + node.first().token().line() + ', col ' + node.first().token().col());
+    }
+    var arr = fs.readdirSync(s);
+    var res = [];
+    arr.forEach(function(item) {
+      var s2 = path.join(s, item);
+      state = fs.lstatSync(s2);
+      if(state.isFile()) {
+        onlyBase ? res.push(path.relative(file, s2)) : res.push(s2);
+      }
+    });
+  }
+  else {
+    res = glob.sync(s);
+    if(onlyBase) {
+      res = res.map(function(s) {
+        return path.relative(file, s);
+      });
+    }
+  }
   return res;
 }
 

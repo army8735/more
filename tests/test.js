@@ -821,6 +821,20 @@ describe('dir', function() {
     var res = more.parse(s);
     expect(res).to.eql('   div{margin:000.png}div{margin:FFF.png}');
   });
+  it('glob', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '$a = @dir("./*.png");div{margin:$a}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:' + __dirname + '/img/000.png,' + __dirname + '/img/FFF.png}');
+  });
+  it('glob 2nd param', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '$a = @dir("./*.png", true);div{margin:$a}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:000.png,FFF.png}');
+  });
 });
 describe('global fn', function() {
   it('basename', function() {
