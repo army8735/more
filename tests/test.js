@@ -844,6 +844,20 @@ describe('global fn', function() {
     var res = more.parse(s);
     expect(res).to.eql('    div{margin:.png}  div{margin:.png}');
   });
+  it('width', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){$b = @width($a);div{margin:$b}}';
+    var res = more.parse(s);
+    expect(res).to.eql('    div{margin:16}  div{margin:16}');
+  });
+  it('height', function() {
+    var more = new More();
+    more.path(path.join(__dirname, './img'));
+    var s = '@for($a of @dir("./")){$b = @height($a);div{margin:$b}}';
+    var res = more.parse(s);
+    expect(res).to.eql('    div{margin:16}  div{margin:16}');
+  });
 });
 describe('config', function() {
   it('code', function() {

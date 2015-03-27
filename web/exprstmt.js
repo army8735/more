@@ -128,8 +128,15 @@ function width(node, fnHash, globalFn, varHash, globalVar, file) {
   var p = cparam.leaf(1).first();
   if(p.isToken()) {
     var token = p.token();
-    if(token.type() == Token.STRING) {
-      s = token.val();
+    switch(token.type()) {
+      case Token.STRING:
+        s = token.val();
+        break;
+      case Token.VARS:
+        s = token.content();
+        var k = s.replace(/^[$@]\{?/, '').replace(/}$/, '');
+        s = (varHash[k] || globalVar[k] || {}).value;
+        break;
     }
   }
   s = path.resolve(file, s);
@@ -145,8 +152,15 @@ function height(node, fnHash, globalFn, varHash, globalVar, file) {
   var p = cparam.leaf(1).first();
   if(p.isToken()) {
     var token = p.token();
-    if(token.type() == Token.STRING) {
-      s = token.val();
+    switch(token.type()) {
+      case Token.STRING:
+        s = token.val();
+        break;
+      case Token.VARS:
+        s = token.content();
+        var k = s.replace(/^[$@]\{?/, '').replace(/}$/, '');
+        s = (varHash[k] || globalVar[k] || {}).value;
+        break;
     }
   }
   s = path.resolve(file, s);
