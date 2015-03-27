@@ -204,8 +204,8 @@ class Tree {
           if(!self.inVar && !self.inOpt) {
             self.res += exprstmt(node, self.varHash, self.globalVar, self.file);
           }
-          var temp = ignore(node, self.ignores, self.index);
-          self.res += temp.res;
+          var temp = ignore(node, self.ignores, self.index, true);
+          self.res += temp.res.replace(/[^\n]/g, '');
           self.index = temp.index;
           break;
       }

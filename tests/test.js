@@ -849,7 +849,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @basename($a, ".png");div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('     div{margin:000}   div{margin:FFF}');
+    expect(res).to.eql('    div{margin:000}  div{margin:FFF}');
   });
   it('basename in value', function() {
     var more = new More();
@@ -919,7 +919,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){div{margin:@height($a) + 1}}';
     var res = more.parse(s);
-    expect(res).to.eql('  div{margin:17  }div{margin:17  }');
+    expect(res).to.eql('  div{margin:17 }div{margin:17 }');
   });
 });
 describe('config', function() {
