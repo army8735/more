@@ -705,6 +705,12 @@ describe('operate', function() {
     var res = more.parse(s);
     expect(res).to.eql('a{margin:3px 6px}');
   });
+  it('vardecl pre', function() {
+    var more = new More();
+    var s = 'a{margin:$b}$a:1;$b=$a + 2;';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:3}');
+  });
 });
 describe('ifstmt', function() {
   it('only if', function() {
@@ -724,6 +730,12 @@ describe('ifstmt', function() {
     var s = '@if(0){}@elseif(2){a{margin:0}}';
     var res = more.parse(s);
     expect(res).to.eql('a{margin:0}');
+  });
+  it('with var', function() {
+    var more = new More();
+    var s = '@if(0){$a=0;}@else{$a=1;a{margin:$a}}';
+    var res = more.parse(s);
+    expect(res).to.eql('a{margin:1}');
   });
 });
 describe('forstmt', function() {

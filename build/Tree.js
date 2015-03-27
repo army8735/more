@@ -182,7 +182,14 @@ var Node = homunculus.getClass('node', 'css');
           self.index = temp.index;
           break;
         case Node.VARDECL:
-          preVar(node, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
+          //在if/for语句中会强制，外部var声明已在初期前置
+          if(self.focus) {
+            preVar(node, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
+          }
+          //要忽略css3本身的var声明
+          else if(['$', '@'].indexOf(node.first().token().content().charAt(0)) > -1){
+            ignore(node, self.ignores, self.index);
+          }
           break;
         case Node.VARSTMT:
           self.inVar = true;
