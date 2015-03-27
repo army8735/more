@@ -144,13 +144,17 @@
       return '"path.basename"';
     }
   });
-  define('images', {
-    'width': function() {
-      return 0;
-    },
-    'height': function() {
-      return 1;
-    }
+  define('images', function() {
+    return function() {
+      return {
+        'width': function() {
+          return 0;
+        },
+        'height': function() {
+          return 1;
+        }
+      }
+    };
   });
   define('clean-css', {});
   seajs.use(['../index', './jssc'], function(More, jssc) {

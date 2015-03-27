@@ -12,6 +12,7 @@ var ifstmt=function(){var _8=require('./ifstmt');return _8.hasOwnProperty("ifstm
 var forstmt=function(){var _9=require('./forstmt');return _9.hasOwnProperty("forstmt")?_9.forstmt:_9.hasOwnProperty("default")?_9.default:_9}();
 var eventbus=function(){var _10=require('./eventbus');return _10.hasOwnProperty("eventbus")?_10.eventbus:_10.hasOwnProperty("default")?_10.default:_10}();
 var preVar=function(){var _11=require('./preVar');return _11.hasOwnProperty("preVar")?_11.preVar:_11.hasOwnProperty("default")?_11.default:_11}();
+var exprstmt=function(){var _12=require('./exprstmt');return _12.hasOwnProperty("exprstmt")?_12.exprstmt:_12.hasOwnProperty("default")?_12.default:_12}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -138,7 +139,7 @@ var Node = homunculus.getClass('node', 'css');
             && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
             && !inFn(parent)
             && parent.parent().name() != Node.EXPR) {
-            var opt = operate(node, self.varHash, self.globalVar);
+            var opt = operate(node, self.varHash, self.globalVar, self.file);
             self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);
           }
@@ -194,9 +195,20 @@ var Node = homunculus.getClass('node', 'css');
         case Node.VARSTMT:
           self.inVar = true;
           break;
+        case Node.BASENAME:
+        case Node.EXTNAME:
+        case Node.WIDTH:
+        case Node.HEIGHT:
+          if(!self.inVar) {
+            self.res += exprstmt(node, self.varHash, self.globalVar, self.file);
+          }
+            var temp = ignore(node, self.ignores, self.index);
+            self.res += temp.res;
+            self.index = temp.index;
+          break;
       }
       //递归子节点，if和for忽略
-      if([Node.IFSTMT, Node.FORSTMT].indexOf(node.name()) == -1) {
+      if([Node.IFSTMT, Node.FORSTMT, Node.BASENAME, Node.EXTNAME, Node.WIDTH, Node.HEIGHT].indexOf(node.name()) == -1) {
         var leaves = node.leaves();
         leaves.forEach(function(leaf) {
           self.join(leaf);

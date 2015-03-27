@@ -12,6 +12,7 @@ import ifstmt from './ifstmt';
 import forstmt from './forstmt';
 import eventbus from './eventbus';
 import preVar from './preVar';
+import exprstmt from './exprstmt';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -138,7 +139,7 @@ class Tree {
             && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
             && !inFn(parent)
             && parent.parent().name() != Node.EXPR) {
-            var opt = operate(node, self.varHash, self.globalVar);
+            var opt = operate(node, self.varHash, self.globalVar, self.file);
             self.res += opt.value + opt.unit;
             ignore(node, self.ignores, self.index);
           }
@@ -194,9 +195,20 @@ class Tree {
         case Node.VARSTMT:
           self.inVar = true;
           break;
+        case Node.BASENAME:
+        case Node.EXTNAME:
+        case Node.WIDTH:
+        case Node.HEIGHT:
+          if(!self.inVar) {
+            self.res += exprstmt(node, self.varHash, self.globalVar, self.file);
+          }
+            var temp = ignore(node, self.ignores, self.index);
+            self.res += temp.res;
+            self.index = temp.index;
+          break;
       }
       //递归子节点，if和for忽略
-      if([Node.IFSTMT, Node.FORSTMT].indexOf(node.name()) == -1) {
+      if([Node.IFSTMT, Node.FORSTMT, Node.BASENAME, Node.EXTNAME, Node.WIDTH, Node.HEIGHT].indexOf(node.name()) == -1) {
         var leaves = node.leaves();
         leaves.forEach(function(leaf) {
           self.join(leaf);

@@ -31,7 +31,7 @@ exports.default=function ifstmt(node, ignores, index, varHash, globalVar, fnHash
   var block = node.leaf(4);
   //计算if的表达式
   var expr = node.leaf(2);
-  var res = exprstmt(expr, fnHash, globalFn, varHash, globalVar);
+  var res = exprstmt(expr, varHash, globalVar);
   if(res) {
     //block的{
     temp = ignore(block.first(), ignores, index);

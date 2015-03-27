@@ -32,7 +32,7 @@ function recursion(node, ignores, varHash, globalVar, file, focus) {
         case Node.WIDTH:
         case Node.HEIGHT:
           varHash[k] = {
-            value: exprstmt(v, null, null, varHash, globalVar, file),
+            value: exprstmt(v, varHash, globalVar, file),
             unit: ''
           };
           break;

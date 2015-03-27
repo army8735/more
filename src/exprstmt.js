@@ -10,24 +10,24 @@ import ignore from './ignore';
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-function exprstmt(node, fnHash, globalFn, varHash, globalVar, file) {
+function exprstmt(node, varHash, globalVar, file) {
   switch(node.name()) {
     case Node.DIR:
-      return dir(node, fnHash, globalFn, varHash, globalVar, file);
+      return dir(node, varHash, globalVar, file);
     case Node.BASENAME:
-      return basename(node, fnHash, globalFn, varHash, globalVar, file);
+      return basename(node, varHash, globalVar, file);
     case Node.EXTNAME:
-      return extname(node, fnHash, globalFn, varHash, globalVar, file);
+      return extname(node, varHash, globalVar, file);
     case Node.WIDTH:
-      return width(node, fnHash, globalFn, varHash, globalVar, file);
+      return width(node, varHash, globalVar, file);
     case Node.HEIGHT:
-      return height(node, fnHash, globalFn, varHash, globalVar, file);
+      return height(node, varHash, globalVar, file);
     default:
-      return eqstmt(node, fnHash, globalFn, varHash, globalVar);
+      return eqstmt(node, varHash, globalVar);
   }
 }
 
-function dir(node, fnHash, globalFn, varHash, globalVar, file) {
+function dir(node, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
   var onlyBase = false;
@@ -35,8 +35,15 @@ function dir(node, fnHash, globalFn, varHash, globalVar, file) {
     var p = cparam.leaf(1).first();
     if(p.isToken()) {
       var token = p.token();
-      if(token.type() == Token.STRING) {
-        s = token.val();
+      switch(token.type()) {
+        case Token.STRING:
+          s = token.val();
+          break;
+        case Token.VARS:
+          s = token.content();
+          var k = s.replace(/^[$@]\{?/, '').replace(/}$/, '');
+          s = (varHash[k] || globalVar[k] || {}).value;
+          break;
       }
     }
     onlyBase = !!cparam.leaf(3);
@@ -64,7 +71,7 @@ function dir(node, fnHash, globalFn, varHash, globalVar, file) {
   return res;
 }
 
-function basename(node, fnHash, globalFn, varHash, globalVar, file) {
+function basename(node, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
   if(cparam.size() == 0) {
@@ -95,7 +102,7 @@ function basename(node, fnHash, globalFn, varHash, globalVar, file) {
   return path.basename(s, ext);
 }
 
-function extname(node, fnHash, globalFn, varHash, globalVar, file) {
+function extname(node, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
   if(cparam.size() == 0) {
@@ -119,7 +126,7 @@ function extname(node, fnHash, globalFn, varHash, globalVar, file) {
   return path.extname(s);
 }
 
-function width(node, fnHash, globalFn, varHash, globalVar, file) {
+function width(node, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
   if(cparam.size() == 0) {
@@ -143,7 +150,7 @@ function width(node, fnHash, globalFn, varHash, globalVar, file) {
   return images(s).width();
 }
 
-function height(node, fnHash, globalFn, varHash, globalVar, file) {
+function height(node, varHash, globalVar, file) {
   var cparam = node.last();
   var s = '';
   if(cparam.size() == 0) {
@@ -167,73 +174,73 @@ function height(node, fnHash, globalFn, varHash, globalVar, file) {
   return images(s).height();
 }
 
-function eqstmt(node, fnHash, globalFn, varHash, globalVar) {
+function eqstmt(node, varHash, globalVar) {
   if(node.name() == Node.EQSTMT) {
-    var rel = relstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var rel = relstmt(node.first(), varHash, globalVar);
     var next = node.leaf(1);
     var token = next.token();
     switch(token.content()) {
       case '==':
-        return rel == relstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return rel == relstmt(node.last(), varHash, globalVar);
       case '!=':
-        return rel != relstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return rel != relstmt(node.last(), varHash, globalVar);
     }
   }
-  return relstmt(node, fnHash, globalFn, varHash, globalVar);
+  return relstmt(node, varHash, globalVar);
 }
 
-function relstmt(node, fnHash, globalFn, varHash, globalVar) {
+function relstmt(node, varHash, globalVar) {
   if(node.name() == Node.RELSTMT) {
-    var add = addstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var add = addstmt(node.first(), varHash, globalVar);
     var next = node.leaf(1);
     var token = next.token();
     switch(token.content()) {
       case '>':
-        return add > addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return add > addstmt(node.last(), varHash, globalVar);
       case '>=':
-        return add >= addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return add >= addstmt(node.last(), varHash, globalVar);
       case '<':
-        return add < addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return add < addstmt(node.last(), varHash, globalVar);
       case '<=':
-        return add <= addstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return add <= addstmt(node.last(), varHash, globalVar);
     }
   }
-  return addstmt(node, fnHash, globalFn, varHash, globalVar);
+  return addstmt(node, varHash, globalVar);
 }
 
-function addstmt(node, fnHash, globalFn, varHash, globalVar) {
+function addstmt(node, varHash, globalVar) {
   if(node.name() == Node.ADDSTMT) {
-    var mtpl = mtplstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var mtpl = mtplstmt(node.first(), varHash, globalVar);
     var next = node.leaf(1);
     var token = next.token();
     switch(token.content()) {
       case '+':
-        return mtpl + mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return mtpl + mtplstmt(node.last(), varHash, globalVar);
       case '-':
-        return mtpl + mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return mtpl + mtplstmt(node.last(), varHash, globalVar);
     }
   }
-  return mtplstmt(node, fnHash, globalFn, varHash, globalVar);
+  return mtplstmt(node, varHash, globalVar);
 }
 
-function mtplstmt(node, fnHash, globalFn, varHash, globalVar) {
+function mtplstmt(node, varHash, globalVar) {
   if(node.name() == Node.MTPLSTMT) {
-    var postfix = postfixstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var postfix = postfixstmt(node.first(), varHash, globalVar);
     var next = node.leaf(1);
     var token = next.token();
     switch(token.content()) {
       case '*':
-        return postfix * mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return postfix * mtplstmt(node.last(), varHash, globalVar);
       case '/':
-        return postfix / mtplstmt(node.last(), fnHash, globalFn, varHash, globalVar);
+        return postfix / mtplstmt(node.last(), varHash, globalVar);
     }
   }
-  return postfixstmt(node, fnHash, globalFn, varHash, globalVar);
+  return postfixstmt(node, varHash, globalVar);
 }
 
-function postfixstmt(node, fnHash, globalFn, varHash, globalVar) {
+function postfixstmt(node, varHash, globalVar) {
   if(node.name() == Node.POSTFIXSTMT) {
-    var prmr = prmrstmt(node.first(), fnHash, globalFn, varHash, globalVar);
+    var prmr = prmrstmt(node.first(), varHash, globalVar);
     var next = node.leaf(1);
     var token = next.token();
     switch(token.content()) {
@@ -243,10 +250,10 @@ function postfixstmt(node, fnHash, globalFn, varHash, globalVar) {
         return prmr.value--;
     }
   }
-  return prmrstmt(node, fnHash, globalFn, varHash, globalVar).value;
+  return prmrstmt(node, varHash, globalVar).value;
 }
 
-function prmrstmt(node, fnHash, globalFn, varHash, globalVar) {
+function prmrstmt(node, varHash, globalVar) {
   var token = node.first().token();
   var s = token.content();
   switch(token.type()) {
@@ -259,7 +266,7 @@ function prmrstmt(node, fnHash, globalFn, varHash, globalVar) {
       return { value: s };
     default:
       if(s == '(') {
-        return { value: exprstmt(node.leaf(1), fnHash, globalFn, varHash, globalVar) };
+        return { value: exprstmt(node.leaf(1), varHash, globalVar) };
       }
       else if(s == '[') {
         var arr = [];
