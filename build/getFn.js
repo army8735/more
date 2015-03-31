@@ -10,11 +10,11 @@ exports.default=function(node, ignores, index, fnHash, globalFn, varHash, global
   var name = node.first().token().content();
   var fn = fnHash[name] || globalFn[name];
   if(fn) {
-    ignore(node, ignores, index);
-    while(ignores[++index]){}
-    while(ignores[++index]){}
-    var res = fn.compile(node.leaf(1), ignores, index, varHash, globalVar).trim().replace(/;$/, '').replace(/\n/g, '');
+    var i = index;
+    while(ignores[++i]){}
+    while(ignores[++i]){}
+    var res = fn.compile(node.leaf(1), ignores, i, varHash, globalVar).trim().replace(/\n/g, '');
     return res;
   }
-  return '';
+  return join(node, ignores, index).str;
 }

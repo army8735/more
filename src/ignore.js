@@ -5,6 +5,7 @@ var Node = homunculus.getClass('node', 'css');
 
 var res;
 var index;
+var append;
 
 function ignore(node, ignores, includeLine) {
   if(node instanceof Token) {
@@ -12,6 +13,7 @@ function ignore(node, ignores, includeLine) {
       return;
     }
     node.ignore = true;
+    append = '';
     while(ignores[++index]) {
       var ig = ignores[index];
       var s = ig.content();
@@ -19,6 +21,7 @@ function ignore(node, ignores, includeLine) {
         s = '/*' + s.slice(2) + '*/';
       }
       res += s;
+      append += s;
       if(includeLine || s != '\n') {
         ignores[index].ignore = true;
       }
@@ -37,6 +40,7 @@ function ignore(node, ignores, includeLine) {
 export default function(node, ignores, i, includeLine) {
   res = '';
   index = i;
+  append = '';
   ignore(node, ignores, includeLine);
-  return { res, index };
+  return { res, index, append };
 };

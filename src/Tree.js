@@ -17,6 +17,22 @@ import exprstmt from './exprstmt';
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
+var IGNORE = {};
+IGNORE[Node.IFSTMT]
+  = IGNORE[Node.FORSTMT]
+  = IGNORE[Node.BASENAME]
+  = IGNORE[Node.EXTNAME]
+  = IGNORE[Node.WIDTH]
+  = IGNORE[Node.HEIGHT]
+  = IGNORE[Node.ADDEXPR]
+  = IGNORE[Node.MTPLEXPR]
+  = IGNORE[Node.PRMREXPR]
+  = IGNORE[Node.FN]
+  = IGNORE[Node.VARSTMT]
+  = IGNORE[Node.UNBOX]
+  = IGNORE[Node.FNC]
+  = true;
+
 class Tree {
   constructor(ignores, index, varHash, globalVar, fnHash, globalFn, styleHash, styleTemp, selectorStack, map, focus, first, file) {
     this.ignores = ignores;
@@ -34,9 +50,6 @@ class Tree {
     this.file = file;
 
     this.res = '';
-    this.autoSplit = false;
-    this.inVar = false;
-    this.inOpt = false;
   }
   join(node) {
     var self = this;
@@ -46,62 +59,38 @@ class Tree {
         return;
       }
       eventbus.emit(node.nid());
-      //标识下一个string是否自动拆分
-      if(token.content() == '~' && token.type() != Token.HACK) {
-        self.autoSplit = true;
-        ignore(token, self.ignores, self.index);
-      }
-      else if(token.type() != Token.STRING) {
-        self.autoSplit = false;
-      }
-      if(!self.inOpt && (!token.ignore
-        || self.focus
-          && !self.inVar)) {
-        //~String拆分语法
-        if(self.autoSplit && token.type() == Token.STRING) {
-          var s = getVar(token, self.varHash, self.globalVar);
-          var c = s.charAt(0);
-          if(c != "'" && c != '"') {
-            c = '"';
-            s = c + s + c;
+      if(!token.ignore || self.focus) {
+        var str = getVar(token, self.varHash, self.globalVar);
+        //map映射url
+        if(token.import && self.map) {
+          var quote = /^['"']/.test(str) ? str.charAt(0) : '';
+          var val = quote ? str.slice(1, str.length - 1) : str;
+          //映射类型可能是回调
+          if(typeof self.map == 'function') {
+            str = self.map(val);
+            //如有引号，需处理转义
+            if(quote) {
+              str = quote + str + quote;
+            }
           }
-          s = s.replace(/,\s*/g, c + ',' + c);
-          self.res += s;
-          self.autoSplit = false;
+          else if(self.map.hasOwnProperty(token.val())){
+            str = self.map[val];
+            if(quote) {
+              str = quote + str + quote;
+            }
+          }
         }
-        else {
-          var str = getVar(token, self.varHash, self.globalVar);
-          //map映射url
-          if(token.import && self.map) {
-            var quote = /^['"']/.test(str) ? str.charAt(0) : '';
-            var val = quote ? str.slice(1, str.length - 1) : str;
-            //映射类型可能是回调
-            if(typeof self.map == 'function') {
-              str = self.map(val);
-              //如有引号，需处理转义
-              if(quote) {
-                str = quote + str + quote;
-              }
-            }
-            else if(self.map.hasOwnProperty(token.val())){
-              str = self.map[val];
-              if(quote) {
-                str = quote + str + quote;
-              }
-            }
+        //有@import url(xxx.css?xxx)的写法，需忽略
+        if(token.import && str.indexOf('.css?') == -1) {
+          //非.xxx结尾加上.css，非.css结尾替换掉.xxx为.css
+          if(!/\.\w+['"]?$/.test(str)) {
+            str = str.replace(/(['"]?)$/, '.css$1');
           }
-          //有@import url(xxx.css?xxx)的写法，需忽略
-          if(token.import && str.indexOf('.css?') == -1) {
-            //非.xxx结尾加上.css，非.css结尾替换掉.xxx为.css
-            if(!/\.\w+['"]?$/.test(str)) {
-              str = str.replace(/(['"]?)$/, '.css$1');
-            }
-            else if(!/\.css+['"]?$/.test(str)) {
-              str = str.replace(/\.\w+(['"]?)$/, '.css$1');
-            }
+          else if(!/\.css+['"]?$/.test(str)) {
+            str = str.replace(/\.\w+(['"]?)$/, '.css$1');
           }
-          self.res += str;
         }
+        self.res += str;
       }
       while(self.ignores[++self.index]) {
         var ig = self.ignores[self.index];
@@ -125,6 +114,10 @@ class Tree {
           break;
         case Node.FNC:
           self.res += getFn(node, self.ignores, self.index, self.fnHash, self.globalFn, self.varHash, self.globalVar);
+          var temp = ignore(node, self.ignores, self.index, true);
+          self.res += temp.res.replace(/[^\n]/g, '');
+          self.res += temp.append.replace(/\n/g, '');
+          self.index = temp.index;
           break;
         case Node.EXTEND:
           self.extend(node);
@@ -135,16 +128,12 @@ class Tree {
         case Node.ADDEXPR:
         case Node.MTPLEXPR:
         case Node.PRMREXPR:
-          var parent = node.parent();
-          if([Node.CALC, Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1
-            && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
-            && !inFn(parent)
-            && parent.parent().name() != Node.EXPR) {
-            var opt = operate(node, self.varHash, self.globalVar, self.file);
-            self.res += opt.value + opt.unit;
-            ignore(node, self.ignores, self.index);
-            self.inOpt = true;
-          }
+          var opr = operate(node, self.varHash, self.globalVar, self.file);
+          self.res += opr.value + opr.unit;
+          var temp = ignore(node, self.ignores, self.index, true);
+          self.res += temp.res.replace(/[^\n]/g, '');
+          self.res += temp.append.replace(/\n/g, '');
+          self.index = temp.index;
           break;
         case Node.IFSTMT:
           var temp = ifstmt(
@@ -184,33 +173,75 @@ class Tree {
           self.res += temp.res;
           self.index = temp.index;
           break;
-        case Node.VARDECL:
-          //在if/for语句中会强制，外部var声明已在初期前置
-          if(self.focus) {
-            preVar(node, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
-          }
-          //要忽略css3本身的var声明
-          else if(['$', '@'].indexOf(node.first().token().content().charAt(0)) > -1){
-            ignore(node, self.ignores, self.index);
-          }
-          break;
         case Node.VARSTMT:
-          self.inVar = true;
+          node.leaves().forEach(function(decl, i) {
+            //在if/for语句中会强制，外部var声明已在初期前置
+            if(self.focus) {
+              if(i % 2 == 0) {
+                if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
+                  preVar(decl, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
+                  var temp = ignore(node, self.ignores, self.index, true);
+                  self.res += temp.res.replace(/[^\n]/g, '');
+                  self.index = temp.index;
+                }
+                else {
+                  var temp = join(decl, self.ignores, self.index);
+                  self.res += temp.str;
+                  self.index = temp.index;
+                }
+              }
+              //vardecl后的,或;
+              else {
+                var temp = ignore(node, self.ignores, self.index, true);
+                self.res += temp.res.replace(/[^\n]/g, '');
+                self.index = temp.index;
+              }
+            }
+            //要忽略css3本身的var声明
+            else {
+              if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
+                var temp = ignore(decl, self.ignores, self.index, true);
+                self.res += temp.res.replace(/[^\n]/g, '');
+                self.index = temp.index;
+              }
+              else {
+                var temp = join(decl, self.ignores, self.index);
+                self.res += temp.str;
+                self.index = temp.index;
+              }
+            }
+          });
           break;
         case Node.BASENAME:
         case Node.EXTNAME:
         case Node.WIDTH:
         case Node.HEIGHT:
-          if(!self.inVar && !self.inOpt) {
-            self.res += exprstmt(node, self.varHash, self.globalVar, self.file);
-          }
+          self.res += exprstmt(node, self.varHash, self.globalVar, self.file);
           var temp = ignore(node, self.ignores, self.index, true);
           self.res += temp.res.replace(/[^\n]/g, '');
           self.index = temp.index;
           break;
+        case Node.FN:
+          var temp = ignore(node, self.ignores, self.index, true);
+          self.res += temp.res.replace(/[^\n]/g, '');
+          self.index = temp.index;
+          break;
+        case Node.UNBOX:
+          var s = getVar(node.last().token(), self.varHash, self.globalVar);
+          var c = s.charAt(0);
+          if(c != "'" && c != '"') {
+            c = '"';
+            s = c + s + c;
+          }
+          s = s.replace(/,\s*/g, c + ',' + c);
+          self.res += s;
+          var temp = ignore(node, self.ignores, self.index, true);
+          self.res += temp.res;
+          self.index = temp.index;
+          break;
       }
       //递归子节点，if和for忽略
-      if([Node.IFSTMT, Node.FORSTMT, Node.BASENAME, Node.EXTNAME, Node.WIDTH, Node.HEIGHT].indexOf(node.name()) == -1) {
+      if(!IGNORE.hasOwnProperty(node.name())) {
         var leaves = node.leaves();
         leaves.forEach(function(leaf) {
           self.join(leaf);
@@ -220,20 +251,6 @@ class Tree {
       switch(node.name()) {
         case Node.STYLESET:
           self.styleset(false, node);
-          break;
-        case Node.VARSTMT:
-          self.inVar = false;
-          break;
-        case Node.ADDEXPR:
-        case Node.MTPLEXPR:
-        case Node.PRMREXPR:
-          var parent = node.parent();
-          if([Node.CALC, Node.ADDEXPR, Node.MTPLEXPR, Node.PRMREXPR].indexOf(parent.name()) == -1
-            && [Node.VARDECL, Node.CPARAMS].indexOf(parent.parent().name()) == -1
-            && !inFn(parent)
-            && parent.parent().name() != Node.EXPR) {
-            self.inOpt = false;
-          }
           break;
       }
     }

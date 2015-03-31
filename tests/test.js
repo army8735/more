@@ -363,7 +363,7 @@ describe('simple test', function() {
   it('#parseFile true', function() {
     var more = new More();
     var res = more.parseFile(path.join(__dirname, './1.css'), true);
-    expect(res).to.eql('\n\n\n.test1{line-height:1}\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;line-height:1;}\n.test2{background:#f00}');
+    expect(res).to.eql('\n\n\n.test1{line-height:1}\n\n\n\nbody{margin:1;}\ndiv{line-height:1;}\n\n\nbody{margin:1;padding:2;font-size:3;text-align:center;;line-height:1;}\n.test2{background:#f00}');
   });
   it('suffix', function() {
     More.suffix('less');
@@ -842,14 +842,14 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @basename($a);div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('    div{margin:000.png}  div{margin:FFF.png}');
+    expect(res).to.eql('  div{margin:000.png}div{margin:FFF.png}');
   });
   it('basename with ext', function() {
     var more = new More();
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @basename($a, ".png");div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('    div{margin:000}  div{margin:FFF}');
+    expect(res).to.eql('  div{margin:000}div{margin:FFF}');
   });
   it('basename in value', function() {
     var more = new More();
@@ -863,7 +863,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @extname($a);div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('    div{margin:.png}  div{margin:.png}');
+    expect(res).to.eql('  div{margin:.png}div{margin:.png}');
   });
   it('extname in value', function() {
     var more = new More();
@@ -877,7 +877,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @width($a);div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('    div{margin:16}  div{margin:16}');
+    expect(res).to.eql('  div{margin:16}div{margin:16}');
   });
   it('width in value', function() {
     var more = new More();
@@ -891,7 +891,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){div{margin:1 + @width($a)}}';
     var res = more.parse(s);
-    expect(res).to.eql('  div{margin:17  }div{margin:17  }');
+    expect(res).to.eql('  div{margin:17}div{margin:17}');
   });
   it('width in prmrexpr', function() {
     var more = new More();
@@ -905,7 +905,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){$b = @height($a);div{margin:$b}}';
     var res = more.parse(s);
-    expect(res).to.eql('    div{margin:16}  div{margin:16}');
+    expect(res).to.eql('  div{margin:16}div{margin:16}');
   });
   it('height in value', function() {
     var more = new More();
@@ -919,7 +919,7 @@ describe('global fn', function() {
     more.path(path.join(__dirname, './img'));
     var s = '@for($a of @dir("./")){div{margin:@height($a) + 1}}';
     var res = more.parse(s);
-    expect(res).to.eql('  div{margin:17 }div{margin:17 }');
+    expect(res).to.eql('  div{margin:17}div{margin:17}');
   });
 });
 describe('config', function() {
