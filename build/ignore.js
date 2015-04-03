@@ -17,7 +17,7 @@ function ignore(node, ignores, includeLine) {
     while(ignores[++index]) {
       var ig = ignores[index];
       var s = ig.content();
-      if(ig.type() == Node.COMMENT && s.indexOf('//') == 0) {
+      if(ig.type() == Token.COMMENT && s.indexOf('//') == 0) {
         s = '/*' + s.slice(2) + '*/';
       }
       res += s;

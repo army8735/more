@@ -181,7 +181,7 @@ class Tree {
                 if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
                   preVar(decl, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
                   var temp = ignore(node, self.ignores, self.index, true);
-                  self.res += temp.res.replace(/[^\n]/g, '');
+                  self.res += temp.res;
                   self.index = temp.index;
                 }
                 else {

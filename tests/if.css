@@ -1,0 +1,13 @@
+$a = 1px;
+@if($a) { //test
+  div{margin:$a}
+}
+@else {
+  //test2
+}
+@if($a < 1) {
+  //test3
+}
+@else { //test4
+  div{margin:$a}
+}
