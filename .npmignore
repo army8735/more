@@ -1,0 +1,10 @@
+.yml
+.gitignore
+.gitattributes
+Makefile
+.npmignore
+tests/
+demo/
+node_modules/
+gulpfile.js
+README.md
