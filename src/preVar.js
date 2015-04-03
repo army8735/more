@@ -1,4 +1,4 @@
-module homunculus from 'homunculus';
+import homunculus from 'homunculus';
 import ignore from './ignore';
 import calculate from './calculate';
 import exprstmt from './exprstmt';

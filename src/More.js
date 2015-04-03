@@ -1,7 +1,7 @@
-module fs from 'fs';
-module path from 'path';
+import fs from 'fs';
+import path from 'path';
 
-module homunculus from 'homunculus';
+import homunculus from 'homunculus';
 
 import preImport from './preImport';
 import preVar from './preVar';

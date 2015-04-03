@@ -1,12 +1,12 @@
-define(function(require, exports, module){var homunculus=require('homunculus');
-var images=require('images');
-var glob=require('glob');
+define(function(require, exports, module){var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0.default:_0}();
+var images=function(){var _1=require('images');return _1.hasOwnProperty("images")?_1.images:_1.hasOwnProperty("default")?_1.default:_1}();
+var glob=function(){var _2=require('glob');return _2.hasOwnProperty("glob")?_2.glob:_2.hasOwnProperty("default")?_2.default:_2}();
 
-var fs=require('fs');
-var path=require('path');
+var fs=function(){var _3=require('fs');return _3.hasOwnProperty("fs")?_3.fs:_3.hasOwnProperty("default")?_3.default:_3}();
+var path=function(){var _4=require('path');return _4.hasOwnProperty("path")?_4.path:_4.hasOwnProperty("default")?_4.default:_4}();
 
-var join=function(){var _0=require('./join');return _0.hasOwnProperty("join")?_0.join:_0.hasOwnProperty("default")?_0.default:_0}();
-var ignore=function(){var _1=require('./ignore');return _1.hasOwnProperty("ignore")?_1.ignore:_1.hasOwnProperty("default")?_1.default:_1}();
+var join=function(){var _5=require('./join');return _5.hasOwnProperty("join")?_5.join:_5.hasOwnProperty("default")?_5.default:_5}();
+var ignore=function(){var _6=require('./ignore');return _6.hasOwnProperty("ignore")?_6.ignore:_6.hasOwnProperty("default")?_6.default:_6}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

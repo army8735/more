@@ -1,9 +1,9 @@
-module homunculus from 'homunculus';
-module images from 'images';
-module glob from 'glob';
+import homunculus from 'homunculus';
+import images from 'images';
+import glob from 'glob';
 
-module fs from 'fs';
-module path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 import join from './join';
 import ignore from './ignore';

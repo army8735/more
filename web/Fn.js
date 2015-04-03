@@ -1,10 +1,10 @@
-define(function(require, exports, module){var homunculus=require('homunculus');
-var join=function(){var _0=require('./join');return _0.hasOwnProperty("join")?_0.join:_0.hasOwnProperty("default")?_0.default:_0}();
-var ignore=function(){var _1=require('./ignore');return _1.hasOwnProperty("ignore")?_1.ignore:_1.hasOwnProperty("default")?_1.default:_1}();
-var getVar=function(){var _2=require('./getVar');return _2.hasOwnProperty("getVar")?_2.getVar:_2.hasOwnProperty("default")?_2.default:_2}();
-var clone=function(){var _3=require('./clone');return _3.hasOwnProperty("clone")?_3.clone:_3.hasOwnProperty("default")?_3.default:_3}();
-var calculate=function(){var _4=require('./calculate');return _4.hasOwnProperty("calculate")?_4.calculate:_4.hasOwnProperty("default")?_4.default:_4}();
-var operate=function(){var _5=require('./operate');return _5.hasOwnProperty("operate")?_5.operate:_5.hasOwnProperty("default")?_5.default:_5}();
+define(function(require, exports, module){var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0.default:_0}();
+var join=function(){var _1=require('./join');return _1.hasOwnProperty("join")?_1.join:_1.hasOwnProperty("default")?_1.default:_1}();
+var ignore=function(){var _2=require('./ignore');return _2.hasOwnProperty("ignore")?_2.ignore:_2.hasOwnProperty("default")?_2.default:_2}();
+var getVar=function(){var _3=require('./getVar');return _3.hasOwnProperty("getVar")?_3.getVar:_3.hasOwnProperty("default")?_3.default:_3}();
+var clone=function(){var _4=require('./clone');return _4.hasOwnProperty("clone")?_4.clone:_4.hasOwnProperty("default")?_4.default:_4}();
+var calculate=function(){var _5=require('./calculate');return _5.hasOwnProperty("calculate")?_5.calculate:_5.hasOwnProperty("default")?_5.default:_5}();
+var operate=function(){var _6=require('./operate');return _6.hasOwnProperty("operate")?_6.operate:_6.hasOwnProperty("default")?_6.default:_6}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

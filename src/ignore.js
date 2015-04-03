@@ -1,4 +1,4 @@
-module homunculus from 'homunculus';
+import homunculus from 'homunculus';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

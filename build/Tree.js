@@ -1,18 +1,18 @@
-var homunculus=require('homunculus');
+var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0.default:_0}();
 
-var join=function(){var _0=require('./join');return _0.hasOwnProperty("join")?_0.join:_0.hasOwnProperty("default")?_0.default:_0}();
-var ignore=function(){var _1=require('./ignore');return _1.hasOwnProperty("ignore")?_1.ignore:_1.hasOwnProperty("default")?_1.default:_1}();
-var getVar=function(){var _2=require('./getVar');return _2.hasOwnProperty("getVar")?_2.getVar:_2.hasOwnProperty("default")?_2.default:_2}();
-var getFn=function(){var _3=require('./getFn');return _3.hasOwnProperty("getFn")?_3.getFn:_3.hasOwnProperty("default")?_3.default:_3}();
-var checkLevel=function(){var _4=require('./checkLevel');return _4.hasOwnProperty("checkLevel")?_4.checkLevel:_4.hasOwnProperty("default")?_4.default:_4}();
-var concatSelector=function(){var _5=require('./concatSelector');return _5.hasOwnProperty("concatSelector")?_5.concatSelector:_5.hasOwnProperty("default")?_5.default:_5}();
-var normalize=function(){var _6=require('./normalize');return _6.hasOwnProperty("normalize")?_6.normalize:_6.hasOwnProperty("default")?_6.default:_6}();
-var operate=function(){var _7=require('./operate');return _7.hasOwnProperty("operate")?_7.operate:_7.hasOwnProperty("default")?_7.default:_7}();
-var ifstmt=function(){var _8=require('./ifstmt');return _8.hasOwnProperty("ifstmt")?_8.ifstmt:_8.hasOwnProperty("default")?_8.default:_8}();
-var forstmt=function(){var _9=require('./forstmt');return _9.hasOwnProperty("forstmt")?_9.forstmt:_9.hasOwnProperty("default")?_9.default:_9}();
-var eventbus=function(){var _10=require('./eventbus');return _10.hasOwnProperty("eventbus")?_10.eventbus:_10.hasOwnProperty("default")?_10.default:_10}();
-var preVar=function(){var _11=require('./preVar');return _11.hasOwnProperty("preVar")?_11.preVar:_11.hasOwnProperty("default")?_11.default:_11}();
-var exprstmt=function(){var _12=require('./exprstmt');return _12.hasOwnProperty("exprstmt")?_12.exprstmt:_12.hasOwnProperty("default")?_12.default:_12}();
+var join=function(){var _1=require('./join');return _1.hasOwnProperty("join")?_1.join:_1.hasOwnProperty("default")?_1.default:_1}();
+var ignore=function(){var _2=require('./ignore');return _2.hasOwnProperty("ignore")?_2.ignore:_2.hasOwnProperty("default")?_2.default:_2}();
+var getVar=function(){var _3=require('./getVar');return _3.hasOwnProperty("getVar")?_3.getVar:_3.hasOwnProperty("default")?_3.default:_3}();
+var getFn=function(){var _4=require('./getFn');return _4.hasOwnProperty("getFn")?_4.getFn:_4.hasOwnProperty("default")?_4.default:_4}();
+var checkLevel=function(){var _5=require('./checkLevel');return _5.hasOwnProperty("checkLevel")?_5.checkLevel:_5.hasOwnProperty("default")?_5.default:_5}();
+var concatSelector=function(){var _6=require('./concatSelector');return _6.hasOwnProperty("concatSelector")?_6.concatSelector:_6.hasOwnProperty("default")?_6.default:_6}();
+var normalize=function(){var _7=require('./normalize');return _7.hasOwnProperty("normalize")?_7.normalize:_7.hasOwnProperty("default")?_7.default:_7}();
+var operate=function(){var _8=require('./operate');return _8.hasOwnProperty("operate")?_8.operate:_8.hasOwnProperty("default")?_8.default:_8}();
+var ifstmt=function(){var _9=require('./ifstmt');return _9.hasOwnProperty("ifstmt")?_9.ifstmt:_9.hasOwnProperty("default")?_9.default:_9}();
+var forstmt=function(){var _10=require('./forstmt');return _10.hasOwnProperty("forstmt")?_10.forstmt:_10.hasOwnProperty("default")?_10.default:_10}();
+var eventbus=function(){var _11=require('./eventbus');return _11.hasOwnProperty("eventbus")?_11.eventbus:_11.hasOwnProperty("default")?_11.default:_11}();
+var preVar=function(){var _12=require('./preVar');return _12.hasOwnProperty("preVar")?_12.preVar:_12.hasOwnProperty("default")?_12.default:_12}();
+var exprstmt=function(){var _13=require('./exprstmt');return _13.hasOwnProperty("exprstmt")?_13.exprstmt:_13.hasOwnProperty("default")?_13.default:_13}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

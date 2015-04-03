@@ -1,14 +1,14 @@
-define(function(require, exports, module){var fs=require('fs');
-var path=require('path');
+define(function(require, exports, module){var fs=function(){var _0=require('fs');return _0.hasOwnProperty("fs")?_0.fs:_0.hasOwnProperty("default")?_0.default:_0}();
+var path=function(){var _1=require('path');return _1.hasOwnProperty("path")?_1.path:_1.hasOwnProperty("default")?_1.default:_1}();
 
-var homunculus=require('homunculus');
+var homunculus=function(){var _2=require('homunculus');return _2.hasOwnProperty("homunculus")?_2.homunculus:_2.hasOwnProperty("default")?_2.default:_2}();
 
-var preImport=function(){var _0=require('./preImport');return _0.hasOwnProperty("preImport")?_0.preImport:_0.hasOwnProperty("default")?_0.default:_0}();
-var preVar=function(){var _1=require('./preVar');return _1.hasOwnProperty("preVar")?_1.preVar:_1.hasOwnProperty("default")?_1.default:_1}();
-var preFn=function(){var _2=require('./preFn');return _2.hasOwnProperty("preFn")?_2.preFn:_2.hasOwnProperty("default")?_2.default:_2}();
-var clone=function(){var _3=require('./clone');return _3.hasOwnProperty("clone")?_3.clone:_3.hasOwnProperty("default")?_3.default:_3}();
-var compress=function(){var _4=require('./compress');return _4.hasOwnProperty("compress")?_4.compress:_4.hasOwnProperty("default")?_4.default:_4}();
-var Tree=function(){var _5=require('./Tree');return _5.hasOwnProperty("Tree")?_5.Tree:_5.hasOwnProperty("default")?_5.default:_5}();
+var preImport=function(){var _3=require('./preImport');return _3.hasOwnProperty("preImport")?_3.preImport:_3.hasOwnProperty("default")?_3.default:_3}();
+var preVar=function(){var _4=require('./preVar');return _4.hasOwnProperty("preVar")?_4.preVar:_4.hasOwnProperty("default")?_4.default:_4}();
+var preFn=function(){var _5=require('./preFn');return _5.hasOwnProperty("preFn")?_5.preFn:_5.hasOwnProperty("default")?_5.default:_5}();
+var clone=function(){var _6=require('./clone');return _6.hasOwnProperty("clone")?_6.clone:_6.hasOwnProperty("default")?_6.default:_6}();
+var compress=function(){var _7=require('./compress');return _7.hasOwnProperty("compress")?_7.compress:_7.hasOwnProperty("default")?_7.default:_7}();
+var Tree=function(){var _8=require('./Tree');return _8.hasOwnProperty("Tree")?_8.Tree:_8.hasOwnProperty("default")?_8.default:_8}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

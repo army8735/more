@@ -1,4 +1,4 @@
-module homunculus from 'homunculus';
+import homunculus from 'homunculus';
 import join from './join';
 import ignore from './ignore';
 

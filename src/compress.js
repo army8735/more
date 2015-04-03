@@ -2,7 +2,7 @@ import Clean from 'clean-css';
 import sort from './sort';
 import RegionCompress from './RegionCompress';
 
-module homunculus from 'homunculus';
+import homunculus from 'homunculus';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

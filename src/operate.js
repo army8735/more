@@ -1,4 +1,4 @@
-module homunculus from 'homunculus';
+import homunculus from 'homunculus';
 import getVar from './getVar';
 import exprstmt from './exprstmt';
 

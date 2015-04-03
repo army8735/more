@@ -1,7 +1,7 @@
-define(function(require, exports, module){var homunculus=require('homunculus');
-var ignore=function(){var _0=require('./ignore');return _0.hasOwnProperty("ignore")?_0.ignore:_0.hasOwnProperty("default")?_0.default:_0}();
-var calculate=function(){var _1=require('./calculate');return _1.hasOwnProperty("calculate")?_1.calculate:_1.hasOwnProperty("default")?_1.default:_1}();
-var exprstmt=function(){var _2=require('./exprstmt');return _2.hasOwnProperty("exprstmt")?_2.exprstmt:_2.hasOwnProperty("default")?_2.default:_2}();
+define(function(require, exports, module){var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0.default:_0}();
+var ignore=function(){var _1=require('./ignore');return _1.hasOwnProperty("ignore")?_1.ignore:_1.hasOwnProperty("default")?_1.default:_1}();
+var calculate=function(){var _2=require('./calculate');return _2.hasOwnProperty("calculate")?_2.calculate:_2.hasOwnProperty("default")?_2.default:_2}();
+var exprstmt=function(){var _3=require('./exprstmt');return _3.hasOwnProperty("exprstmt")?_3.exprstmt:_3.hasOwnProperty("default")?_3.default:_3}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');

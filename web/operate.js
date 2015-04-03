@@ -1,6 +1,6 @@
-define(function(require, exports, module){var homunculus=require('homunculus');
-var getVar=function(){var _0=require('./getVar');return _0.hasOwnProperty("getVar")?_0.getVar:_0.hasOwnProperty("default")?_0.default:_0}();
-var exprstmt=function(){var _1=require('./exprstmt');return _1.hasOwnProperty("exprstmt")?_1.exprstmt:_1.hasOwnProperty("default")?_1.default:_1}();
+define(function(require, exports, module){var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0.default:_0}();
+var getVar=function(){var _1=require('./getVar');return _1.hasOwnProperty("getVar")?_1.getVar:_1.hasOwnProperty("default")?_1.default:_1}();
+var exprstmt=function(){var _2=require('./exprstmt');return _2.hasOwnProperty("exprstmt")?_2.exprstmt:_2.hasOwnProperty("default")?_2.default:_2}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
