@@ -1,7 +1,7 @@
 {
   "name": "more-css",
   "version": "0.10.1",
-  "description": "a css pre-compiler & agressive compressor",
+  "description": "a css pre-compiler&agressive compressor",
   "maintainers": [
     {
       "name": "army8735",
