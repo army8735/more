@@ -13,31 +13,23 @@ function recursion(node, ignores, varHash, globalVar, file, focus) {
     if(node.name() == Node.VARDECL
       && ['$', '@'].indexOf(node.first().token().content().charAt(0)) > -1) {
       var i = index;
+      //变量明和:/=
       while(ignores[++i]) {}
       while(ignores[++i]) {}
+      //value可能有多个
       var leaves = node.leaves();
       var k = leaves[0].token().content().slice(1);
       var v = leaves[2];
       switch(v.name()) {
-        case Node.UNBOX:
-          varHash[k] = {
-            value: v.last().token().val(),
-            unit: ''
-          };
-          break;
         case Node.ARRLTR:
         case Node.DIR:
-        case Node.BASENAME:
-        case Node.EXTNAME:
-        case Node.WIDTH:
-        case Node.HEIGHT:
           varHash[k] = {
             value: exprstmt(v, varHash, globalVar, file),
             unit: ''
           };
           break;
         default:
-          varHash[k] = calculate(v, ignores, i, varHash, globalVar);
+          varHash[k] = calculate(v, ignores, i, varHash, globalVar, file);
       }
       index = ignore(node, ignores, index).index;
       index = ignore(node.next(), ignores, index).index;
