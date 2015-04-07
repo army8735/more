@@ -1,4 +1,4 @@
-A css pre-compiler & radical-compressor
+A css pre-compiler&radical-compressor
 ====
 
 相对于less，more的命名意思是比原本的css多做了一点点。
@@ -14,6 +14,7 @@ more定位于普通产品简化开发位置，而非广义CSS下游框架重量�
 对于没用到这些功能的css代码，more会智能识别不变更。more不会动普通的css代码。
 
 详细见：https://github.com/army8735/more/wiki/document
+中文：https://github.com/army8735/more/wiki/文档
 
 build目录下为nodejs环境的module模块。
 web目录下为书写符合AMD/CMD规范的js文件。
