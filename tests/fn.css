@@ -1,0 +1,6 @@
+$fn($a) {
+  @for($b in $a) {
+    margin:$b;
+  }
+}
+a{$fn([1,2])}

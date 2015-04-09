@@ -157,6 +157,14 @@ describe('simple test', function() {
     var res = more.parse(s);
     expect(res).to.eql('body{margin:2}');
   });
+  it('fncall file', function() {
+    var s = fs.readFileSync(path.join(__dirname, 'fn.css'), { encoding: 'utf-8' });
+    var more = new More();
+    var res = more.parse(s);
+    //fs.writeFileSync(path.join(__dirname, 'fn2.css'), res, { encoding: 'utf-8' });
+    var s2 = fs.readFileSync(path.join(__dirname, 'fn2.css'), { encoding: 'utf-8' });
+    expect(res).to.eql(s2);
+  });
   it('undefined fncall', function() {
     var more = new More();
     var s = 'body{fn(2)}';
