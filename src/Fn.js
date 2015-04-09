@@ -5,20 +5,22 @@ import getVar from './getVar';
 import clone from './clone';
 import calculate from './calculate';
 import operate from './operate';
+import exprstmt from './exprstmt';
+import Tree from './Tree';
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
 class Fn {
-  constructor(node, ignores, index) {
+  constructor(node, ignores, index, fnHash, globalFn, file) {
     this.node = node;
     this.ignores = ignores;
     this.index = index;
-    this.index2 = index;
+    this.fnHash = fnHash;
+    this.globalFn = globalFn;
+    this.file = file;
+
     this.params = [];
-    this.flag = false;
-    this.autoSplit = false;
-    this.res = '';
     this.preCompiler(node, ignores);
   }
   preCompiler(node, ignores) {
@@ -30,12 +32,8 @@ class Fn {
       }
     });
   }
-  compile(cParams, ignores, index, varHash, globalHash) {
+  compile(cParams, index, varHash, globalHash, first) {
     var self = this;
-    self.index2 = self.index;
-    self.flag = false;
-    this.autoSplit = false;
-    self.res = '';
     var newVarHash = clone(varHash);
     var leaves = cParams.leaves();
     leaves.slice(1, leaves.length - 1).forEach(function(leaf, i) {
@@ -45,6 +43,13 @@ class Fn {
           var k = self.params[idx];
           k = k.replace(/^[$@]\{?/, '').replace(/}$/, '');
           switch(leaf.name()) {
+            case Node.ARRLTR:
+            case Node.DIR:
+              newVarHash[k] = {
+                value: exprstmt(leaf, varHash, globalHash, self.file),
+                unit: ''
+              };
+              break;
             case Node.UNBOX:
               newVarHash[k] = {
                 value: leaf.last().token().val(),
@@ -52,68 +57,45 @@ class Fn {
               };
               break;
             default:
-              newVarHash[k] = calculate(leaf, ignores, index, varHash, globalHash);
+              newVarHash[k] = calculate(leaf, self.ignores, index, varHash, globalHash, self.file);
               break;
           }
         }
       }
-      index = ignore(leaf, ignores, index).index;
+      index = ignore(leaf, self.ignores, index).index;
     });
-    self.recursion(self.node, ignores, newVarHash, globalHash);
-    return self.res.replace(/^{/, '').replace(/}$/, '');
-  }
-  recursion(node, ignores, newVarHash, globalHash) {
-    var self = this;
-    if(node.isToken()) {
-      var token = node.token();
-      if(!token.isVirtual()) {
-        if(self.flag) {
-          if(token.content() == '~' && token.type() != Token.HACK) {
-            self.autoSplit = true;
-          }
-          else {
-            var s = getVar(token, newVarHash, globalHash);
-            if(self.autoSplit && token.type() == Token.STRING) {
-              var c = s.charAt(0);
-              if(c != "'" && c != '"') {
-                c = '"';
-                s = c + s + c;
-              }
-              s = s.replace(/,\s*/g, c + ',' + c);
-            }
-            self.res += s;
-            self.autoSplit = false;
-          }
-        }
-        while(self.ignores[++self.index2]) {
-          var s = self.ignores[self.index2].content();
-          if(self.flag && s != '\n') {
-            self.res += s;
-          }
-        }
+    index = self.index;
+    index = ignore(self.node.first(), self.ignores, index).index;
+    index = ignore(self.node.leaf(1), self.ignores, index).index;
+    var block = self.node.leaf(2);
+    index = ignore(block.first(), self.ignores, index).index;
+    var temp;
+    var res = '';
+    for(var j = 1, len = block.size(); j < len - 1; j++) {
+      var l = block.leaf(j);
+      if(l.isToken() && l.token().isVirtual()) {
+        continue;
       }
+      var tree = new Tree(
+        self.ignores,
+        index,
+        newVarHash,
+        globalHash,
+        self.fnHash,
+        self.globalFn,
+        {},
+        0,
+        [],
+        {},
+        true,
+        first,
+        self.file
+      );
+      temp = tree.join(l);
+      res += temp.res;
+      index = temp.index;
     }
-    else {
-      switch(node.name()) {
-        case Node.BLOCK:
-          self.flag = true;
-          break;
-        case Node.ADDEXPR:
-        case Node.MTPLEXPR:
-        case Node.PRMREXPR:
-          var parent = node.parent();
-          if(parent.name() != Node.CALC && parent.parent().name() != Node.EXPR) {
-            var opt = operate(node, newVarHash, globalHash);
-            self.res += opt.value + opt.unit;
-            self.index2 = ignore(node, ignores, self.index2).index;
-            return;
-          }
-          break;
-      }
-      node.leaves().forEach(function(leaf) {
-        self.recursion(leaf, ignores, newVarHash, globalHash);
-      });
-    }
+    return res;
   }
 }
 

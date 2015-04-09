@@ -8,17 +8,17 @@ var Node = homunculus.getClass('node', 'css');
 
 var index;
 
-function recursion(node, ignores, res) {
+function recursion(node, ignores, fnHash, globalFn, file) {
   if(!node.isToken()) {
     if(node.name() == Node.FN) {
       var leaves = node.leaves();
       var k = leaves[0].token().content();
-      res[k] = new Fn(node, ignores, index);
+      fnHash[k] = new Fn(node, ignores, index, fnHash, globalFn, file);
       index = ignore(node, ignores, index).index;
     }
     else {
       node.leaves().forEach(function(leaf) {
-        recursion(leaf, ignores, res);
+        recursion(leaf, ignores, fnHash, globalFn, file);
       });
     }
   }
@@ -27,7 +27,7 @@ function recursion(node, ignores, res) {
   }
 }
 
-exports.default=function(node, ignores, i, fnHash) {
+exports.default=function(node, ignores, i, fnHash, globalFn, file) {
   index = i;
-  recursion(node, ignores, fnHash);
+  recursion(node, ignores, fnHash, globalFn, file);
 }});

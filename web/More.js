@@ -34,6 +34,7 @@ var global = {
     this.fnHash = {};
     this.res = '';
     this.index = 0;
+    this.ignores = {};
     this.msg = null;
     this.autoSplit = false;
     this.selectorStack = [];
@@ -159,7 +160,7 @@ var global = {
     }
     this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
     preVar(this.node, this.ignores, this.index, this.varHash, global.vars, this.file || global.file);
-    preFn(this.node, this.ignores, this.index, this.fnHash);
+    preFn(this.node, this.ignores, this.index, this.fnHash, global.fns, this.file || global.file);
   }
   More.prototype.parseOn = function() {
     this.preJoin();

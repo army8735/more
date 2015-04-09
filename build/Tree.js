@@ -113,7 +113,7 @@ IGNORE[Node.IFSTMT]
           self.block(node);
           break;
         case Node.FNC:
-          self.res += getFn(node, self.ignores, self.index, self.fnHash, self.globalFn, self.varHash, self.globalVar);
+          self.res += getFn(node, self.ignores, self.index, self.fnHash, self.globalFn, self.varHash, self.globalVar, self.first);
           var temp = ignore(node, self.ignores, self.index, true);
           self.res += temp.res.replace(/[^\n]/g, '');
           self.res += temp.append.replace(/\n/g, '');

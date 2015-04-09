@@ -13,7 +13,7 @@ exports.default=function(node, ignores, index, fnHash, globalFn, varHash, global
     var i = index;
     while(ignores[++i]){}
     while(ignores[++i]){}
-    var res = fn.compile(node.leaf(1), ignores, i, varHash, globalVar).trim().replace(/\n/g, '');
+    var res = fn.compile(node.leaf(1), i, varHash, globalVar).trim().replace(/[\r\n]/g, '');
     return res;
   }
   return join(node, ignores, index).str;
