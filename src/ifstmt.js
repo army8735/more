@@ -121,5 +121,8 @@ export default function ifstmt(node, ignores, index, varHash, globalVar, fnHash,
       index = temp.index;
     }
   }
+  else {
+    res = s;
+  }
   return { res, index };
 };

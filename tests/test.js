@@ -727,6 +727,12 @@ describe('ifstmt', function() {
     var res = more.parse(s);
     expect(res).to.eql('div{margin:1}');
   });
+  it('if not', function() {
+    var more = new More();
+    var s = '@if(0) {a{margin:2}}';
+    var res = more.parse(s);
+    expect(res).to.eql(' ');
+  });
   it('else', function() {
     var more = new More();
     var s = '@if(0){/*no*/div{margin:0}}@else{div{margin:1}}';
