@@ -820,6 +820,18 @@ describe('unbox', function() {
     var res = more.parse(s);
     expect(res).to.eql('div{margin:test}');
   });
+  it('value', function() {
+    var more = new More();
+    var s = 'div{margin:~"0,1"}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{margin:0,1}');
+  });
+  it('value font-family', function() {
+    var more = new More();
+    var s = 'div{font-family:~"0,1"}';
+    var res = more.parse(s);
+    expect(res).to.eql('div{font-family:"0","1"}');
+  });
 });
 describe('dir', function() {
   it('normal', function() {
