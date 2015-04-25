@@ -234,7 +234,7 @@ class Tree {
             parent = parent.parent();
             if(parent.name() == Node.STYLE) {
               if(parent.first().name() == Node.KEY) {
-                var t = parent.first().first();
+                var t = parent.first().last();
                 if(t.isToken()) {
                   t = t.token();
                   //TODO:vars可以作为key
