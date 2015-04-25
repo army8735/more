@@ -238,7 +238,7 @@ class Tree {
                 if(t.isToken()) {
                   t = t.token();
                   //TODO:vars可以作为key
-                  if(t.type() == Token.STRING && t.content().toLowerCase() == 'font-family') {
+                  if(t.type() == Token.KEYWORD && t.content().toLowerCase() == 'font-family') {
                     isFontFamily = true;
                   }
                 }
@@ -248,9 +248,9 @@ class Tree {
           var c = s.charAt(0);
           if(c != "'" && c != '"') {
             c = '"';
+            s = c + s + c;
           }
           if(isFontFamily) {
-            s = c + s + c;
             s = s.replace(/,\s*/g, c + ',' + c);
           }
           else {
