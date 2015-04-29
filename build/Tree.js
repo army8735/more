@@ -237,7 +237,6 @@ IGNORE[Node.IFSTMT]
                 var t = parent.first().last();
                 if(t.isToken()) {
                   t = t.token();
-                  //TODO:vars可以作为key
                   if(t.type() == Token.KEYWORD && t.content().toLowerCase() == 'font-family') {
                     isFontFamily = true;
                   }
