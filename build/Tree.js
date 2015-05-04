@@ -174,43 +174,44 @@ IGNORE[Node.IFSTMT]
           self.index = temp.index;
           break;
         case Node.VARSTMT:
-          node.leaves().forEach(function(decl, i) {
-            //在if/for语句中会强制，外部var声明已在初期前置
-            if(self.focus) {
-              if(i % 2 == 0) {
-                if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
+          //在if/for语句中会强制，外部var声明已在初期前置
+          if(self.focus) {
+            if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
+              node.leaves().forEach(function(decl, i) {
+                if(i % 2 == 0) {
                   preVar(decl, self.ignores, self.index, self.varHash, self.globalVar, self.file, self.focus);
-                  var temp = ignore(node, self.ignores, self.index, true);
+                  var temp = ignore(decl, self.ignores, self.index, true);
                   self.res += temp.res;
                   self.index = temp.index;
                 }
+                //vardecl后的,或;
                 else {
-                  var temp = join(decl, self.ignores, self.index);
-                  self.res += temp.str;
+                  var temp = ignore(decl, self.ignores, self.index, true);
+                  self.res += temp.res.replace(/[^\n]/g, '');
                   self.index = temp.index;
                 }
-              }
-              //vardecl后的,或;
-              else {
-                var temp = ignore(node, self.ignores, self.index, true);
-                self.res += temp.res.replace(/[^\n]/g, '');
-                self.index = temp.index;
-              }
+              });
             }
             //要忽略css3本身的var声明
             else {
-              if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
-                var temp = ignore(decl, self.ignores, self.index, true);
-                self.res += temp.res.replace(/[^\n]/g, '');
-                self.index = temp.index;
-              }
-              else {
-                var temp = join(decl, self.ignores, self.index);
-                self.res += temp.str;
-                self.index = temp.index;
-              }
+              var temp = join(node, self.ignores, self.index);
+              self.res += temp.str;
+              self.index = temp.index;
             }
-          });
+          }
+          else {
+            //要忽略css3本身的var声明
+            if(['$', '@'].indexOf(node.first().first().token().content().charAt(0)) > -1) {
+              var temp = ignore(node, self.ignores, self.index, true);
+              self.res += temp.res.replace(/[^\n]/g, '');
+              self.index = temp.index;
+            }
+            else {
+              var temp = join(node, self.ignores, self.index);
+              self.res += temp.str;
+              self.index = temp.index;
+            }
+          }
           break;
         case Node.BASENAME:
         case Node.EXTNAME:

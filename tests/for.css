@@ -3,3 +3,7 @@
     div{margin:$a $b}
   }
 }
+
+@for($i = 0; $i < 3; $i++) {$j=$i + 1;
+  .list .b$i{animation:bn$i .2s;-webkit-animation:$j .2s}
+}

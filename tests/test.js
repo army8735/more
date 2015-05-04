@@ -796,7 +796,7 @@ describe('forstmt', function() {
     var s = fs.readFileSync(path.join(__dirname, 'for.css'), { encoding: 'utf-8' });
     var more = new More();
     var res = more.parse(s);
-    //fs.writeFileSync(path.join(__dirname, 'for2.css'), res, { encoding: 'utf-8' });
+    fs.writeFileSync(path.join(__dirname, 'for2.css'), res, { encoding: 'utf-8' });
     var s2 = fs.readFileSync(path.join(__dirname, 'for2.css'), { encoding: 'utf-8' });
     expect(res).to.eql(s2);
   });

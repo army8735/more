@@ -1,6 +1,6 @@
 {
   "name": "more-css",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "a css pre-compiler&agressive compressor",
   "maintainers": [
     {
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "clean-css": "~3.0.10",
-    "homunculus": "~0.9.0",
+    "homunculus": "~0.9.1",
     "glob": "~5.0.5",
     "images": "~2.1.4"
   },
@@ -46,7 +46,7 @@
     "mocha": "^2.2.4",
     "mocha-lcov-reporter": "^0.0.2",
     "through2": "^0.6.1",
-    "jsdc": "^0.5.7"
+    "jsdc": "^0.5.12"
   },
   "main": "./index",
   "engines": {
