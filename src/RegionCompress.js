@@ -21,6 +21,7 @@ class RegionCompress {
      4聚合相同样式的选择器（样式确保唯一后排序，不冲突则合并相同的）、
      5提取公因子（最大图形选择算法），
      2和3已被clean-css实现，无需重复
+     追加：除5外都被clean-css实现，但尚不完整，对!important冲突判断有误
      */
     this.merge(this.list);
     this.merge(this.list, true);
@@ -29,6 +30,8 @@ class RegionCompress {
     this.union(this.list, true);
     this.preRelease(this.list);
     this.extract(this.list);
+    this.merge(this.list);
+    this.merge(this.list, true);
     return this.join(this.list);
   }
   //合并相同选择器，向前向后两个方向

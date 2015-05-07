@@ -18,6 +18,10 @@ var KEY_HASH=function(){var _0=require('./abbreviationKey.js');return _0.hasOwnP
     else if(this.imCache.hasOwnProperty([first + ',' + last])) {
       return this.imCache[first + ',' + last];
     }
+    //都是tag结尾则无冲突
+    else if(this.allTag(list, first, last)) {
+      return this.imCache[first + ',' + last + ',' + child] = true;
+    }
     //非紧邻若无相同样式或important优先级不同无影响
     else {
       var hash = {};
@@ -126,6 +130,41 @@ var KEY_HASH=function(){var _0=require('./abbreviationKey.js');return _0.hasOwnP
       }
     }
     return true;
+  }
+  Impact.prototype.allTag = function(list, first, last) {
+    var hash = {};
+    for(var i = 0, len = list[first].selectors.length; i < len; i++) {
+      var s = list[first].selectors[i];
+      //div全字母为tag
+      if(/^[a-z]+$/i.test(s)) {
+        hash[s] = true;
+        continue;
+      }
+      // div前面空格类型
+      if(/ [a-z]+$/i.test(s)) {
+        hash[/ [a-z]+$/i.exec(s)[0].slice(1)] = true;
+        continue;
+      }
+      //>div
+      if(/>[a-z]+$/i.test(s)) {
+        hash[/>[a-z]+$/i.exec(s)[0].slice(1)] = true;
+        continue;
+      }
+      return false;
+    }
+    for(var i = 0, len = list[last].selectors.length; i < len; i++) {
+      var s = list[last].selectors[i];
+      if(/^[a-z]+$/i.test(s) && !hash[s]) {
+        continue;
+      }
+      if(/ [a-z]+$/i.test(s) && !hash[/ [a-z]+$/i.exec(s)[0].slice(1)]) {
+        continue;
+      }
+      if(/>[a-z]+$/i.test(s) && !hash[/>[a-z]+$/i.exec(s)[0].slice(1)]) {
+        continue;
+      }
+      return false;
+    }
   }
 
 

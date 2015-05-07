@@ -18,6 +18,10 @@ define(function(require, exports, module){var KEY_HASH=function(){var _0=require
     else if(this.imCache.hasOwnProperty([first + ',' + last + ',' + child])) {
       return this.imCache[first + ',' + last + ',' + child];
     }
+    //都是tag结尾则无冲突
+    else if(this.allTag(list, first, last)) {
+      return this.imCache[first + ',' + last + ',' + child] = true;
+    }
     //非紧邻若无相同样式或important优先级不同无影响
     else {
       var style = list[last].styles[child];
@@ -32,7 +36,8 @@ define(function(require, exports, module){var KEY_HASH=function(){var _0=require
       };
       for(var i = first + 1; i < last; i++) {
         var item = list[i];
-        if(this.isChildren(item, list[last]) || this.isChildren(item, list[first])) {
+        if(this.isChildren(item, list[last])
+          || this.isChildren(item, list[first])) {
           this.imCache[i + ',' + last + ',' + child] = true;
           continue;
         }
@@ -75,6 +80,41 @@ define(function(require, exports, module){var KEY_HASH=function(){var _0=require
       }
     }
     return true;
+  }
+  ImpactChild.prototype.allTag = function(list, first, last) {
+    var hash = {};
+    for(var i = 0, len = list[first].selectors.length; i < len; i++) {
+      var s = list[first].selectors[i];
+      //div全字母为tag
+      if(/^[a-z]+$/i.test(s)) {
+        hash[s] = true;
+        continue;
+      }
+      // div前面空格类型
+      if(/ [a-z]+$/i.test(s)) {
+        hash[/ [a-z]+$/i.exec(s)[0].slice(1)] = true;
+        continue;
+      }
+      //>div
+      if(/>[a-z]+$/i.test(s)) {
+        hash[/>[a-z]+$/i.exec(s)[0].slice(1)] = true;
+        continue;
+      }
+      return false;
+    }
+    for(var i = 0, len = list[last].selectors.length; i < len; i++) {
+      var s = list[last].selectors[i];
+      if(/^[a-z]+$/i.test(s) && !hash[s]) {
+        continue;
+      }
+      if(/ [a-z]+$/i.test(s) && !hash[/ [a-z]+$/i.exec(s)[0].slice(1)]) {
+        continue;
+      }
+      if(/>[a-z]+$/i.test(s) && !hash[/>[a-z]+$/i.exec(s)[0].slice(1)]) {
+        continue;
+      }
+      return false;
+    }
   }
 
 
