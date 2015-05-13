@@ -33,8 +33,8 @@ npm install more-css
 * parseFile(file:String, combo:Boolean = false):String 转换css文件，combo表明是否静态合并@import的文件
  * combo详见[parseFile高级用法](https://github.com/army8735/more/wiki/document#parsefile高级用法)
 * ast():Object 返回解析后的语法树
-* tokens():Array<Object> 返回解析后的词法单元序列
-* imports():Array<String> 返回解析后的@import文件列表
+* tokens():Array\<Object> 返回解析后的词法单元序列
+* imports():Array\<String> 返回解析后的@import文件列表
 * vars(data:Object):Object 设置/读取变量哈希
 * styles(data:Object):Object 设置/读取样式哈希
 * fns(data:Object):Object 设置/读取方法哈希
@@ -53,7 +53,7 @@ npm install more-css
 * config(str:String):void 预编译一段css并将其结果作为之后全局预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
-* addKeyWord(kw:String/Array<String>):void 添加未知的css属性关键字以支持分析
+* addKeyWord(kw:String/Array\<String>):void 添加未知的css属性关键字以支持分析
 * compress(code:String, radical:Boolean = false):String 基于clean-css压缩css代码，radical表明是否使用激进安全算法
 * compress(code:String, options:Object = { processImport: false }, radical:Boolean = false):String 同上，增加options选项，传给clean-css
 * map(data:Object/Function):Object/Function 全局设置/读取映射表，用以将@import的文件名作匹配替换处理
