@@ -1187,3 +1187,38 @@ describe('map', function() {
     expect(res).to.eql('b{}');
   });
 });
+describe('type', function(){
+  it('INDEPENDENT', function() {
+    More.clean();
+    var more = new More();
+    more.clean();
+    var more2 = new More();
+    more2.clean();
+    var code = fs.readFileSync(path.join(__dirname, './type1.css'), { encoding: 'utf-8' });
+    var res = more.parse(code);
+    var res2 = more2.parse(code, More.INDEPENDENT);
+    //fs.writeFileSync(path.join(__dirname, './type1-0.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(fs.readFileSync(path.join(__dirname, './type1-0.css'), { encoding: 'utf-8' }));
+    expect(res2).to.eql(fs.readFileSync(path.join(__dirname, './type1-0.css'), { encoding: 'utf-8' }));
+  });
+  it('INCLUDE', function() {
+    var file = path.join(__dirname, './type1.css');
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    var more = new More();
+    more.clean();
+    more.path(file);
+    var res = more.parse(code, More.INCLUDE);
+    //fs.writeFileSync(path.join(__dirname, './type1-1.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(fs.readFileSync(path.join(__dirname, './type1-1.css'), { encoding: 'utf-8' }));
+  });
+  it('COMPLEX', function() {
+    var file = path.join(__dirname, './type1.css');
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    var more = new More();
+    more.clean();
+    more.path(file);
+    var res = more.parse(code, More.COMPLEX);
+    //fs.writeFileSync(path.join(__dirname, './type1-2.css'), res, { encoding: 'utf-8' });
+    expect(res).to.eql(fs.readFileSync(path.join(__dirname, './type1-2.css'), { encoding: 'utf-8' }));
+  });
+});

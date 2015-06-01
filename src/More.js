@@ -13,7 +13,7 @@ import Tree from './Tree';
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
 
-var global = {
+var globals = {
   vars: {},
   fns: {},
   styles: {},
@@ -29,7 +29,7 @@ class More {
     this.node = null;
     this.parser = null;
     this.varHash = {};
-    this.styleHash = clone(global.styles);
+    this.styleHash = clone(globals.styles);
     this.styleTemp = 0;
     this.fnHash = {};
     this.res = '';
@@ -40,58 +40,65 @@ class More {
     this.importStack = [];
     this.file = '';
   }
-  parse(code, ignoreImport) {
-    if(code) {
-      this.code = code;
-    }
-    this.preParse(ignoreImport);
-    if(this.msg) {
-      return this.msg;
-    }
-    return this.parseOn();
-  }
-  //combo指明为true时，将全部@import文件合并进来分析
-  //简易使用可忽略此参数，此时变量作用域不是页面，而是此文件本身
-  //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
-  parseFile(file, combo) {
+  parse(code, type) {
     var self = this;
-    self.file = file;
-    var code = fs.readFileSync(file, { encoding: 'utf-8' });
-    self.code = code;
-    self.preParse(combo);
+    self.code = code || '';
+    self.preParse(type && type !== More.INDEPENDENT);
     if(self.msg) {
       return self.msg;
     }
-    if(combo && self.imports().length) {
+    if(type && type !== More.INDEPENDENT && self.imports().length) {
+      var list = [];
+      var res = '';
       var data = {
         vars: {},
         fns: {},
         styles: {}
       };
-      var list = [];
       self.imports().forEach(function(im) {
-        if(global.map) {
+        if(globals.map) {
           //映射类型可能是回调
-          if(typeof global.map == 'function') {
-            im = global.map(im);
+          if(typeof globals.map == 'function') {
+            im = globals.map(im);
           }
-          else if(global.map.hasOwnProperty(im)){
-            im = global.map[im];
+          else if(globals.map.hasOwnProperty(im)){
+            im = globals.map[im];
           }
         }
-        if(global.suffix != 'css') {
-          im = im.replace(/\.\w+$/, '.' + global.suffix);
+        if(!/\.\w+$/.test(im)) {
+          im += '.css';
+        }
+        if(globals.suffix && globals.suffix != 'css') {
+          im = im.replace(/\.\w+$/, '.' + globals.suffix);
         }
         var iFile;
         if(im.charAt(0) == '/') {
           iFile = path.join(More.root(), '.' + im);
         }
         else {
-          iFile = path.join(path.dirname(file), im);
+          iFile = path.join(path.dirname(self.file), im);
         }
         self.mixImport(iFile, data, list);
       });
-      var res = '';
+      var error = '';
+      //COMPLEX类型
+      if(type == More.COMPLEX) {
+        list.forEach(function(more, i) {
+          if(error) {
+            return;
+          }
+          if(more.msg) {
+            error = more.msg;
+            return;
+          }
+          res += more.parseOn();
+        });
+        if(error) {
+          return error;
+        }
+        return res += self.parseOn();
+      }
+      //INCLUDE类型
       Object.keys(self.varHash).forEach(function(k) {
         data.vars[k] = self.varHash[k];
       });
@@ -101,15 +108,43 @@ class More {
       self.vars(data.vars);
       self.fns(data.fns);
       list.forEach(function(more, i) {
+        if(error) {
+          return;
+        }
         more.vars(data.vars);
         more.fns(data.fns);
         if(i) {
           more.styles(list[i - 1].styles());
         }
-        res += more.msg || more.parseOn();
+        if(more.msg) {
+          error = more.msg;
+          return;
+        }
+        res += more.parseOn();
       });
+      if(error) {
+        return error;
+      }
       self.styles(list[list.length - 1].styles());
       return res += self.parseOn();
+    }
+    return self.parseOn();
+  }
+  //combo指明为INCLUDE时，将全部@import文件合并进来分析
+  //简易使用可忽略此参数，默认INDEPENDENT此时变量作用域不是页面，而是此文件本身
+  //COMPLEX为合并@import但每个文件还是隔离作用域
+  //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
+  parseFile(file, type) {
+    var self = this;
+    self.file = file;
+    var code = fs.readFileSync(file, { encoding: 'utf-8' });
+    self.code = code;
+    self.preParse(type && type !== More.INDEPENDENT);
+    if(self.msg) {
+      return self.msg;
+    }
+    if(type && type != More.INDEPENDENT && self.imports().length) {
+      return self.parse(code, type);
     }
     return self.parseOn();
   }
@@ -122,8 +157,20 @@ class More {
       return more.msg;
     }
     more.imports().forEach(function(im) {
-      if(global.suffix != 'css') {
-        im = im.replace(/\.\w+$/, '.' + global.suffix);
+      if(globals.map) {
+        //映射类型可能是回调
+        if(typeof globals.map == 'function') {
+          im = globals.map(im);
+        }
+        else if(globals.map.hasOwnProperty(im)){
+          im = globals.map[im];
+        }
+      }
+      if(!/\.\w+$/.test(im)) {
+        im += '.css';
+      }
+      if(globals.suffix && globals.suffix != 'css') {
+        im = im.replace(/\.\w+$/, '.' + globals.suffix);
       }
       var iFile;
       if(im.charAt(0) == '/') {
@@ -158,8 +205,8 @@ class More {
       return this.msg = e.toString();
     }
     this.importStack = preImport(this.node, this.ignores, this.index, ignoreImport);
-    preVar(this.node, this.ignores, this.index, this.varHash, global.vars, this.file || global.file);
-    preFn(this.node, this.ignores, this.index, this.fnHash, global.fns, this.file || global.file);
+    preVar(this.node, this.ignores, this.index, this.varHash, globals.vars, this.file || globals.file);
+    preFn(this.node, this.ignores, this.index, this.fnHash, globals.fns, this.file || globals.file);
   }
   parseOn() {
     this.preJoin();
@@ -167,16 +214,16 @@ class More {
       this.ignores,
       this.index,
       this.varHash,
-      global.vars,
+      globals.vars,
       this.fnHash,
-      global.fns,
+      globals.fns,
       this.styleHash,
       this.styleTemp,
       this.selectorStack,
-      global.map,
+      globals.map,
       false,
       true,
-      this.file || global.file
+      this.file || globals.file
     );
     var temp = tree.join(this.node);
     this.res += temp.res;
@@ -289,57 +336,57 @@ class More {
   }
   static suffix(str) {
     if(str) {
-      global.suffix = str.replace(/^\./, '');
+      globals.suffix = str.replace(/^\./, '');
     }
-    return global.suffix;
+    return globals.suffix;
   }
   static root(str) {
     if(str) {
       if(!/\/\\$/.test(str)) {
         str += '/';
       }
-      global.root = str;
+      globals.root = str;
     }
-    return global.root;
+    return globals.root;
   }
   static vars(o, mix) {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.vars[k] = o[k];
+          globals.vars[k] = o[k];
         });
       }
       else {
-        global.vars = o;
+        globals.vars = o;
       }
     }
-    return global.vars;
+    return globals.vars;
   }
   static fns(o, mix) {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.fns[k] = o[k];
+          globals.fns[k] = o[k];
         });
       }
       else {
-        global.fns = o;
+        globals.fns = o;
       }
     }
-    return global.fns;
+    return globals.fns;
   }
   static styles(o, mix) {
     if(o) {
       if(mix) {
         Object.keys(o).forEach(function(k) {
-          global.styles[k] = o[k];
+          globals.styles[k] = o[k];
         });
       }
       else {
-        global.styles = o;
+        globals.styles = o;
       }
     }
-    return global.styles;
+    return globals.styles;
   }
   static config(str, mix) {
     if(str) {
@@ -352,22 +399,26 @@ class More {
       More.fns(more.fns(), mix);
       More.styles(more.styles(), mix);
     }
-    return global;
+    return globals;
   }
   static configFile(file, mix) {
     return More.config(fs.readFileSync(file, { encoding: 'utf-8' }), mix);
   }
   static clean() {
-    global.vars = {};
-    global.fns = {};
-    global.styles = {};
-    return global;
+    globals.vars = {};
+    globals.fns = {};
+    globals.styles = {};
+    globals.map = null;
+    globals.suffix = '';
+    globals.root = '';
+    globals.file = '';
+    return globals;
   }
   static path(file) {
     if(file) {
-      global.file = file;
+      globals.file = file;
     }
-    return global.file;
+    return globals.file;
   }
 
   static addKeyword(kw) {
@@ -378,10 +429,14 @@ class More {
   }
   static map(data) {
     if(typeof data != 'undefined') {
-      global.map = data;
+      globals.map = data;
     }
-    return global.map;
+    return globals.map;
   }
 }
+
+More.INDEPENDENT = 0;
+More.INCLUDE = 1;
+More.COMPLEX = 2;
 
 export default More;

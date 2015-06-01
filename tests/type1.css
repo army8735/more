@@ -1,0 +1,6 @@
+@import "2.css";
+@import "3.less";
+$a:1;
+$d:1;
+body{margin:$a;padding:$b;font-size:$c;fn1();@extend .test1}
+.test2{background:#f00}
