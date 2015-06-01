@@ -59,4 +59,4 @@ events.on = on;
 events.off = off;
 events.emit = emit;
 
-exports.default=events;});
+exports["default"]=events;});

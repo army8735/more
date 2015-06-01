@@ -1,5 +1,5 @@
 import homunculus from 'homunculus';
-import images from 'images';
+import imageSize from 'image-size';
 import glob from 'glob';
 
 import fs from 'fs';
@@ -156,7 +156,7 @@ function width(node, varHash, globalVar, file) {
     }
   }
   s = path.resolve(file, s);
-  return images(s).width();
+  return imageSize(s).width;
 }
 
 function height(node, varHash, globalVar, file) {
@@ -180,7 +180,7 @@ function height(node, varHash, globalVar, file) {
     }
   }
   s = path.resolve(file, s);
-  return images(s).height();
+  return imageSize(s).height;
 }
 
 function eqstmt(node, varHash, globalVar) {

@@ -20,4 +20,4 @@ KEYS.forEach(function(ks, i) {
   });
 });
 
-exports.default=KEY_HASH;});
+exports["default"]=KEY_HASH;});

@@ -36,7 +36,6 @@ class More {
     this.index = 0;
     this.ignores = {};
     this.msg = null;
-    this.autoSplit = false;
     this.selectorStack = [];
     this.importStack = [];
     this.file = '';

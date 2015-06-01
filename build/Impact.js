@@ -1,4 +1,4 @@
-var KEY_HASH=function(){var _0=require('./abbreviationKey.js');return _0.hasOwnProperty("KEY_HASH")?_0.KEY_HASH:_0.hasOwnProperty("default")?_0.default:_0}();
+var KEY_HASH=function(){var _0=require('./abbreviationKey.js');return _0.hasOwnProperty("KEY_HASH")?_0.KEY_HASH:_0.hasOwnProperty("default")?_0["default"]:_0}();
 
 
   function Impact() {
@@ -172,4 +172,4 @@ function getKey(style) {
   return style.key.slice(style.prefixHack.length).toLowerCase();
 }
 
-exports.default=Impact;
+exports["default"]=Impact;

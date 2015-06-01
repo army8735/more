@@ -31,22 +31,21 @@
   },
   "dependencies": {
     "clean-css": "~3.2.8",
-    "homunculus": "~0.9.3",
-    "glob": "~5.0.5",
-    "images": "~2.1.5"
+    "homunculus": "~0.9.7",
+    "glob": "~5.0.10",
+    "image-size": "~0.3.5"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
     "coveralls": "^2.11.2",
     "expect.js": "^0.3.1",
-    "gulp": "^3.8.8",
+    "gulp": "^3.8.11",
     "gulp-clean": "^0.3.1",
-    "gulp-jsdc": "^0.2.4",
     "gulp-util": "^3.0.1",
     "mocha": "^2.2.4",
     "mocha-lcov-reporter": "^0.0.2",
     "through2": "^0.6.1",
-    "jsdc": "^0.5.12"
+    "jsdc": "^0.6.4"
   },
   "main": "./index",
   "engines": {

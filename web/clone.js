@@ -8,7 +8,7 @@ define(function(require, exports, module){function clone(obj) {
   return o;
 }
 
-exports.default=function(obj) {
+exports["default"]=function(obj) {
   if(typeof obj != 'object') {
     return obj;
   }

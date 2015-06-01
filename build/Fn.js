@@ -1,12 +1,12 @@
-var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0.default:_0}();
-var join=function(){var _1=require('./join');return _1.hasOwnProperty("join")?_1.join:_1.hasOwnProperty("default")?_1.default:_1}();
-var ignore=function(){var _2=require('./ignore');return _2.hasOwnProperty("ignore")?_2.ignore:_2.hasOwnProperty("default")?_2.default:_2}();
-var getVar=function(){var _3=require('./getVar');return _3.hasOwnProperty("getVar")?_3.getVar:_3.hasOwnProperty("default")?_3.default:_3}();
-var clone=function(){var _4=require('./clone');return _4.hasOwnProperty("clone")?_4.clone:_4.hasOwnProperty("default")?_4.default:_4}();
-var calculate=function(){var _5=require('./calculate');return _5.hasOwnProperty("calculate")?_5.calculate:_5.hasOwnProperty("default")?_5.default:_5}();
-var operate=function(){var _6=require('./operate');return _6.hasOwnProperty("operate")?_6.operate:_6.hasOwnProperty("default")?_6.default:_6}();
-var exprstmt=function(){var _7=require('./exprstmt');return _7.hasOwnProperty("exprstmt")?_7.exprstmt:_7.hasOwnProperty("default")?_7.default:_7}();
-var Tree=function(){var _8=require('./Tree');return _8.hasOwnProperty("Tree")?_8.Tree:_8.hasOwnProperty("default")?_8.default:_8}();
+var homunculus=function(){var _0=require('homunculus');return _0.hasOwnProperty("homunculus")?_0.homunculus:_0.hasOwnProperty("default")?_0["default"]:_0}();
+var join=function(){var _1=require('./join');return _1.hasOwnProperty("join")?_1.join:_1.hasOwnProperty("default")?_1["default"]:_1}();
+var ignore=function(){var _2=require('./ignore');return _2.hasOwnProperty("ignore")?_2.ignore:_2.hasOwnProperty("default")?_2["default"]:_2}();
+var getVar=function(){var _3=require('./getVar');return _3.hasOwnProperty("getVar")?_3.getVar:_3.hasOwnProperty("default")?_3["default"]:_3}();
+var clone=function(){var _4=require('./clone');return _4.hasOwnProperty("clone")?_4.clone:_4.hasOwnProperty("default")?_4["default"]:_4}();
+var calculate=function(){var _5=require('./calculate');return _5.hasOwnProperty("calculate")?_5.calculate:_5.hasOwnProperty("default")?_5["default"]:_5}();
+var operate=function(){var _6=require('./operate');return _6.hasOwnProperty("operate")?_6.operate:_6.hasOwnProperty("default")?_6["default"]:_6}();
+var exprstmt=function(){var _7=require('./exprstmt');return _7.hasOwnProperty("exprstmt")?_7.exprstmt:_7.hasOwnProperty("default")?_7["default"]:_7}();
+var Tree=function(){var _8=require('./Tree');return _8.hasOwnProperty("Tree")?_8.Tree:_8.hasOwnProperty("default")?_8["default"]:_8}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -99,4 +99,4 @@ var Node = homunculus.getClass('node', 'css');
   }
 
 
-exports.default=Fn;
+exports["default"]=Fn;

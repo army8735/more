@@ -1,8 +1,8 @@
-var sort=function(){var _0=require('./sort');return _0.hasOwnProperty("sort")?_0.sort:_0.hasOwnProperty("default")?_0.default:_0}();
-var CalArea=function(){var _1=require('./CalArea.js');return _1.hasOwnProperty("CalArea")?_1.CalArea:_1.hasOwnProperty("default")?_1.default:_1}();
-var Impact=function(){var _2=require('./Impact');return _2.hasOwnProperty("Impact")?_2.Impact:_2.hasOwnProperty("default")?_2.default:_2}();
+var sort=function(){var _0=require('./sort');return _0.hasOwnProperty("sort")?_0.sort:_0.hasOwnProperty("default")?_0["default"]:_0}();
+var CalArea=function(){var _1=require('./CalArea.js');return _1.hasOwnProperty("CalArea")?_1.CalArea:_1.hasOwnProperty("default")?_1["default"]:_1}();
+var Impact=function(){var _2=require('./Impact');return _2.hasOwnProperty("Impact")?_2.Impact:_2.hasOwnProperty("default")?_2["default"]:_2}();
 
-var homunculus=function(){var _3=require('homunculus');return _3.hasOwnProperty("homunculus")?_3.homunculus:_3.hasOwnProperty("default")?_3.default:_3}();
+var homunculus=function(){var _3=require('homunculus');return _3.hasOwnProperty("homunculus")?_3.homunculus:_3.hasOwnProperty("default")?_3["default"]:_3}();
 
 var Token = homunculus.getClass('token', 'css');
 var Node = homunculus.getClass('node', 'css');
@@ -253,4 +253,4 @@ var Node = homunculus.getClass('node', 'css');
   }
 
 
-exports.default=RegionCompress;
+exports["default"]=RegionCompress;
