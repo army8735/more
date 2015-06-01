@@ -31,7 +31,7 @@ npm install more-css
 * constructor(code:String = '') 传入需要预编译的code
 * parse(code:String = null, type:int = More.INDEPENDENT):String 预编译code，可以为空，否则会覆盖构造函数里传入的code；type为处理@import类型
 * parseFile(file:String, type:int = More.INDEPENDENT):String 转换css文件；type为处理@import类型
- * type详见[import高级用法](https://github.com/army8735/more/wiki/document#import高级用法)
+ * type详见[import高级用法](https://github.com/army8735/more/wiki/%E6%96%87%E6%A1%A3#import高级用法)
 * ast():Object 返回解析后的语法树
 * tokens():Array\<Object> 返回解析后的词法单元序列
 * imports():Array\<String> 返回解析后的@import文件列表
