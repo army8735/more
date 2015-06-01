@@ -41,13 +41,15 @@ var globals = {
     this.file = '';
   }
   More.prototype.parse = function(code, type) {
-    var self = this;
-    self.code = code || '';
+    if(type===void 0)type=More.INDEPENDENT;var self = this;
+    if(code){
+      self.code = code;
+    }
     self.preParse(type && type !== More.INDEPENDENT);
     if(self.msg) {
       return self.msg;
     }
-    if(type && type !== More.INDEPENDENT && self.imports().length) {
+    if(type !== More.INDEPENDENT && self.imports().length) {
       var list = [];
       var res = '';
       var data = {
@@ -135,11 +137,11 @@ var globals = {
   //COMPLEX为合并@import但每个文件还是隔离作用域
   //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
   More.prototype.parseFile = function(file, type) {
-    var self = this;
+    if(type===void 0)type=More.INDEPENDENT;var self = this;
     self.file = file;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
     self.code = code;
-    self.preParse(type && type !== More.INDEPENDENT);
+    self.preParse(type !== More.INDEPENDENT);
     if(self.msg) {
       return self.msg;
     }
@@ -328,11 +330,11 @@ var globals = {
     return this.file;
   }
 
-  More.parse=function(code) {
-    return (new More()).parse(code);
+  More.parse=function(code, type) {
+    return (new More()).parse(code, type);
   }
-  More.parseFile=function(file, combo) {
-    return (new More()).parseFile(file, combo);
+  More.parseFile=function(file, type) {
+    return (new More()).parseFile(file, type);
   }
   More.suffix=function(str) {
     if(str) {

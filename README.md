@@ -29,27 +29,29 @@ npm install more-css
 
 ### More
 * constructor(code:String = '') 传入需要预编译的code
-* parse(code:String = null):String 预编译code，可以为空，否则会覆盖构造函数里传入的code
-* parseFile(file:String, combo:Boolean = false):String 转换css文件，combo表明是否静态合并@import的文件
- * combo详见[parseFile高级用法](https://github.com/army8735/more/wiki/document#parsefile高级用法)
+* parse(code:String = null, type:int = More.INDEPENDENT):String 预编译code，可以为空，否则会覆盖构造函数里传入的code；type为处理@import类型
+* parseFile(file:String, type:int = More.INDEPENDENT):String 转换css文件；type为处理@import类型
+ * type详见[import高级用法](https://github.com/army8735/more/wiki/document#import高级用法)
 * ast():Object 返回解析后的语法树
 * tokens():Array\<Object> 返回解析后的词法单元序列
 * imports():Array\<String> 返回解析后的@import文件列表
 * vars(data:Object):Object 设置/读取变量哈希
 * styles(data:Object):Object 设置/读取样式哈希
 * fns(data:Object):Object 设置/读取方法哈希
+* path(file:String):String 设置/读取文件路径
 * config(str:String):void 预编译一段css并将其结果作为此more对象之后预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空设置
 
 ### 静态属性
-* parse(code:String = ''):String 快捷方式预编译，无需new步骤
-* parseFile(code:String = '', combo:Boolean = false):String 快捷方式预编译文件，无需new步骤
+* parse(code:String = null, type:int = More.INDEPENDENT):String 快捷方式预编译，无需new步骤
+* parseFile(file:String, type:int = More.INDEPENDENT):String 快捷方式预编译文件，无需new步骤
 * suffix(str:String):String 全局设置/读取文件后缀名，默认css
 * root(str:String):String 全局设置/读取相对本地文件的根路径
 * vars(data:Object):Object 全局设置/读取变量哈希
 * styles(data:Object):Object 全局设置/读取样式哈希
 * fns(data:Object):Object 全局设置/读取方法哈希
+* path(file:String):String 全局设置/读取文件路径
 * config(str:String):void 预编译一段css并将其结果作为之后全局预编译时的全局变量
 * configFile(file:String):void 同上，传入一个文件的路径
 * clean():void 清空全局设置
@@ -57,6 +59,9 @@ npm install more-css
 * compress(code:String, radical:Boolean = false):String 基于clean-css压缩css代码，radical表明是否使用激进安全算法
 * compress(code:String, options:Object = { processImport: false }, radical:Boolean = false):String 同上，增加options选项，传给clean-css
 * map(data:Object/Function):Object/Function 全局设置/读取映射表，用以将@import的文件名作匹配替换处理
+* INDEPENDENT:int = 0 类型，不处理import的文件，改写文件结尾为css
+* INCLUDE:int = 1 类型，处理import的文件，共享作用域，不改写文件结尾
+* COMPLEX:int = 2 类型，处理import的文件，隔离作用域，不改写文件结尾
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖

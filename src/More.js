@@ -40,14 +40,16 @@ class More {
     this.importStack = [];
     this.file = '';
   }
-  parse(code, type) {
+  parse(code, type = More.INDEPENDENT) {
     var self = this;
-    self.code = code || '';
+    if(code){
+      self.code = code;
+    }
     self.preParse(type && type !== More.INDEPENDENT);
     if(self.msg) {
       return self.msg;
     }
-    if(type && type !== More.INDEPENDENT && self.imports().length) {
+    if(type !== More.INDEPENDENT && self.imports().length) {
       var list = [];
       var res = '';
       var data = {
@@ -134,12 +136,12 @@ class More {
   //简易使用可忽略此参数，默认INDEPENDENT此时变量作用域不是页面，而是此文件本身
   //COMPLEX为合并@import但每个文件还是隔离作用域
   //按css规范（草案）及历史设计延续，变量作用域应该以页面为准，后出现拥有高优先级
-  parseFile(file, type) {
+  parseFile(file, type = More.INDEPENDENT) {
     var self = this;
     self.file = file;
     var code = fs.readFileSync(file, { encoding: 'utf-8' });
     self.code = code;
-    self.preParse(type && type !== More.INDEPENDENT);
+    self.preParse(type !== More.INDEPENDENT);
     if(self.msg) {
       return self.msg;
     }
@@ -328,11 +330,11 @@ class More {
     return this.file;
   }
 
-  static parse(code) {
-    return (new More()).parse(code);
+  static parse(code, type) {
+    return (new More()).parse(code, type);
   }
-  static parseFile(file, combo) {
-    return (new More()).parseFile(file, combo);
+  static parseFile(file, type) {
+    return (new More()).parseFile(file, type);
   }
   static suffix(str) {
     if(str) {
