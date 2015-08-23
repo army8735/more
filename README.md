@@ -1,25 +1,25 @@
 A css pre-compiler&radical-compressor
 ====
 
-相对于less，more的命名意思是比原本的css多做了一点点。
+Relative to the less, the more the name mean, like css more than a little bit.
 
 [![NPM version](https://badge.fury.io/js/more-css.png)](https://npmjs.org/package/more-css)
 [![Build Status](https://travis-ci.org/army8735/more.svg?branch=master)](https://travis-ci.org/army8735/more)
 [![Coverage Status](https://coveralls.io/repos/army8735/more/badge.png)](https://coveralls.io/r/army8735/more)
 [![Dependency Status](https://david-dm.org/army8735/more.png)](https://david-dm.org/army8735/more)
 
-more定位于普通产品简化开发位置，而非广义CSS下游框架重量级功能。more的设计严格遵循css标准规范并进行扩展。
+more – Positioning of the ordinary products simplify the development of location, rather than a broad definition of CSS downstream framework for heavyweight functions. more design strict adherence to css standards, norms and expansion.
 
-目前提供层级功能、子文件拆分（实际上就是原标准的@import语法）、层级变量、自动拆分字符串、深继承、函数混入、四则运算；还有css激进压缩器。
-对于没用到这些功能的css代码，more会智能识别不变更。more不会动普通的css代码。
+Currently provide the level of functionality, document splitting (actually it's the standard@import syntax), the levels of variables, automatically split strings, deep inheritance, a function of mixing, the rule of four; css radical compression.
+To not use these functions to the css code, The more the cognitive't change. more not normal css code.
 
-详细见：https://github.com/army8735/more/wiki/文档<br/>
+Details (Chinese): https://github.com/army8735/more/wiki/文档<br/>
 English：https://github.com/army8735/more/wiki/document
 
-build目录下为nodejs环境的module模块。
-web目录下为书写符合AMD/CMD规范的js文件。
+build directory for nodejs environment module module.
+web directory for writing compatible with AMD/CMD norms js document.
 
-more的核心理念是：原有的浏览器标准不修改，编译后的代码严格保持调试一致，行数不变更，文件对应关系不改变，满足GoToDefine的先决条件。
+the core concept: the original browser standards no changes, editing, translation, code, strictly to maintain tuning consistency, the numbers don't change, document the relationship don't change to meet GoToDefine prerequisite.
 
 ##INSTALL
 
@@ -28,46 +28,46 @@ npm install more-css
 ##API
 
 ### More
-* constructor(code:String = '') 传入需要预编译的code
-* parse(code:String = null, type:int = More.INDEPENDENT):String 预编译code，可以为空，否则会覆盖构造函数里传入的code；type为处理@import类型
-* parseFile(file:String, type:int = More.INDEPENDENT):String 转换css文件；type为处理@import类型
- * type详见[import高级用法](https://github.com/army8735/more/wiki/%E6%96%87%E6%A1%A3#import高级用法)
-* ast():Object 返回解析后的语法树
-* tokens():Array\<Object> 返回解析后的词法单元序列
-* imports():Array\<String> 返回解析后的@import文件列表
-* vars(data:Object):Object 设置/读取变量哈希
-* styles(data:Object):Object 设置/读取样式哈希
-* fns(data:Object):Object 设置/读取方法哈希
-* path(file:String):String 设置/读取文件路径
-* config(str:String):void 预编译一段css并将其结果作为此more对象之后预编译时的全局变量
-* configFile(file:String):void 同上，传入一个文件的路径
-* clean():void 清空设置
+* constructor(code:String = '') In need to pre-compile the code
+* parse(code:String = null, type:int = More.INDEPENDENT):String Pre-compiled code, it can be empty, otherwise it will cover the structure, function, where in the code; and type for address@import types
+* parseFile(file:String, type:int = More.INDEPENDENT):String Convert css files; type the address@import types
+ * type for details, see [import high use](https://github.com/army8735/more/wiki/%E6%96%87%E6%A1%A3#import高级用法)
+* ast():Object Return, the syntax tree.
+* tokens():Array\<Object> Return, the term module sequence.
+* imports():Array\<String> Return,@import Document List.
+* vars(data:Object):Object Set/read variables hash.
+* styles(data:Object):Object Set/read the style hash.
+* fns(data:Object):Object Set/read methods hash.
+* path(file:String):String Set/read the document path
+* config(str:String):void Pre-compiled paragraph of css and its results as more of the image after pre-compile time global variables
+* configFile(file:String):void Ibid., in a file path
+* clean():void Empty set
 
-### 静态属性
-* parse(code:String = null, type:int = More.INDEPENDENT):String 快捷方式预编译，无需new步骤
-* parseFile(file:String, type:int = More.INDEPENDENT):String 快捷方式预编译文件，无需new步骤
-* suffix(str:String):String 全局设置/读取文件后缀名，默认css
-* root(str:String):String 全局设置/读取相对本地文件的根路径
-* vars(data:Object):Object 全局设置/读取变量哈希
-* styles(data:Object):Object 全局设置/读取样式哈希
-* fns(data:Object):Object 全局设置/读取方法哈希
-* path(file:String):String 全局设置/读取文件路径
-* config(str:String):void 预编译一段css并将其结果作为之后全局预编译时的全局变量
-* configFile(file:String):void 同上，传入一个文件的路径
-* clean():void 清空全局设置
-* addKeyWord(kw:String/Array\<String>):void 添加未知的css属性关键字以支持分析
-* compress(code:String, radical:Boolean = false):String 基于clean-css压缩css代码，radical表明是否使用激进安全算法
-* compress(code:String, options:Object = { processImport: false }, radical:Boolean = false):String 同上，增加options选项，传给clean-css
-* map(data:Object/Function):Object/Function 全局设置/读取映射表，用以将@import的文件名作匹配替换处理
-* INDEPENDENT:int = 0 类型，不处理import的文件，改写文件结尾为css
-* INCLUDE:int = 1 类型，处理import的文件，共享作用域，不改写文件结尾
-* COMPLEX:int = 2 类型，处理import的文件，隔离作用域，不改写文件结尾
+### Static attributes
+* parse(code:String = null, type:int = More.INDEPENDENT):String Quick a way to pre-compile, without the need for new steps
+* parseFile(file:String, type:int = More.INDEPENDENT):String Quick a way of pre-editing and translation of documents, without the need for new steps
+* suffix(str:String):String The authority to set/read a document name list, the default css
+* root(str:String):String The authority to set/read the local document root path
+* vars(data:Object):Object Global set/read variables hash.
+* styles(data:Object):Object Global set/read pattern Hashi
+* fns(data:Object):Object Global set/read methods hash.
+* path(file:String):String The authority to set/read the document path
+* config(str:String):void Pre-compiled paragraph of css and its results, as after the overall compilation time of a global variable
+* configFile(file:String):void Ibid., in a file path
+* clean():void Clear the Board to set
+* addKeyWord(kw:String/Array\<String>):void Add unknown css attributes of key words to support analysis
+* compress(code:String, radical:Boolean = false):String Based on clean-css compress css code, radical indicates whether or not to use a radical of the security algorithm.
+* compress(code:String, options:Object = { processImport: false }, radical:Boolean = false):String Ibid., an increase of options Options to pass clean-css
+* map(data:Object/Function):Object/Function The authority to set/read the mapping table, use the@import of the name of the file as a matching replacement handle
+* INDEPENDENT:int = 0 Types, processing of import documents, rewrite the paper concludes with css
+* INCLUDE:int = 1 Types, processing of import documents, sharing role, don't rewrite document end
+* COMPLEX:int = 2 Types, processing of import documentation, segregation, don't rewrite document end
 
 ## Demo
-* demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
-* 依赖的语法解析器来自于`homunculus`：https://github.com/army8735/homunculus
-* 在线地址：http://army8735.me/more/demo/
-* 压缩率对比：http://goalsmashers.github.io/css-minification-benchmark/
+* demo Directory is a web-end real-time conversion example of this, local browsing needs `npm install`Installation-dependent
+* Dependency grammar parser. from the `homunculus`：https://github.com/army8735/homunculus
+* On-line address：http://army8735.me/more/demo/
+* Compression rate comparison：http://goalsmashers.github.io/css-minification-benchmark/
 
 # License
 [MIT License]
