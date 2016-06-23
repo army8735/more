@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "clean-css": "~3.2.8",
+    "clean-css": "~3.4.8",
     "homunculus": "~0.9.7",
     "glob": "~5.0.10",
     "image-size": "~0.3.5"
