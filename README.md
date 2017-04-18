@@ -21,11 +21,11 @@ web directory for writing compatible with AMD/CMD norms js document.
 
 the core concept: the original browser standards no changes, editing, translation, code, strictly to maintain tuning consistency, the numbers don't change, document the relationship don't change to meet GoToDefine prerequisite.
 
-##INSTALL
+## INSTALL
 
 npm install more-css
 
-##API
+## API
 
 ### More
 * constructor(code:String = '') In need to pre-compile the code
